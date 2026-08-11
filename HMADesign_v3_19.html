@@ -1525,10 +1525,15 @@ function calcWeighCard(trial, cardType){
     if(!agg||!agg.material)return;
     const blendPct=(parseFloat(trial.blendPct[slot])||0)/100;
     const stockpilePct=(stockpilePcts[slot]||0)/100;
-    // For weight calculations: use stockpile % for virgin materials, blend % for RAP
-    // (RAP's AC is physically bound to it, so batch the full RAP weight by blend %)
-    const usePercentage = agg.isRAP ? blendPct : stockpilePct;
-    const aggMass=aggTotalMass*usePercentage;
+    // Match Excel ROUND sequence: for RAP, compute agg-only first then derive full weight by ratio
+    let aggMass, rapBinder=0;
+    if(agg.isRAP){
+      const rapAggOnly=Math.round(aggTotalMass*stockpilePct*10)/10;
+      aggMass=rapAggOnly>0?Math.round(rapAggOnly*(blendPct/stockpilePct)*10)/10:0;
+      rapBinder=aggMass-rapAggOnly;
+    }else{
+      aggMass=aggTotalMass*stockpilePct;
+    }
     const grad=agg.gradation||{};
     const gradMod=agg.gradation_mod||{};
     // null = 100% passing (coarser than top size) — same convention as blend calc
