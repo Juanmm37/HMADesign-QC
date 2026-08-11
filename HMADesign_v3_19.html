@@ -1973,9 +1973,10 @@ function renderS3TrialBlendAnalysis(){
             {label:'Gsb',key:'Gsb',fmt:(v)=>v.toFixed(3)},
             {label:'Gsa',key:'Gsa',fmt:(v)=>v.toFixed(3)},
             {label:'Air Voids %',key:'Va',fmt:(v)=>v.toFixed(2)+'%'},
-            {label:'VMA %',key:'VMA',fmt:(v)=>v.toFixed(2)+'%'}
+            {label:'VMA %',key:'VMA',fmt:(v)=>v.toFixed(2)+'%'},
+            {label:'% Binder Replacement',key:'BR',fmt:(v)=>v.toFixed(1)+'%'}
           ].map(prop=>{
-            return`<tr style="background:${prop.key==='totalPct'?'#e8f0fe':'#fff'}">
+            return`<tr style="background:${prop.key==='totalPct'?'#e8f0fe':prop.key==='BR'?'#fff8e1':'#fff'}">
               <td style="padding:6px 8px;font-weight:600;color:#1f3864">${prop.label}</td>
               ${trialGrads.map((tg,bi)=>{
                 let val=null;
@@ -1989,8 +1990,11 @@ function renderS3TrialBlendAnalysis(){
                   const workflowTrial=ms.trials&&ms.trials[bi];val=(workflowTrial&&workflowTrial.vol&&workflowTrial.vol.Va!==undefined)?workflowTrial.vol.Va:null;
                 } else if(prop.key==='VMA'){
                   const workflowTrial=ms.trials&&ms.trials[bi];val=(workflowTrial&&workflowTrial.vol&&workflowTrial.vol.VMA!==undefined)?workflowTrial.vol.VMA:null;
+                } else if(prop.key==='BR'){
+                  val=calcBinderReplacement(ms.tbaTrials[bi].pcts,ms.tbaTrials[bi].Pb);
                 }
-                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:#1f3864">${val!==null?prop.fmt(val):'—'}</td>`;
+                const brWarning=(prop.key==='BR'&&val!==null&&val>15)?` <span style="color:#c0392b;font-size:9px" title="PG grade lowered 6°C both ends">⚠ PG −6°C</span>`:'';
+                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':'#1f3864'}">${val!==null?prop.fmt(val):'—'}${brWarning}</td>`;
               }).join('')}
             </tr>`;
           }).join('')}
