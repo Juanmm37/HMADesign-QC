@@ -1552,7 +1552,7 @@ function calcWeighCard(trial, cardType){
       if(f.ret==='pan'){f.cumMass=null;}
       else{cumSum+=f.mass;f.cumMass=cumSum;}
     });
-    rows.push({slot,agg,blendPct:blendPct*100,stockpilePct:stockpilePct*100,aggMass,fractions});
+    rows.push({slot,agg,blendPct:blendPct*100,stockpilePct:stockpilePct*100,aggMass,rapBinder,fractions});
   });
 
   // RAP summary for footer
