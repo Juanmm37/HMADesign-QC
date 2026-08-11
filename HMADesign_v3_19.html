@@ -1561,15 +1561,14 @@ function calcWeighCard(trial, cardType){
   rows.forEach(r=>{
     if(r.agg.isRAP){
       rapTotalMass+=r.aggMass;
-      const acPct=(r.agg.ACpct_adj!==null&&r.agg.ACpct_adj!==undefined)?r.agg.ACpct_adj:(r.agg.ACpct_m||0);
-      rapACWtSum+=r.aggMass*(acPct/100);
+      rapACWtSum+=r.rapBinder; // use rounded difference (matches Excel S41-S40)
     }
   });
-  // Extract RAP aggregate portion (physical RAP minus its bound AC)
   const rapAggMass=rapTotalMass-rapACWtSum;
   const virginAggMass=aggTotalMass-rapAggMass;
   const rapACcombined=rapTotalMass>0?rapACWtSum/rapTotalMass*100:null;
-  const virginBinderMass=binderMass-rapACWtSum;
+  // Match Excel: D44 = ROUND(D16*(Pb/(100-Pb)) - ΣrapBinder, 1)
+  const virginBinderMass=Math.round((aggTotalMass*Pb/(1-Pb)-rapACWtSum)*10)/10;
   // Ensure actualTotal matches totalBatch (accounting for rounding)
   const actualTotal=totalBatch;
 
