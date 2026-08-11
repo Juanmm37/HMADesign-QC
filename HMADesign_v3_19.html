@@ -1437,55 +1437,57 @@ function calcStockpilePercentages(trial) {
   const slots = ms.slots;
   const result = {};
 
-  // Find RAP slot if it exists
-  const rapSlot = SLOTS.find(s => {
-    const agg = getAgg(slots[s]);
-    return agg && agg.isRAP;
-  });
-
-  if (!rapSlot) {
-    // No RAP present - stockpile percentages = blend percentages
-    SLOTS.forEach(s => {
-      result[s] = parseFloat(trial.blendPct[s]) || 0;
-    });
-    return result;
-  }
-
-  // RAP is present - calculate AC distribution
-  const rapAgg = getAgg(slots[rapSlot]);
-  const rapBlendPct = parseFloat(trial.blendPct[rapSlot]) || 0;
-  const rapACpct = (rapAgg.ACpct_adj !== null && rapAgg.ACpct_adj !== undefined)
-    ? rapAgg.ACpct_adj
-    : (rapAgg.ACpct_m || 0);
-
-  // Amount of AC bound in RAP (as a percentage of total mix)
-  const rapACtoDistribute = (rapBlendPct * rapACpct) / 100;
-
-  // Sum of virgin material percentages
+  // Sum AC contributions from all RAP slots, and total virgin blend %
+  let totalRapACtoDistribute = 0;
   let virginTotal = 0;
+
   SLOTS.forEach(s => {
     const agg = getAgg(slots[s]);
-    if (agg && !agg.isRAP) {
-      virginTotal += (parseFloat(trial.blendPct[s]) || 0);
+    if (!agg) return;
+    const blendPct = parseFloat(trial.blendPct[s]) || 0;
+    if (agg.isRAP) {
+      const acPct = (agg.ACpct_adj !== null && agg.ACpct_adj !== undefined) ? agg.ACpct_adj : (agg.ACpct_m || 0);
+      totalRapACtoDistribute += blendPct * acPct / 100;
+    } else {
+      virginTotal += blendPct;
     }
   });
 
-  // Calculate stockpile percentages for each material
   SLOTS.forEach(s => {
     const agg = getAgg(slots[s]);
+    if (!agg) { result[s] = 0; return; }
     const blendPct = parseFloat(trial.blendPct[s]) || 0;
-
-    if (agg && agg.isRAP) {
-      // RAP stockpile = RAP blend - AC bound in RAP
-      result[s] = blendPct - rapACtoDistribute;
+    if (agg.isRAP) {
+      // RAP stockpile% = blend% × (1 - own AC%/100)  [matches Excel: ROUND(blend*(1-AC/100),5)]
+      const acPct = (agg.ACpct_adj !== null && agg.ACpct_adj !== undefined) ? agg.ACpct_adj : (agg.ACpct_m || 0);
+      result[s] = blendPct * (1 - acPct / 100);
     } else {
-      // Virgin material gets proportional share of RAP AC
+      // Virgin material gets proportional share of ALL RAP AC (proportional to its blend %)
       const virginShare = virginTotal > 0 ? blendPct / virginTotal : 0;
-      result[s] = blendPct + (rapACtoDistribute * virginShare);
+      result[s] = blendPct + totalRapACtoDistribute * virginShare;
     }
   });
 
   return result;
+}
+
+function calcBinderReplacement(blendPct, Pb) {
+  if (!Pb) return null;
+  const slots = ms.slots;
+  let totalRapBlendPct = 0;
+  let weightedSumRapAC = 0;
+  SLOTS.forEach(s => {
+    const agg = getAgg(slots[s]);
+    if (!agg || !agg.isRAP) return;
+    const bp = parseFloat(blendPct[s]) || 0;
+    if (!bp) return;
+    const acPct = (agg.ACpct_adj !== null && agg.ACpct_adj !== undefined) ? agg.ACpct_adj : (agg.ACpct_m || 0);
+    weightedSumRapAC += acPct * bp;
+    totalRapBlendPct += bp;
+  });
+  if (!totalRapBlendPct) return null;
+  const weightedAvgRapAC = Math.round(weightedSumRapAC / totalRapBlendPct * 10) / 10;
+  return Math.round(weightedAvgRapAC * totalRapBlendPct / Pb * 10) / 10;
 }
 
 // ── WEIGH CARD: by sieve fraction ──
