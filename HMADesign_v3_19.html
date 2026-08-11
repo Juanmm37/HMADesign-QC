@@ -1676,6 +1676,12 @@ function renderWeighCard(trial, cardType, forPrint=false){
         <td style="${tdKey}">${fmtG(actualTotal)}</td>
         <td style="${tdGrams}">grams</td>
       </tr>
+      ${(()=>{const br=hasRAP?calcBinderReplacement(trial.blendPct,trial.Pb):null;return br!==null?`<tr style="background:${br>15?'#fff0f0':'#f5f8ff'}">
+        <td style="${tdLblB};color:${br>15?'#c0392b':'inherit'}">% Binder Replacement</td>
+        <td style="${tdKey};color:${br>15?'#c0392b':'inherit'};border-color:${br>15?'#c0392b':'#c0392b'}">${br.toFixed(1)}%</td>
+        <td style="${tdGrams};border-right:2px solid #1f3864">${br>15?'⚠':''}</td>
+        <td colspan="3" style="padding:6px 12px;font-size:10px;color:${br>15?'#c0392b':'#555'}">${br>15?'PG grade must be lowered 6°C both ends (RAP replacement exceeds 15%)':''}</td>
+      </tr>`:'';})()}
     </tbody>
   </table>`;
 
