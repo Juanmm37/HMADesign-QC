@@ -2682,6 +2682,11 @@ function printTrial(trialIdx){
     ${vals.map((v,i)=>`<td style="text-align:right;font-size:10px;font-weight:600;padding:3px 4px;border-right:1px solid #cce;${i===vals.length-3?'color:#1f3864;font-weight:800;':''}">${v}</td>`).join('')}
   </tr>`).join('');
 
+  const brValue=calcBinderReplacement(trial.blendPct,trial.Pb);
+  const brHtml=brValue!==null?`<div style="margin-top:4px;font-size:10px">
+    % Binder Replacement: <strong style="color:${brValue>15?'#c0392b':'#1a6b1a'}">${brValue.toFixed(1)}%</strong>${brValue>15?' <span style="color:#c0392b;font-weight:700">⚠ PG grade lowered 6°C both ends</span>':''}
+  </div>`:'';
+
   const page1=`
   <div style="page-break-after:always">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864">
@@ -2697,6 +2702,7 @@ function printTrial(trialIdx){
           Within 100mm Surface: ${info.surface||'—'} &nbsp;|&nbsp;
           Pb Initial: <strong>${Number(trial.Pb).toFixed(1)}%</strong>
         </div>
+        ${brHtml}
       </div>
     </div>
     <div style="margin-bottom:8px">
