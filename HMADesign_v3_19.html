@@ -1570,15 +1570,21 @@ function calcWeighCard(trial, cardType){
   // RAP summary for footer
   // Note: rapTotalMass is now the RAP PHYSICAL weight (aggregate + bound AC) for weight card batching
   let rapTotalMass=0,rapACWtSum=0;
+  // For combined RAP AC%: use blend-weighted average (matches Excel M36 formula)
+  let rapBlendTotal=0,rapACBlendSum=0;
   rows.forEach(r=>{
     if(r.agg.isRAP){
       rapTotalMass+=r.aggMass;
       rapACWtSum+=r.rapBinder; // use rounded difference (matches Excel S41-S40)
+      const acPct=(r.agg.ACpct_adj!==null&&r.agg.ACpct_adj!==undefined)?r.agg.ACpct_adj:(r.agg.ACpct_m||0);
+      rapACBlendSum+=acPct*r.blendPct;
+      rapBlendTotal+=r.blendPct;
     }
   });
   const rapAggMass=rapTotalMass-rapACWtSum;
   const virginAggMass=aggTotalMass-rapAggMass;
-  const rapACcombined=rapTotalMass>0?rapACWtSum/rapTotalMass*100:null;
+  // Match Excel M36: ROUND(Σ(AC%×blend%) / Σblend%, 1)
+  const rapACcombined=rapBlendTotal>0?Math.round(rapACBlendSum/rapBlendTotal*10)/10:null;
   // Match Excel: D44 = ROUND(D16*(Pb/(100-Pb)) - ΣrapBinder, 1)
   const virginBinderMass=Math.round((aggTotalMass*Pb/(1-Pb)-rapACWtSum)*10)/10;
   // Ensure actualTotal matches totalBatch (accounting for rounding)
