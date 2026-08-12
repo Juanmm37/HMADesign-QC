@@ -2328,8 +2328,14 @@ function renderS3(){
     </tr>`;
   }).join('');
 
-  // Properties rows (Gsb, Gsa, WA)
+  // Combined RAP AC% for % AC row
+  const _getAC=s=>{const a=getAgg(ms.slots[s]);if(!a||!a.isRAP)return null;return(a.ACpct_adj!=null)?a.ACpct_adj:(a.ACpct_m!=null?a.ACpct_m:null);};
+  let _rapBT=0,_rapAS=0;aggs.forEach(s=>{const ac=_getAC(s);if(ac===null)return;const bp=parseFloat(trial.blendPct[s])||0;if(!bp)return;_rapAS+=ac*bp;_rapBT+=bp;});
+  const _rapACcomb4=_rapBT>0?Math.round(_rapAS/_rapBT*10)/10:null;
+
+  // Properties rows (% AC, Gsb, Gsa, WA)
   const propRowDefs=[
+    ...(_rapACcomb4!==null?[{lbl:'% AC',id:'',aggVals:aggs.map(s=>{const ac=_getAC(s);return ac!=null?Number(ac).toFixed(1):'—';}),blend:Number(_rapACcomb4).toFixed(1)}]:[]),
     {lbl:'Gsb',      id:'s3-blend-gsb-tbl', aggVals:aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsb'))),    blend:fN(blendGsb)},
     {lbl:'Gsa',      id:'s3-blend-gsa-tbl', aggVals:aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsa'))),    blend:fN(blendGsa)},
     {lbl:'Water Abs.',id:'s3-blend-wa-tbl', aggVals:aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'WA'),2)),   blend:fN(blendWA,2)},
@@ -2337,7 +2343,7 @@ function renderS3(){
   const propRows=propRowDefs.map(({lbl,id,aggVals,blend})=>`<tr style="background:#f0f5ff">
     <td colspan="2" style="font-size:11px;font-weight:700;color:#1f3864;padding:3px 6px">${lbl}</td>
     ${aggVals.map(v=>`<td style="text-align:right;font-size:11px;font-weight:600;padding:3px 4px">${v}</td>`).join('')}
-    <td id="${id}" style="text-align:right;font-size:11px;font-weight:800;color:#1f3864;padding:3px 4px">${blend}</td>
+    <td ${id?`id="${id}"`:''}style="text-align:right;font-size:11px;font-weight:800;color:#1f3864;padding:3px 4px">${blend}</td>
     <td colspan="2"></td>
   </tr>`).join('');
 
