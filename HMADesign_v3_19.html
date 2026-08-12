@@ -3894,8 +3894,8 @@ function renderAnalytics(){
     <text x="${xOf(s)}" y="${H-8}" font-size="9" fill="#555" text-anchor="middle" transform="rotate(-45,${xOf(s)},${H-8})">${SL[s]||s}</text>`).join('');
 
   const hasTarget=Object.keys(targetGrad).length>0;
-  const targetSvg=hasTarget?line(targetGrad,'#f0b429','6,3',2.5)+dots(targetGrad,'#f0b429',3.5):'';
-  const trialSvgs=trialGrads.map((t,i)=>line(t.blendGrad,CHART_COLORS[i%CHART_COLORS.length],'',2)+dots(t.blendGrad,CHART_COLORS[i%CHART_COLORS.length],3.5)).join('');
+  const targetSvg=hasTarget?line(targetGrad,'#f0b429','6,3',1.5):'';
+  const trialSvgs=trialGrads.map((t,i)=>line(t.blendGrad,CHART_COLORS[i%CHART_COLORS.length],'',1.5)).join('');
 
   const svg=`<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:inherit">
     <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff"/>
