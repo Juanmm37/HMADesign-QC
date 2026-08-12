@@ -4276,6 +4276,7 @@ function printSelected(){
   const rapLabel=info.hasRAP==='Yes'?' RAP':'';
   const{totalPct,blendGsb,blendGsa,blendWA,blendGrad}=calcBlendProps(selTrial);
 
+  const _brSel=calcBinderReplacement(selTrial.blendPct,selTrial.Pb);
   const hdr=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864">
     <img src="${LOGO_SRC}" alt="Capital Paving" style="height:46px">
     <div>
@@ -4283,6 +4284,7 @@ function printSelected(){
       <div style="font-size:10px;color:#666;margin-top:2px">
         Mix Design No. <strong>${info.mixNo||'—'}</strong> | ${mt}${rapLabel} | PGAC: <strong>${info.pgac||'—'}</strong> | Traffic: <strong>${info.traffic||'—'}</strong> | Spec: ${info.spec||'—'} | Pb: <strong>${selTrial.Pb.toFixed(1)}%</strong>
       </div>
+      ${_brSel!==null?`<div style="margin-top:4px;font-size:10px">% Binder Replacement: <strong style="color:${_brSel>15?'#c0392b':'#1a6b1a'}">${_brSel.toFixed(1)}%</strong></div>`:''}
     </div>
   </div>`;
 
