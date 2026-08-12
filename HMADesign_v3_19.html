@@ -2561,8 +2561,7 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     bandSvg=bandSieves.map(s=>{const x=xOf(s);return`<rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][1])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/><rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][0])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/>`;}).join('');
   }
 
-  // Blend curve ONLY — red line with circles, like the PDF
-  const blendPts=chartSieves.map(s=>{
+    const blendPts=chartSieves.map(s=>{
     const v=blendGrad[s];
     return(v!==null&&v!==undefined&&xOf(s)!==null)?`${xOf(s)},${yOf(v)}`:null;
   }).filter(Boolean);
@@ -2570,14 +2569,7 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   let blendSvg='';
   if(blendPts.length>1){
     const path=blendPts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ');
-    blendSvg=`<path d="${path}" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-    // Dots
-    chartSieves.forEach(s=>{
-      const v=blendGrad[s];
-      if(v!==null&&v!==undefined&&xOf(s)!==null){
-        blendSvg+=`<circle cx="${xOf(s)}" cy="${yOf(v)}" r="4" fill="#c0392b" stroke="white" stroke-width="1.5"/>`;
-      }
-    });
+    blendSvg=`<path d="${path}" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   }
 
   // Chart title
