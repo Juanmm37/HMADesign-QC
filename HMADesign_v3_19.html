@@ -4382,7 +4382,15 @@ function printSelected(){
     if(band&&bv!=null){if(bv>=band[0]&&bv<=band[1]){bc='#1a6b1a';bb='background:#c6efce33';}else{bc='#9c0006';bb='background:#ffc7ce55';}}
     return`<tr style="${ri%2?'background:#fafbfc':''}"><td style="font-size:10px;color:#333;padding:3px 6px;font-weight:600;border-right:1px solid #dde">${SL[sv]}</td><td style="font-size:9px;color:#888;text-align:center;padding:3px 3px;border-right:1px solid #dde">${US[sv]||'—'}</td>${avs}<td style="text-align:right;font-weight:800;font-size:11px;color:${bc};${bb};padding:3px 6px;border-right:1px solid #cce">${bv!=null?Number(bv).toFixed(1):'—'}</td><td style="text-align:center;font-size:10px;color:#777;padding:3px 4px;border-right:1px solid #dde">${band?Number(band[0]).toFixed(1):''}</td><td style="text-align:center;font-size:10px;color:#777;padding:3px 4px">${band?Number(band[1]).toFixed(1):''}</td></tr>`;
   }).join('');
-  const prRows=[['Gsb',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsb'))),fN(blendGsb)],['Gsa',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsa'))),fN(blendGsa)],['Water Abs.',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'WA'),2)),fN(blendWA,2)]].map(([l,...vs])=>`<tr style="background:#e8f0fe"><td colspan="2" style="font-size:10px;font-weight:700;color:#1f3864;padding:3px 6px;border-right:1px solid #cce">${l}</td>${vs.map((v,i)=>`<td style="text-align:right;font-size:10px;font-weight:${i===vs.length-3?'800':'600'};padding:3px 4px;border-right:1px solid #cce">${v}</td>`).join('')}<td colspan="2"></td></tr>`).join('');
+  const _getACsp=s=>{const a=getAgg(ms.slots[s]);if(!a||!a.isRAP)return null;return(a.ACpct_adj!=null)?a.ACpct_adj:(a.ACpct_m!=null?a.ACpct_m:null);};
+  let _rBTsp=0,_rASsp=0;aggs.forEach(s=>{const ac=_getACsp(s);if(ac===null)return;const bp=parseFloat(selTrial.blendPct[s])||0;if(!bp)return;_rASsp+=ac*bp;_rBTsp+=bp;});
+  const _rapACcombSP=_rBTsp>0?Math.round(_rASsp/_rBTsp*10)/10:null;
+  const prRows=[
+    ...(_rapACcombSP!==null?[['% AC',...aggs.map(s=>{const ac=_getACsp(s);return ac!=null?Number(ac).toFixed(1):'—';}),Number(_rapACcombSP).toFixed(1)]]:[]),
+    ['Gsb',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsb'))),fN(blendGsb)],
+    ['Gsa',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsa'))),fN(blendGsa)],
+    ['Water Abs.',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'WA'),2)),fN(blendWA,2)],
+  ].map(([l,...vs])=>`<tr style="background:#e8f0fe"><td colspan="2" style="font-size:10px;font-weight:700;color:#1f3864;padding:3px 6px;border-right:1px solid #cce">${l}</td>${vs.map((v,i)=>`<td style="text-align:right;font-size:10px;font-weight:${i===vs.length-3?'800':'600'};padding:3px 4px;border-right:1px solid #cce">${v}</td>`).join('')}<td colspan="2"></td></tr>`).join('');
 
   const page2=`<div style="page-break-after:always">
     ${hdr}
