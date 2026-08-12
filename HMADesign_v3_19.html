@@ -1610,14 +1610,14 @@ function renderWeighCard(trial, cardType, forPrint=false){
   const info=ms.info,mt=info.mixType||'';
   const rapLabel=info.hasRAP==='Yes'?' RAP':'';
 
-  // Column headers: slot name + material
+  // Column headers: slot name + material — equal width via colgroup
   const colHeaders=rows.map(r=>`
-    <th style="min-width:60px;padding:4px 5px;border-right:1px solid rgba(255,255,255,0.2)">
+    <th style="padding:4px 5px;border-right:1px solid rgba(255,255,255,0.2)">
       <div style="font-weight:800;font-size:11px">${r.slot}</div>
       <div style="font-weight:400;font-size:9px;opacity:0.85;white-space:normal;line-height:1.2">${r.agg.material}</div>
     </th>`).join('');
 
-  const sourceRow=rows.map(r=>`<td style="font-size:9px;color:#555;text-align:center;padding:2px 4px;border-right:1px solid #eee;background:#f5f8ff">${r.agg.supplier}</td>`).join('');
+  const sourceRow=rows.map(r=>`<td style="font-size:9px;color:#555;text-align:center;padding:2px 4px;border-right:1px solid #eee;background:#f5f8ff">${(ms.slots[r.slot]&&ms.slots[r.slot].source)||r.agg.supplier||''}</td>`).join('');
   const blendRow=rows.map(r=>`<td style="font-weight:700;font-size:11px">${Number(r.blendPct).toFixed(1)}%</td>`).join('');
   const stockpileRow=rows.map(r=>`<td style="font-weight:700;font-size:11px;color:#1f3864;background:#e8f0fe">${Number(r.stockpilePct).toFixed(1)}%</td>`).join('');
 
