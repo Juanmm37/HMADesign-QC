@@ -2073,8 +2073,7 @@ function renderTBAChart(trialGrads, bands, info){
     const pts=SIEVES.map(s=>{const v=target.values[s];return(v!==null&&v!==undefined)?`${xOf(s)},${yOf(parseFloat(v))}`:null;}).filter(Boolean);
     if(pts.length<2)return'';
     const targetColor='#ff6b35';
-    return`<path d="${pts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ')}" fill="none" stroke="${targetColor}" stroke-width="2.5" stroke-dasharray="5,3" stroke-linejoin="round" stroke-linecap="round"/>
-      ${pts.map(p=>{const[x,y]=p.split(',');return`<circle cx="${x}" cy="${y}" r="3.5" fill="${targetColor}" stroke="white" stroke-width="1.5"/>`;}).join('')}`;
+    return`<path d="${pts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ')}" fill="none" stroke="${targetColor}" stroke-width="1.5" stroke-dasharray="5,3" stroke-linejoin="round" stroke-linecap="round"/>`;
   }).join('');
 
   const yGrid=[0,20,40,60,80,100].map(v=>`
