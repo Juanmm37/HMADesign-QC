@@ -2064,8 +2064,7 @@ function renderTBAChart(trialGrads, bands, info){
     const pts=SIEVES.map(s=>{const v=tg.grad[s];return(v!==null&&v!==undefined)?`${xOf(s)},${yOf(v)}`:null;}).filter(Boolean);
     if(pts.length<2)return'';
     const color=CHART_COLORS[idx%CHART_COLORS.length];
-    return`<path d="${pts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ')}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-      ${pts.map(p=>{const[x,y]=p.split(',');return`<circle cx="${x}" cy="${y}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"/>`;}).join('')}`;
+    return`<path d="${pts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   }).join('');
 
   // Lines for targets
