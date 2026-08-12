@@ -2053,12 +2053,9 @@ function renderTBAChart(trialGrads, bands, info){
   // Spec band
   let bandSvg='';
   const bandSieves=SIEVES.filter(s=>bands[s]);
-  if(bandSieves.length>1){
-    const tl=bandSieves.map((s,i)=>`${i===0?'M':'L'}${xOf(s)},${yOf(bands[s][1])}`).join(' ');
-    const bl=bandSieves.map((s,i)=>`${i===0?'M':'L'}${xOf(s)},${yOf(bands[s][0])}`).join(' ');
-    bandSvg=`<path d="${tl}" fill="none" stroke="#1f3864" stroke-width="1" stroke-dasharray="5,3" opacity="0.6"/>
-      <path d="${bl}" fill="none" stroke="#1f3864" stroke-width="1" stroke-dasharray="5,3" opacity="0.6"/>
-      <polygon points="${bandSieves.map(s=>`${xOf(s)},${yOf(bands[s][1])}`).join(' ')} ${[...bandSieves].reverse().map(s=>`${xOf(s)},${yOf(bands[s][0])}`).join(' ')}" fill="rgba(31,56,100,0.08)"/>`;
+  if(bandSieves.length){
+    const h=4;
+    bandSvg=bandSieves.map(s=>{const x=xOf(s);return`<rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][1])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/><rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][0])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/>`;}).join('');
   }
 
 
