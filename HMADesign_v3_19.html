@@ -2692,7 +2692,11 @@ function printTrial(trialIdx){
     </tr>`;
   }).join('');
 
+  const _getACp=s=>{const a=getAgg(ms.slots[s]);if(!a||!a.isRAP)return null;return(a.ACpct_adj!=null)?a.ACpct_adj:(a.ACpct_m!=null?a.ACpct_m:null);};
+  let _rpBT=0,_rpAS=0;aggs.forEach(s=>{const ac=_getACp(s);if(ac===null)return;const bp=parseFloat(trial.blendPct[s])||0;if(!bp)return;_rpAS+=ac*bp;_rpBT+=bp;});
+  const _rapACcombP=_rpBT>0?Math.round(_rpAS/_rpBT*10)/10:null;
   const propRows=[
+    ...(_rapACcombP!==null?[['% AC',...aggs.map(s=>{const ac=_getACp(s);return ac!=null?Number(ac).toFixed(1):'—';}),Number(_rapACcombP).toFixed(1),'','']]:[]),
     ['Gsb',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsb'))),fN(blendGsb),'',''],
     ['Gsa',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsa'))),fN(blendGsa),'',''],
     ['Water Abs.',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'WA'),2)),fN(blendWA,2),'',''],
