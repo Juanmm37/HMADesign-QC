@@ -1381,17 +1381,19 @@ function calcBlendProps(trial){
     total += parseFloat(trial.blendPct[s])||0;
   });
 
-  // Weighted densities — only count aggregates with valid (non-null, non-zero) values
+  // Weighted densities using stockpile percentages (matches Excel row 18 / M37 formula)
+  // Stockpile% accounts for bound AC in RAP; virgin gets proportional bump
+  const stockpilePcts = calcStockpilePercentages(trial);
   aggs.forEach(s=>{
-    const p = parseFloat(trial.blendPct[s])||0;
+    const p = (stockpilePcts[s]||0)/100;
     if(!p) return;
     const a = getAgg(slots[s]);
     const gsbRaw = (a.Gsb_mod!==null&&a.Gsb_mod!==undefined) ? a.Gsb_mod : a.Gsb_m;
     const gsaRaw = (a.Gsa_mod!==null&&a.Gsa_mod!==undefined) ? a.Gsa_mod : a.Gsa_m;
     const waRaw  = (a.WA_mod!==null&&a.WA_mod!==undefined)   ? a.WA_mod  : a.WA_m;
-    if(gsbRaw!==null&&gsbRaw!==undefined&&gsbRaw>0){wGsb+=(p/100)*gsbRaw;pGsb+=p/100;}
-    if(gsaRaw!==null&&gsaRaw!==undefined&&gsaRaw>0){wGsa+=(p/100)*gsaRaw;pGsa+=p/100;}
-    if(waRaw!==null&&waRaw!==undefined){wWA+=(p/100)*waRaw;pWA+=p/100;}
+    if(gsbRaw!==null&&gsbRaw!==undefined&&gsbRaw>0){wGsb+=p*gsbRaw;pGsb+=p;}
+    if(gsaRaw!==null&&gsaRaw!==undefined&&gsaRaw>0){wGsa+=p*gsaRaw;pGsa+=p;}
+    if(waRaw!==null&&waRaw!==undefined){wWA+=p*waRaw;pWA+=p;}
   });
   // Normalize by sum of percentages with valid data (skips null-density aggregates)
   const nGsb = pGsb>0 ? wGsb/pGsb : null;
