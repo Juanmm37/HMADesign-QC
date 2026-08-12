@@ -2559,14 +2559,9 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   // Spec band
   const bandSieves=chartSieves.filter(s=>bands[s]&&xOf(s)!==null);
   let bandSvg='';
-  if(bandSieves.length>1){
-    const topPts=bandSieves.map(s=>`${xOf(s)},${yOf(bands[s][1])}`).join(' ');
-    const botPts=[...bandSieves].reverse().map(s=>`${xOf(s)},${yOf(bands[s][0])}`).join(' ');
-    const tl=bandSieves.map((s,i)=>`${i===0?'M':'L'}${xOf(s)},${yOf(bands[s][1])}`).join(' ');
-    const bl=bandSieves.map((s,i)=>`${i===0?'M':'L'}${xOf(s)},${yOf(bands[s][0])}`).join(' ');
-    bandSvg=`<polygon points="${topPts} ${botPts}" fill="rgba(31,56,100,0.06)"/>
-      <path d="${tl}" fill="none" stroke="#1f3864" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>
-      <path d="${bl}" fill="none" stroke="#1f3864" stroke-width="1.2" stroke-dasharray="5,4" opacity="0.6"/>`;
+  if(bandSieves.length){
+    const h=4;
+    bandSvg=bandSieves.map(s=>{const x=xOf(s);return`<rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][1])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/><rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][0])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/>`;}).join('');
   }
 
   // Blend curve ONLY — red line with circles, like the PDF
