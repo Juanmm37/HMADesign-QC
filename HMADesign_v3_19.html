@@ -2582,11 +2582,10 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   const legX=PL+cW-legW-10, legY=PT+cH-legH-10;
   const legendSvg=`
     <rect x="${legX-6}" y="${legY-6}" width="${legW+12}" height="${legH+10}" fill="rgba(255,255,255,0.92)" stroke="#ccc" stroke-width="1" rx="4"/>
-    <line x1="${legX}" y1="${legY+8}" x2="${legX+20}" y2="${legY+8}" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="5,3"/>
-    <circle cx="${legX+10}" cy="${legY+8}" r="3.5" fill="#c0392b" stroke="white" stroke-width="1.5"/>
+    <line x1="${legX}" y1="${legY+8}" x2="${legX+20}" y2="${legY+8}" stroke="#c0392b" stroke-width="1.5"/>
     <text x="${legX+26}" y="${legY+13}" font-size="10" fill="#333" font-family="'Segoe UI',sans-serif">Trial ${trial.id} Blend</text>
-    <rect x="${legX}" y="${legY+26}" width="20" height="10" fill="rgba(31,56,100,0.1)" stroke="#1f3864" stroke-width="1" stroke-dasharray="3,2" rx="1"/>
-    <text x="${legX+26}" y="${legY+35}" font-size="10" fill="#333" font-family="'Segoe UI',sans-serif">Spec Band</text>`;
+    <rect x="${legX}" y="${legY+26}" width="8" height="8" fill="#1f3864" opacity="0.85"/>
+    <text x="${legX+26}" y="${legY+35}" font-size="10" fill="#333" font-family="'Segoe UI',sans-serif">Spec Limit</text>`;
 
   return`<div style="margin-bottom:${forPrint?0:12}px">
     <svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:'Segoe UI',sans-serif;${forPrint?'':'max-width:'+W+'px'}">
