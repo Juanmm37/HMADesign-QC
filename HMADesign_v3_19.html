@@ -1993,8 +1993,7 @@ function renderS3TrialBlendAnalysis(){
                 } else if(prop.key==='BR'){
                   val=calcBinderReplacement(ms.tbaTrials[bi].pcts,ms.tbaTrials[bi].Pb);
                 }
-                const brWarning=(prop.key==='BR'&&val!==null&&val>15)?` <span style="color:#c0392b;font-size:9px" title="PG grade lowered 6°C both ends">⚠ PG −6°C</span>`:'';
-                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':'#1f3864'}">${val!==null?prop.fmt(val):'—'}${brWarning}</td>`;
+                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':'#1f3864'}">${val!==null?prop.fmt(val):'—'}</td>`;
               }).join('')}
             </tr>`;
           }).join('')}
