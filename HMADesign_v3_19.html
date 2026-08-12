@@ -208,7 +208,17 @@ let _showCardsIdx=null; // persists across renders
 let targetGrad={},targetName='Target';
 const CHART_COLORS=['#1f3864','#e65100','#1a7a1a','#6b1a9a','#b36000','#0277bd','#880e4f'];
 
-function saveDB(){localStorage.setItem('capmix_v4',JSON.stringify(db));}
+function saveDB(){
+  localStorage.setItem('capmix_v4',JSON.stringify(db));
+  try{localStorage.setItem('capmix_session',JSON.stringify({ms,view}));}catch(e){}
+}
+// Restore active session on page load (survives code-change refreshes)
+(function(){
+  try{
+    const s=localStorage.getItem('capmix_session');
+    if(s){const p=JSON.parse(s);if(p&&p.ms&&(p.ms.step>1||p.view==='newmix')){ms=p.ms;if(p.view&&p.view!=='dashboard')view=p.view;}}
+  }catch(e){}
+})();
 
 // ── Tab-navigation helpers ──
 // Tab → move to next input in same TSR column (same specimen, next measurement row).
