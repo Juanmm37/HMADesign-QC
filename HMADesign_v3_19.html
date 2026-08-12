@@ -2683,7 +2683,7 @@ function printTrial(trialIdx){
 
   const brValue=calcBinderReplacement(trial.blendPct,trial.Pb);
   const brHtml=brValue!==null?`<div style="margin-top:4px;font-size:10px">
-    % Binder Replacement: <strong style="color:${brValue>15?'#c0392b':'#1a6b1a'}">${brValue.toFixed(1)}%</strong>${brValue>15?' <span style="color:#c0392b;font-weight:700">⚠ PG grade lowered 6°C both ends</span>':''}
+    % Binder Replacement: <strong style="color:${brValue>15?'#c0392b':'#1a6b1a'}">${brValue.toFixed(1)}%</strong>
   </div>`:'';
 
   const page1=`
