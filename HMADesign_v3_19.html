@@ -1526,7 +1526,8 @@ function calcWeighCard(trial, cardType){
   }
 
   const Pb=trial.Pb/100;
-  const aggTotalMass = totalBatch*(1-Pb);
+  // Truncate to 1 decimal place — matches Excel's hardcoded D16 which truncates (not rounds) aggTotal
+  const aggTotalMass = Math.floor(totalBatch*(1-Pb)*10)/10;
   const binderMass = totalBatch*Pb;
   const aggs=SLOTS.filter(s=>slots[s]);
   const rows=[];
