@@ -1482,6 +1482,13 @@ function calcStockpilePercentages(trial) {
     }
   });
 
+  // Match Excel row 20: ROUND(stockpile_fraction, 5) = round % to 3 decimal places
+  SLOTS.forEach(s => {
+    if (result[s] !== undefined) {
+      result[s] = Math.round(result[s] * 1000) / 1000;
+    }
+  });
+
   return result;
 }
 
