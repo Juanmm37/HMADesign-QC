@@ -1432,9 +1432,11 @@ function calcBRDMass(trial, info, blendGsb){
   const isMarshall=(info.family||'')==='Marshall';
   const dia=isMarshall?101.6:150.0, ht=isMarshall?63.5:115.0;
   const Vol=Math.PI*Math.pow(dia/2,2)*ht/1000; // cm³
-  const Pb=(trial.Pb||5.0)/100, Ps=1-Pb;
+  // Use brdInitPb (initial estimate Pb) for batch sizing, not design Pb
+  // Excel uses initial Pb=5.0% and Gb=1.022 to set batch mass; design Pb used later for binder split
+  const Pb=(trial.brdInitPb!==null&&trial.brdInitPb!==undefined?trial.brdInitPb:5.0)/100, Ps=1-Pb;
   const Gse=blendGsb||2.700;
-  const Gb=(trial.brdGb!==null&&trial.brdGb!==undefined)?trial.brdGb:1.030;
+  const Gb=(trial.brdGb!==null&&trial.brdGb!==undefined)?trial.brdGb:1.022;
   const Va=((trial.brdVa!==null&&trial.brdVa!==undefined)?trial.brdVa:4.0)/100;
   const Gmm=1/((Pb/Gb)+(Ps/Gse));
   const Gmb=Gmm*(1-Va);
