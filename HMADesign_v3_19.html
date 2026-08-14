@@ -3141,7 +3141,7 @@ function getVolTargets(info,mt){
     const vmaMin=SP_VOL.VMA[mt]||14;
     const vfaRow=SP_VOL.VFA_by_traffic[tc]||{};
     const vfa=vfaRow[mt]||vfaRow['default']||[65,78];
-    const pNiniMax=SP_VOL['%GmmNini'][tc]||90.5;
+    const pNiniMax=Math.max(SP_VOL['%GmmNini'][tc]||90.5,89.5);
     return{Va:[3.5,4.5],VMA:[vmaMin,null],VFA:vfa,pGmmNini:[null,pNiniMax],pGmmNdes:[95.5,96.5],Stab:null,Flow:null};
   } else if(fam==='SMA'){
     return{Va:[3.5,4.5],VMA:[17,null],VFA:null,pGmmNini:null,pGmmNdes:null,Stab:null,Flow:null};
