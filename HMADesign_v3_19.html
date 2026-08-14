@@ -2324,7 +2324,7 @@ function renderS3(){
   const gradPasses=SIEVES.filter(sv=>{const b=bands[sv],v=blendGrad[sv];return b&&v!==null&&v!==undefined&&v>=b[0]&&v<=b[1];}).length;
   const gradFails=SIEVES.filter(sv=>{const b=bands[sv],v=blendGrad[sv];return b&&v!==null&&v!==undefined&&(v<b[0]||v>b[1]);}).length;
 
-  const aggHeaders=aggs.map(s=>{const a=getAgg(ms.slots[s]);return`<th style="min-width:70px;max-width:90px;padding:5px 4px;text-align:center;vertical-align:bottom;border-right:1px solid rgba(255,255,255,0.2)"><div style="font-weight:800;font-size:11px">${s}</div><div style="font-size:8px;font-weight:400;opacity:0.9;white-space:normal;word-break:break-word;line-height:1.3;margin-top:2px">${a.material||''}</div></th>`;}).join('');
+  const aggHeaders=aggs.map(s=>{const a=getAgg(ms.slots[s]);return`<th style="padding:5px 4px;text-align:center;vertical-align:bottom;border-right:1px solid rgba(255,255,255,0.2)"><div style="font-weight:800;font-size:11px">${s}</div><div style="font-size:8px;font-weight:400;opacity:0.9;white-space:normal;word-break:break-word;line-height:1.3;margin-top:2px">${a.material||''}</div></th>`;}).join('');
   const sourceRow2=aggs.map(s=>{const ra=getAgg(ms.slots[s]);return`<td style="font-size:9px;color:#555;text-align:center;padding:2px 3px;background:#f5f8ff;border-right:1px solid #eee">${ra.supplier||''}</td>`;}).join('');
 
   const gradRows=SIEVES.map(sv=>{
@@ -2339,7 +2339,7 @@ function renderS3(){
       const isModified=(gmod!==null&&gmod!==undefined);
       const display=(v!==null&&v!==undefined)?Number(v).toFixed(1):'100.0';
       const isNull=(v===null||v===undefined);
-      return`<td style="text-align:right;color:${isNull?'#aaa':'#333'};padding:3px 4px;${isModified?'color:#e65100;font-weight:700':''}">${display}${isModified?'⚡':''}</td>`;
+      return`<td style="text-align:right;color:${isNull?'#aaa':isModified?'#e65100':'#333'};font-weight:${isModified?'700':'600'};padding:3px 4px">${display}${isModified?'⚡':''}</td>`;
     }).join('');
     // blend cell with pass/fail color
     let blendColor='#1f3864',blendBg='',statusBadge='';
