@@ -2582,16 +2582,16 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   const yOf=v=>PT+cH-(Math.max(0,Math.min(100,v))/100)*cH;
 
   // Font sizes: 3× for axis labels in print, 2× for legend/title
-  const fsAxis = forPrint ? 30 : 10;
-  const fsAxisX = forPrint ? 28 : 9;
-  const fsLeg = forPrint ? 20 : 10;
-  const fsTitle = forPrint ? 28 : 13;
-  const fsSub = forPrint ? 20 : 9;
-  const fsYLabel = forPrint ? 28 : 10;
+  const fsAxis = forPrint ? 18 : 10;
+  const fsAxisX = forPrint ? 16 : 9;
+  const fsLeg = forPrint ? 14 : 10;
+  const fsTitle = forPrint ? 20 : 13;
+  const fsSub = forPrint ? 14 : 9;
+  const fsYLabel = forPrint ? 16 : 10;
   const axisLw = forPrint ? 3 : 1.5;
   const blendLw = forPrint ? 4 : 1.5;
   const specSq = forPrint ? 8 : 4;
-  const yLabelX = forPrint ? PL-58 : PL-38;
+  const yLabelX = forPrint ? PL-46 : PL-38;
 
   // Grid
   const yVals=[0,10,20,30,40,50,60,70,80,90,100];
