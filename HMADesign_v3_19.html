@@ -2116,7 +2116,7 @@ function renderTBAChart(trialGrads, bands, info){
     <text x="${PL-5}" y="${yOf(v)+4}" font-size="10" fill="#999" text-anchor="end">${v}</text>`).join('');
   const xLbls=SIEVES.map(s=>{const x=xOf(s);return x!==null?`
     <line x1="${x}" y1="${PT}" x2="${x}" y2="${PT+cH}" stroke="#f0f0f0" stroke-width="1"/>
-    <text x="${x}" y="${PT+cH+5}" font-size="8" fill="#666" text-anchor="start" transform="rotate(90,${x},${PT+cH+5})">${SL[s]||s}</text>`:'';}).join('');
+    <text x="${x}" y="${PT+cH+5}" font-size="8" fill="#666" text-anchor="start" transform="rotate(90,${x},${PT+cH+5})">${(SL[s]||s).replace('mm','')}</text>`:'';}).join('');
 
   const svg=`<svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:inherit;margin:12px 0">
     <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff"/>
