@@ -1732,26 +1732,19 @@ function renderWeighCard(trial, cardType, forPrint=false){
 
   return`<div class="wc-wrap" style="${wrapStyle}">
     <div class="print-logo">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:92px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:96px">
       <div>
-        <div style="font-size:15px;font-weight:900;color:#1f3864">MIX DESIGN WEIGH CARD</div>
+        <div style="font-size:16px;font-weight:900;color:#1f3864">MIX DESIGN — ${generateWeighCardTitle(trial, cardType)}</div>
         <div style="font-size:10px;color:#666;margin-top:2px">
           Mix Design No. <strong>${info.mixNo||'—'}</strong> &nbsp;|&nbsp;
           ${mt}${rapLabel} &nbsp;|&nbsp;
           PGAC: <strong>${info.pgac||'—'}</strong> &nbsp;|&nbsp;
           Traffic: <strong>${info.traffic||'—'}</strong> &nbsp;|&nbsp;
+          Pb: <strong>${Number(trial.Pb).toFixed(1)}%</strong> &nbsp;|&nbsp;
+          Target: <strong>${totalBatch.toFixed(0)} g</strong> &nbsp;|&nbsp;
           Mix Temp: ${info.tMix||165}°C &nbsp;|&nbsp;
           Comp Temp: ${info.tComp||150}°C
         </div>
-      </div>
-    </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div style="font-weight:800;color:#1f3864;font-size:13px;text-transform:uppercase;letter-spacing:0.04em">
-        ${generateWeighCardTitle(trial, cardType)}
-      </div>
-      <div style="font-size:11px;color:#666">
-        Pb: <strong>${Number(trial.Pb).toFixed(1)}%</strong> &nbsp;|&nbsp;
-        Target: <strong>${totalBatch.toFixed(0)} g</strong>
       </div>
     </div>
     <div style="overflow-x:auto">
