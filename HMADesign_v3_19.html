@@ -1550,7 +1550,19 @@ function calcWeighCard(trial, cardType){
       totalBatch=calcBRDMass(trial,info,blendGsb).massUsed||(BRD_TOTAL[mt]||4800);
     }
   } else {
-    totalBatch=MRD[mt]||1500;
+    // Fix total aggregate (virgin + RAP incl. RAP AC) = MRD[mt] so that AC is added on top.
+    // Without this, the 2000g total includes AC — after losing 20-30g during mixing the sample is underweight.
+    const mrdAggTarget=MRD[mt]||1500;
+    const spPctsEarly=calcStockpilePercentages(trial);
+    let rapACFrac=0;
+    SLOTS.filter(s=>slots[s]).forEach(slot=>{
+      const agg=getAgg(slots[slot]);
+      if(!agg||!agg.isRAP)return;
+      const bf=(parseFloat(trial.blendPct[slot])||0)/100;
+      const sf=(spPctsEarly[slot]||0)/100;
+      rapACFrac+=bf-sf;
+    });
+    totalBatch=mrdAggTarget/((1+rapACFrac)*(1-trial.Pb/100));
   }
 
   const Pb=trial.Pb/100;
