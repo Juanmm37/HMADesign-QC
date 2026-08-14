@@ -4701,16 +4701,16 @@ function printSelected(){
 
     const totalsRow=rows.map(r=>`<td style="font-weight:800;border-right:1px solid #aab;padding:4px 6px;text-align:right">${r.aggMass.toFixed(1)}</td>`).join('');
 
-    // Fixed-aggregate approach: hold dry agg and RAP AC contribution constant at reference Pb;
-    // only virgin binder varies — total mass changes with each AC point (matches spreadsheet).
-    const refAgg=wcData.aggTotalMass;
-    const refRapACWt=wcData.rapTotalMass-wcData.aggTotalMass+wcData.virginAggMass;
+    // Fixed-aggregate approach: the total aggregate (virgin + RAP incl. RAP AC) is held constant
+    // at the reference Pb level. Only virgin binder varies; total batch changes with each AC point.
+    // Formula: virBinder = (Pb × totalAggRef − rapACRef) / (1 − Pb)  [derives from Pb = totalBinder/total]
     const refTotalAggInclRAP=wcData.virginAggMass+wcData.rapTotalMass;
+    const refRapACWt=wcData.rapTotalMass-(wcData.aggTotalMass-wcData.virginAggMass);
 
     const acFooter=acPbs.map((Pb2,pi)=>{
       const Pb1=Math.round(Pb2*10)/10;
       const Pb_frac=Pb1/100;
-      const virBinder=Math.round((refAgg*Pb_frac/(1-Pb_frac)-refRapACWt)*10)/10;
+      const virBinder=Math.round(((Pb_frac*refTotalAggInclRAP-refRapACWt)/(1-Pb_frac))*10)/10;
       const acTotal=Math.round((refTotalAggInclRAP+virBinder)*10)/10;
       const bg=pi%2===0?'#f5f8ff':'#ffffff';
       return`<tr style="background:${bg}">
