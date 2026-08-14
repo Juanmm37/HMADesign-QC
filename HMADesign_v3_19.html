@@ -2664,8 +2664,8 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
       ${blendSvg}
       ${xLbls}
       ${legendSvg}
-      <text x="${PL+cW/2}" y="${forPrint?PT/2-10:PT-fsTitle*0.6}" font-size="${fsTitle}" font-weight="800" fill="#1f3864" text-anchor="middle">${chartTitle}</text>
-      <text x="${PL+cW/2}" y="${forPrint?PT/2+14:PT-fsSub*0.2}" font-size="${fsSub}" fill="#666" text-anchor="middle">Trial ${trial.id} — ${info.spec||''} — ${info.mixNo||''}</text>
+      <text x="${PL+cW/2}" y="${PT/2-fsSub/2-4}" font-size="${fsTitle}" font-weight="800" fill="#1f3864" text-anchor="middle">${chartTitle}</text>
+      <text x="${PL+cW/2}" y="${PT/2+fsSub/2+6}" font-size="${fsSub}" fill="#666" text-anchor="middle">Trial ${trial.id} — ${info.spec||''} — ${info.mixNo||''}</text>
       <text x="${yLabelX}" y="${PT+cH/2}" font-size="${fsYLabel}" font-weight="700" fill="#555" text-anchor="middle" transform="rotate(-90,${yLabelX},${PT+cH/2})">PERCENT PASSING (%)</text>
       <text x="${PL+cW/2}" y="${H-fsSub*0.3}" font-size="${fsSub}" fill="#777" text-anchor="middle">SIEVE SIZE (mm) &nbsp;|&nbsp; ← Finer &nbsp;&nbsp;&nbsp; Coarser →</text>
     </svg>
