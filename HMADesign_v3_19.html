@@ -1713,8 +1713,8 @@ function renderWeighCard(trial, cardType, forPrint=false){
         <td style="${tdLbl};border-bottom:1px solid #dde">% AC Binder</td>
         <td style="${tdNum};border-bottom:1px solid #dde">${Number(trial.Pb).toFixed(1)}</td>
         <td style="border-right:2px solid #1f3864;border-bottom:1px solid #dde"></td>
-        <td style="${tdLbl};border-bottom:1px solid #dde">Aggregate<sub>virgin&nbsp;+&nbsp;RAP</sub> Wt.</td>
-        <td style="${tdKey}">${fmtG(aggTotalMass)}</td>
+        <td style="${tdLbl};border-bottom:1px solid #dde">Aggregate<sub>virgin&nbsp;+&nbsp;RAP</sub> Wt. <span style="font-size:9px;opacity:0.7">(incl. RAP AC)</span></td>
+        <td style="${tdKey}">${fmtG(virginAggMass+rapTotalMass)}</td>
         <td style="${tdGrams};border-bottom:1px solid #dde">grams</td>
       </tr>
       <tr style="background:#f5f8ff">
