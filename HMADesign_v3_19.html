@@ -4192,7 +4192,7 @@ function renderS5Select(){
 
     const aggHeaders=aggs.map(s=>{
       const a=getAgg(ms.slots[s]);
-      return`<th style="min-width:68px;max-width:88px;padding:5px 4px;text-align:center;vertical-align:bottom;border-right:1px solid rgba(255,255,255,0.2)">
+      return`<th style="padding:5px 4px;text-align:center;vertical-align:bottom;border-right:1px solid rgba(255,255,255,0.2)">
         <div style="font-weight:800;font-size:11px">${s}</div>
         <div style="font-size:8px;font-weight:400;opacity:0.9;white-space:normal;word-break:break-word;line-height:1.3;margin-top:2px">${a.material||''}</div>
       </th>`;
