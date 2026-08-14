@@ -4845,6 +4845,26 @@ function initACPoints(){
     vols:Array.from({length:numSpec},(_,i)=>({label:['A','B','C'][i],Gmb:null,Gmm:null,Gmm2:null,hNiniA:null,hNiniB:null,hNdesA:null,hNdesB:null,Stab:null,Flow:null})),
     notes:''
   }));
+  // Pre-fill the reference Pb row from the selected trial's Step 5 volumetric data
+  if(t.vol){
+    const refPb=Math.round(t.Pb*10)/10;
+    const refIdx=ms.acPoints.findIndex(pt=>Math.round(pt.Pb*10)/10===refPb);
+    if(refIdx>=0){
+      const pt=ms.acPoints[refIdx];
+      const v=t.vol;
+      if(v.GmbA!=null)pt.vols[0].Gmb=v.GmbA;
+      if(v.GmbB!=null)pt.vols[1].Gmb=v.GmbB;
+      if(isM&&v.GmbC!=null&&pt.vols[2])pt.vols[2].Gmb=v.GmbC;
+      if(v.GmmA!=null)pt.vols[0].GmmA=v.GmmA;
+      if(v.GmmB!=null)pt.vols[0].GmmB=v.GmmB;
+      if(v.hNiniA!=null)pt.vols[0].hNiniA=v.hNiniA;
+      if(v.hNiniB!=null)pt.vols[0].hNiniB=v.hNiniB;
+      if(v.hNdesA!=null)pt.vols[0].hNdesA=v.hNdesA;
+      if(v.hNdesB!=null)pt.vols[0].hNdesB=v.hNdesB;
+      if(v.Stab!=null)pt.vols[0].Stab=v.Stab;
+      if(v.Flow!=null)pt.vols[0].Flow=v.Flow;
+    }
+  }
 }
 
 function renderACWeighCards(selTrial,fam){
