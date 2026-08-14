@@ -2723,7 +2723,7 @@ function printTrial(trialIdx){
       const isModified=(gmod!==null&&gmod!==undefined);
       const display=isNull?'100.0':Number(v).toFixed(1);
       const col=isNull?'#aaa':isModified?'#e65100':'#333';
-      return`<td style="text-align:right;font-size:10px;padding:3px 4px;border-right:1px solid #eee;color:${col};font-weight:${isModified?'700':'400'};${rowI%2?'background:#fafbfc':''}">${display}${isModified?'⚡':''}</td>`;
+      return`<td style="text-align:right;font-size:10px;padding:3px 4px;border-right:1px solid #eee;color:${col};font-weight:${isModified?'700':'600'};${rowI%2?'background:#fafbfc':''}">${display}${isModified?'⚡':''}</td>`;
     }).join('');
     let blendColor='#1f3864',blendBg='';
     if(band&&blendVal!==null&&blendVal!==undefined){
