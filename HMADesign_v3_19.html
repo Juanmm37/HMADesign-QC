@@ -1730,8 +1730,12 @@ function renderWeighCard(trial, cardType, forPrint=false){
 
   const wrapStyle=forPrint?'':'border:1px solid #c5d3ef;border-radius:10px;padding:16px;margin-top:10px;overflow-x:auto;background:#f8fbff';
 
+  const hdrStyle=forPrint
+    ?'display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864'
+    :'';
+
   return`<div class="wc-wrap" style="${wrapStyle}">
-    <div class="print-logo">
+    <div class="print-logo" style="${hdrStyle}">
       <img src="${LOGO_SRC}" alt="Capital Paving" style="height:96px">
       <div>
         <div style="font-size:16px;font-weight:900;color:#1f3864">MIX DESIGN — ${generateWeighCardTitle(trial, cardType)}</div>
