@@ -2059,6 +2059,186 @@ function renderS3TrialBlendAnalysis(){
   </div>`}</div>`;
 }
 
+// ── PRINT: Step 3 Trial Blend Analysis Summary ──
+function printS3TrialBlendAnalysis(){
+  const info=ms.info, mt=info.mixType||'', fam=info.family||'Superpave', bands=getBands(info);
+  const aggs=SLOTS.filter(s=>ms.slots[s]);
+  const rapLabel=info.hasRAP==='Yes'?' RAP':'';
+
+  const trialGrads=ms.tbaTrials.map((b,bi)=>{
+    const grad={};
+    const totalPct=aggs.reduce((sum,s)=>(b.pcts[s]||0)+sum,0);
+    SIEVES.forEach(sv=>{
+      let val=0;
+      aggs.forEach(s=>{
+        const a=getAgg(ms.slots[s]);
+        const pct=b.pcts[s]||0;
+        const gm=(a.gradation||{})[sv];
+        const gmod=(a.gradation_mod||{})[sv];
+        const aggGrad=(gmod!==null&&gmod!==undefined)?gmod:gm;
+        const passing=(aggGrad!==null&&aggGrad!==undefined)?aggGrad:100;
+        val+=passing*(pct/100);
+      });
+      grad[sv]=totalPct>0?val:null;
+    });
+    const Gsb=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(b.pcts[s]||0)/100;const gsb=eff(a,'Gsb');return sum+(gsb!==null?gsb*pct:0);},0);
+    const Gsa=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(b.pcts[s]||0)/100;const gsa=eff(a,'Gsa');return sum+(gsa!==null?gsa*pct:0);},0);
+    const BR=calcBinderReplacement(b.pcts,b.Pb);
+    return{name:b.name,grad,totalPct,Pb:b.Pb,selected:b.selected,Gsb,Gsa,BR};
+  });
+
+  const selectedTarget=ms.tbaTargets[ms.selectedTargetIdx]||{label:'',values:{}};
+
+  // ── Header ──
+  const hdr=`<div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864">
+    <img src="${LOGO_SRC}" alt="Capital Paving" style="height:96px">
+    <div>
+      <div style="font-size:16px;font-weight:900;color:#1f3864">MIX DESIGN — TRIAL BLEND ANALYSIS</div>
+      <div style="font-size:10px;color:#666;margin-top:2px">
+        Mix Design No. <strong>${info.mixNo||'—'}</strong> &nbsp;|&nbsp;
+        ${mt}${rapLabel} &nbsp;|&nbsp;
+        PGAC: <strong>${info.pgac||'—'}</strong> &nbsp;|&nbsp;
+        Traffic: <strong>${info.traffic||'—'}</strong> &nbsp;|&nbsp;
+        Spec: ${info.spec||'—'} &nbsp;|&nbsp;
+        Within 100mm Surface: ${info.surface||'—'}
+      </div>
+    </div>
+  </div>`;
+
+  // ── Trial Blend % table ──
+  const blendTable=`
+  <div style="margin-bottom:16px">
+    <div style="font-size:10px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;border-bottom:2px solid #e8edf5;padding-bottom:3px">Trial Blend Percentages</div>
+    <table style="border-collapse:collapse;width:100%;font-size:11px">
+      <thead>
+        <tr style="background:#1f3864;color:#fff">
+          <th style="padding:5px 8px;text-align:left">Aggregate &amp; Source</th>
+          ${trialGrads.map(tg=>`<th style="padding:5px 8px;text-align:center">${tg.name}</th>`).join('')}
+        </tr>
+        <tr style="background:#2a4a7c;color:#cde;font-size:10px">
+          <th style="padding:3px 8px;text-align:left">Pb %</th>
+          ${trialGrads.map(tg=>`<th style="padding:3px 8px;text-align:center">${tg.Pb.toFixed(1)}%</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${aggs.map((s,si)=>{
+          const a=getAgg(ms.slots[s]);
+          const source=ms.slots[s].source||'';
+          return`<tr style="background:${si%2===0?'#fff':'#fafbfc'}">
+            <td style="padding:4px 8px;color:#1f3864">
+              <div style="font-weight:700">${s} — ${a.material||'—'}</div>
+              ${source?`<div style="font-size:9px;color:#888">${source}</div>`:''}
+            </td>
+            ${ms.tbaTrials.map(b=>{
+              const v=b.pcts[s]||0;
+              return`<td style="padding:4px 8px;text-align:center;font-weight:700;color:#1f3864">${v>0?v.toFixed(1)+'%':'—'}</td>`;
+            }).join('')}
+          </tr>`;
+        }).join('')}
+        <tr style="background:#1f3864;color:#fff;font-weight:800">
+          <td style="padding:5px 8px">Total %</td>
+          ${trialGrads.map(tg=>{
+            const isOk=Math.abs(tg.totalPct-100)<0.01;
+            return`<td style="padding:5px 8px;text-align:center;color:${isOk?'#fff':'#ffcccc'}">${tg.totalPct.toFixed(1)}%</td>`;
+          }).join('')}
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+
+  // ── Gradation comparison table ──
+  const gradTable=`
+  <div style="margin-bottom:16px">
+    <div style="font-size:10px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;border-bottom:2px solid #e8edf5;padding-bottom:3px">Gradation Comparison</div>
+    <table style="border-collapse:collapse;width:100%;font-size:11px">
+      <thead>
+        <tr style="background:#1f3864;color:#fff">
+          <th style="padding:5px 8px;text-align:left">Sieve</th>
+          ${trialGrads.map(tg=>`<th style="padding:5px 8px;text-align:center">${tg.name}</th>`).join('')}
+          <th style="padding:5px 8px;text-align:center;background:#162d52">Target: ${selectedTarget.label||'—'}</th>
+          <th style="padding:5px 8px;text-align:center;background:#162d52">Min</th>
+          <th style="padding:5px 8px;text-align:center;background:#162d52">Max</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${SIEVES.map((sv,ri)=>{
+          const band=bands[sv];
+          const targetVal=selectedTarget.values[sv];
+          return`<tr style="background:${ri%2===0?'#fff':'#fafbfc'}">
+            <td style="padding:4px 8px;font-weight:700;color:#1f3864">${(SL[sv]||sv).replace('mm','')}</td>
+            ${trialGrads.map(tg=>{
+              const v=tg.grad[sv];
+              const inBand=band&&v!==null?(v>=band[0]&&v<=band[1]):true;
+              return`<td style="padding:4px 8px;text-align:center;font-weight:700;color:${band?(inBand?'#1a6b1a':'#c0392b'):'#333'};background:${band?(inBand?'#c6efce33':'#ffc7ce33'):''}">
+                ${v!==null?v.toFixed(1):'—'}
+              </td>`;
+            }).join('')}
+            <td style="padding:4px 8px;text-align:center;font-weight:700;color:#1f3864;background:#f0f4ff">${targetVal!==null&&targetVal!==undefined?parseFloat(targetVal).toFixed(1):'—'}</td>
+            <td style="padding:4px 8px;text-align:center;font-size:10px;color:#666">${band?band[0].toFixed(1):'—'}</td>
+            <td style="padding:4px 8px;text-align:center;font-size:10px;color:#666">${band?band[1].toFixed(1):'—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  // ── Trial properties table ──
+  const propsTable=`
+  <div style="margin-bottom:16px">
+    <div style="font-size:10px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;border-bottom:2px solid #e8edf5;padding-bottom:3px">Trial Properties</div>
+    <table style="border-collapse:collapse;width:100%;font-size:11px">
+      <thead>
+        <tr style="background:#1f3864;color:#fff">
+          <th style="padding:5px 8px;text-align:left">Property</th>
+          ${trialGrads.map(tg=>`<th style="padding:5px 8px;text-align:center">${tg.name}</th>`).join('')}
+        </tr>
+      </thead>
+      <tbody>
+        ${[
+          {label:'Blend %',key:'totalPct',fmt:v=>v.toFixed(1)+'%'},
+          {label:'Pb (AC %)',key:'Pb',fmt:v=>v.toFixed(1)+'%'},
+          {label:'Gsb',key:'Gsb',fmt:v=>v.toFixed(3)},
+          {label:'Gsa',key:'Gsa',fmt:v=>v.toFixed(3)},
+          {label:'% Binder Replacement',key:'BR',fmt:v=>v!==null?v.toFixed(1)+'%':'—'},
+        ].map((prop,pi)=>`<tr style="background:${pi%2===0?'#fff':'#fafbfc'}">
+          <td style="padding:5px 8px;font-weight:700;color:#1f3864">${prop.label}</td>
+          ${trialGrads.map(tg=>{
+            const v=tg[prop.key];
+            const isBRHigh=prop.key==='BR'&&v!==null&&v>15;
+            return`<td style="padding:5px 8px;text-align:center;font-weight:700;color:${isBRHigh?'#c0392b':'#1f3864'}">${v!==null?prop.fmt(v):'—'}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  // ── Gradation chart (reuse renderTBAChart but force print sizing) ──
+  const chartSvg=renderTBAChart(trialGrads,bands,info);
+
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8">
+  <title>Trial Blend Analysis — ${info.mixNo||''}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;color:#1a1a2e;background:#fff;padding:12px}
+    @page{size:landscape;margin:8mm}
+    @media print{body{padding:0}}
+    table{border-collapse:collapse;width:100%}
+    th,td{border-bottom:1px solid #eee}
+  </style></head><body>
+  ${hdr}
+  ${blendTable}
+  <div style="page-break-before:always">${gradTable}</div>
+  ${chartSvg}
+  ${propsTable}
+  </body></html>`;
+
+  const w=window.open('','_blank','width=1200,height=850');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(()=>w.print(),600);
+}
+
 // Multi-trial gradation chart
 function renderTBAChart(trialGrads, bands, info){
   const mt=info.mixType||'',fam=info.family||'',isMarshall=fam==='Marshall';
