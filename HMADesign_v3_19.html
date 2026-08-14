@@ -2047,10 +2047,13 @@ function renderS3TrialBlendAnalysis(){
                   val=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const gsb=eff(a,'Gsb');return sum+(gsb!==null?gsb*pct:0);},0);
                 } else if(prop.key==='Gsa'){
                   val=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const gsa=eff(a,'Gsa');return sum+(gsa!==null?gsa*pct:0);},0);
-                } else if(prop.key==='Va'){
-                  const workflowTrial=ms.trials&&ms.trials[bi];val=(workflowTrial&&workflowTrial.vol&&workflowTrial.vol.Va!==undefined)?workflowTrial.vol.Va:null;
-                } else if(prop.key==='VMA'){
-                  const workflowTrial=ms.trials&&ms.trials[bi];val=(workflowTrial&&workflowTrial.vol&&workflowTrial.vol.VMA!==undefined)?workflowTrial.vol.VMA:null;
+                } else if(prop.key==='Va'||prop.key==='VMA'){
+                  const workflowTrial=ms.trials&&ms.trials[bi];
+                  if(workflowTrial&&workflowTrial.vol){
+                    const{blendGsb}=calcBlendProps(workflowTrial);
+                    const res=calcVol(workflowTrial,ms.info,blendGsb);
+                    val=res?res[prop.key]:null;
+                  }
                 } else if(prop.key==='BR'){
                   val=calcBinderReplacement(ms.tbaTrials[bi].pcts,ms.tbaTrials[bi].Pb);
                 }
