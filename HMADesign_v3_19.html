@@ -4225,7 +4225,7 @@ function renderS5Select(){
         const v=(gmod!=null)?gmod:gm;
         const isMod=(gmod!=null);
         const display=(v!=null)?Number(v).toFixed(1):'100.0';
-        return`<td style="text-align:right;color:${v==null?'#aaa':isMod?'#e65100':'#333'};font-weight:${isMod?'700':'400'};padding:3px 4px;border-right:1px solid #eee">${display}${isMod?'⚡':''}</td>`;
+        return`<td style="text-align:right;color:${v==null?'#aaa':isMod?'#e65100':'#333'};font-weight:${isMod?'700':'600'};padding:3px 4px;border-right:1px solid #eee">${display}${isMod?'⚡':''}</td>`;
       }).join('');
       let blendColor='#1f3864',blendBg='';
       if(band&&blendVal!=null){
