@@ -2643,9 +2643,9 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   // Legend — bottom-right corner; size scales with font
   const legW=forPrint?230:150, legH=forPrint?76:52;
   const legX=PL+cW-legW-10, legY=PT+cH-legH-10;
-  const legLH=forPrint?44:22; // legend line height
-  const legLW=forPrint?32:16; // legend line sample width
-  const legSq=forPrint?16:8;  // legend square size
+  const legLH=forPrint?32:22; // legend line height
+  const legLW=forPrint?24:16; // legend line sample width
+  const legSq=forPrint?12:8;  // legend square size
   const legendSvg=`
     <rect x="${legX-8}" y="${legY-8}" width="${legW+16}" height="${legH+12}" fill="rgba(255,255,255,0.94)" stroke="#bbb" stroke-width="${forPrint?2:1}" rx="4"/>
     <line x1="${legX}" y1="${legY+legLH*0.4}" x2="${legX+legLW}" y2="${legY+legLH*0.4}" stroke="#c0392b" stroke-width="${blendLw}"/>
