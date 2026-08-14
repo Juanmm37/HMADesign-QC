@@ -4527,13 +4527,20 @@ function printSelected(){
     }).join('');
 
     return`<div${pageBreak?' style="page-break-after:always"':''}>
-      ${hdr}
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <div style="font-weight:800;color:#1f3864;font-size:13px;text-transform:uppercase;letter-spacing:0.04em">
-          ${cardType} Weigh Card — Selected Blend: Trial ${selTrial.id}
-        </div>
-        <div style="font-size:11px;color:#666">
-          Pb ref: ${selTrial.Pb.toFixed(1)}% | ${numSpec2} specimens per AC point | Gsb: ${fN(wcData.aggTotalMass>0?calcBlendProps(selTrial).blendGsb:null)}
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864">
+        <img src="${LOGO_SRC}" alt="Capital Paving" style="height:96px">
+        <div>
+          <div style="font-size:16px;font-weight:900;color:#1f3864">MIX DESIGN — ${cardType} Weigh Card — Selected Blend: Trial ${selTrial.id}</div>
+          <div style="font-size:10px;color:#666;margin-top:2px">
+            Mix Design No. <strong>${info.mixNo||'—'}</strong> &nbsp;|&nbsp;
+            ${mt}${rapLabel} &nbsp;|&nbsp;
+            PGAC: <strong>${info.pgac||'—'}</strong> &nbsp;|&nbsp;
+            Traffic: <strong>${info.traffic||'—'}</strong> &nbsp;|&nbsp;
+            Pb ref: <strong>${selTrial.Pb.toFixed(1)}%</strong> &nbsp;|&nbsp;
+            ${numSpec2} specimens per AC point &nbsp;|&nbsp;
+            Gsb: ${fN(wcData.aggTotalMass>0?calcBlendProps(selTrial).blendGsb:null)}
+          </div>
+          ${_brSel!==null?`<div style="margin-top:4px;font-size:10px">% Binder Replacement: <strong style="color:${_brSel>15?'#c0392b':'#1a6b1a'}">${_brSel.toFixed(1)}%</strong></div>`:''}
         </div>
       </div>
       <div style="overflow-x:auto">
