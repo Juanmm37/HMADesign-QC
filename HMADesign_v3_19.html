@@ -2054,6 +2054,7 @@ function renderS3TrialBlendAnalysis(){
   return `<div id="s3_trialBlendAnalysis">${targetSection + jmfInput + gradTable + chart + trialProps + `
   <div class="row print-hide" style="justify-content:space-between;margin-top:14px">
     <button class="btn" onclick="ms.step=2;render()">← Back</button>
+    <button class="btn" onclick="printS3TrialBlendAnalysis()" style="background:#1f3864;color:#fff;border:none;padding:8px 18px;border-radius:6px;font-weight:700;cursor:pointer">🖨 Print Summary</button>
     <button class="btn btn-primary" onclick="createTrialsFromTrials()">Export Selected → Next →</button>
   </div>`}</div>`;
 }
