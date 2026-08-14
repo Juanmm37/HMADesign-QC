@@ -1492,6 +1492,27 @@ function calcStockpilePercentages(trial) {
   return result;
 }
 
+// CAA blend: ROUND(Σ(CAA_i × pct_above_4.75_i × stockpile_frac_i) / Σ(pct_above_4.75_i × stockpile_frac_i), 0)
+// Uses stockpile fractions (matching Excel row 18) and gradation to get coarse fraction weight
+function calcCAABlend(trial, key) {
+  const spPcts = calcStockpilePercentages(trial);
+  let num = 0, den = 0;
+  SLOTS.forEach(s => {
+    const agg = getAgg(ms.slots[s]);
+    if (!agg) return;
+    const caa = agg[key];
+    if (caa === null || caa === undefined) return;
+    const spFrac = (spPcts[s] || 0) / 100;
+    if (!spFrac) return;
+    const grad = agg.gradation || {}, gradMod = agg.gradation_mod || {};
+    const p475 = (gradMod['4.75'] !== null && gradMod['4.75'] !== undefined) ? gradMod['4.75'] : (grad['4.75'] !== null && grad['4.75'] !== undefined ? grad['4.75'] : 0);
+    const pctAbove = 100 - p475;
+    num += caa * pctAbove * spFrac;
+    den += pctAbove * spFrac;
+  });
+  return den > 0 ? Math.round(num / den) : null;
+}
+
 function calcBinderReplacement(blendPct, Pb) {
   if (!Pb) return null;
   const slots = ms.slots;
