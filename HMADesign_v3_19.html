@@ -271,7 +271,7 @@ function printStep(title){
   win.document.write(`<!DOCTYPE html><html><head><title>${title} — ${mixLabel}</title><meta charset="UTF-8">
   <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;color:#1a1a2e;background:#fff;padding:10px}@page{size:${pageSize};margin:8mm}@media print{body{padding:0}.print-hide{display:none!important}}.print-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #1f3864}.card{border:1px solid #ccc;border-radius:6px;padding:10px;margin-bottom:8px}.card-blue{border-left:4px solid #1f3864}.st{font-size:9px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.06em;border-bottom:2px solid #e8edf5;padding-bottom:3px;margin-bottom:6px}.mc{background:#f5f8ff;border-radius:5px;padding:8px;text-align:center;border:1px solid #d4dcf0}.ml{font-size:9px;color:#888;font-weight:700;text-transform:uppercase}.mv{font-size:16px;font-weight:900;color:#1f3864}.pass{background:#c6efce;color:#1a6b1a;padding:1px 5px;border-radius:10px;font-size:10px;font-weight:700}.fail{background:#ffc7ce;color:#9c0006;padding:1px 5px;border-radius:10px;font-size:10px;font-weight:700}.ibox{background:#e8f0fe;border:1px solid #c5d3ef;border-radius:4px;padding:6px 10px;font-size:11px;color:#1f3864;margin-bottom:8px}.wbox{background:#fff8e0;border:1px solid #ffe082;border-radius:4px;padding:6px 10px;font-size:11px;margin-bottom:8px}table{width:100%;border-collapse:collapse}th{background:#1f3864;color:#fff;padding:4px 6px;text-align:center;font-size:9px}th.L{text-align:left}td{padding:4px 6px;border-bottom:1px solid #eee;font-size:10px}td.L{text-align:left}tr:nth-child(even) td{background:#f8f9fc}.wc-wrap{background:#f8fbff;border:1px solid #c5d3ef;border-radius:8px;padding:10px;margin:6px 0;overflow-x:auto}.wct{font-weight:800;color:#1f3864;font-size:11px;margin-bottom:4px}.wc-meta{font-size:9px;color:#555;margin-bottom:6px}.wc-table{border-collapse:collapse;font-size:9px;width:100%}.wc-table th{background:#1f3864;color:#fff;padding:3px 4px;text-align:center;font-size:8px}.wc-table th.L{text-align:left}.wc-table td{padding:2px 4px;border-bottom:1px solid #e0e6f0;text-align:right}.wc-table td.L{text-align:left;color:#555}.agg-table{table-layout:fixed!important}.agg-table th,.agg-table td{padding:4px 6px!important;overflow:hidden;text-overflow:ellipsis;vertical-align:middle;text-align:center}.btn,.print-hide,.steps-bar,.nav,.topbar,.card-blue > .st:first-of-type{display:none!important}.print-logo{display:flex!important;align-items:center;gap:12px;margin-bottom:10px}svg{max-width:100%}[style*="stroke-dasharray"]{display:none!important}</style>
   </head><body>
-  <div class="print-header"><img src="${LOGO_SRC}" alt="Capital Paving" style="height:40px"><div><div style="font-size:14px;font-weight:900;color:#1f3864">${title}</div><div style="font-size:9px;color:#666;margin-top:1px">${mixLabel} | ${info.pgac||''} | ${info.spec||''} | Traffic: ${info.traffic||''}</div></div></div>
+  <div class="print-header"><img src="${LOGO_SRC}" alt="Capital Paving" style="height:80px"><div><div style="font-size:14px;font-weight:900;color:#1f3864">${title}</div><div style="font-size:9px;color:#666;margin-top:1px">${mixLabel} | ${info.pgac||''} | ${info.spec||''} | Traffic: ${info.traffic||''}</div></div></div>
   ${printContent}</body></html>`);
   win.document.close();win.focus();setTimeout(()=>{win.print();},500);
 }
@@ -1732,7 +1732,7 @@ function renderWeighCard(trial, cardType, forPrint=false){
 
   return`<div class="wc-wrap" style="${wrapStyle}">
     <div class="print-logo">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:46px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:92px">
       <div>
         <div style="font-size:15px;font-weight:900;color:#1f3864">MIX DESIGN WEIGH CARD</div>
         <div style="font-size:10px;color:#666;margin-top:2px">
@@ -2512,7 +2512,7 @@ function renderS3(){
 
   return `<div class="card card-blue" id="trial-print-area">
     <div class="print-logo">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:46px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:92px">
       <div>
         <div style="font-size:15px;font-weight:900;color:#1f3864">MIX DESIGN — TRIAL BLEND ${trial.id}</div>
         <div style="font-size:11px;color:#666">${info.mixNo||'—'} &nbsp;|&nbsp; ${mt}${info.hasRAP==='Yes'?' RAP':''} &nbsp;|&nbsp; ${info.pgac||'—'} &nbsp;|&nbsp; Traffic ${info.traffic||'—'} &nbsp;|&nbsp; ${info.spec||''}</div>
@@ -2581,11 +2581,23 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   }
   const yOf=v=>PT+cH-(Math.max(0,Math.min(100,v))/100)*cH;
 
+  // Font sizes: 3× for axis labels in print, 2× for legend/title
+  const fsAxis = forPrint ? 30 : 10;
+  const fsAxisX = forPrint ? 28 : 9;
+  const fsLeg = forPrint ? 20 : 10;
+  const fsTitle = forPrint ? 28 : 13;
+  const fsSub = forPrint ? 20 : 9;
+  const fsYLabel = forPrint ? 28 : 10;
+  const axisLw = forPrint ? 3 : 1.5;
+  const blendLw = forPrint ? 4 : 1.5;
+  const specSq = forPrint ? 8 : 4;
+  const yLabelX = forPrint ? PL-58 : PL-38;
+
   // Grid
   const yVals=[0,10,20,30,40,50,60,70,80,90,100];
   const yGrid=yVals.map(v=>`
     <line x1="${PL}" y1="${yOf(v)}" x2="${PL+cW}" y2="${yOf(v)}" stroke="${v%20===0?'#ccc':'#eee'}" stroke-width="${v%20===0?1:0.5}"/>
-    <text x="${PL-5}" y="${yOf(v)+4}" font-size="10" fill="#666" text-anchor="end">${v}</text>`).join('');
+    <text x="${PL-5}" y="${yOf(v)+fsAxis*0.4}" font-size="${fsAxis}" fill="#555" font-weight="600" text-anchor="end">${v}</text>`).join('');
 
   // Vertical grid lines at each sieve
   const xGrid=chartSieves.map(s=>`
@@ -2600,7 +2612,7 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     const label=SIEVE_LABELS_CHART[s]||s;
     const x=xOf(s);
     const y=PT+cH+8;
-    return`<text x="${x}" y="${y}" font-size="9" fill="#444" text-anchor="end"
+    return`<text x="${x}" y="${y}" font-size="${fsAxisX}" fill="#444" font-weight="600" text-anchor="end"
       transform="rotate(-90,${x},${y})">${label}</text>`;
   }).join('');
 
@@ -2608,11 +2620,11 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   const bandSieves=chartSieves.filter(s=>bands[s]&&xOf(s)!==null);
   let bandSvg='';
   if(bandSieves.length){
-    const h=4;
+    const h=specSq;
     bandSvg=bandSieves.map(s=>{const x=xOf(s);return`<rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][1])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/><rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][0])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/>`;}).join('');
   }
 
-    const blendPts=chartSieves.map(s=>{
+  const blendPts=chartSieves.map(s=>{
     const v=blendGrad[s];
     return(v!==null&&v!==undefined&&xOf(s)!==null)?`${xOf(s)},${yOf(v)}`:null;
   }).filter(Boolean);
@@ -2620,7 +2632,7 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   let blendSvg='';
   if(blendPts.length>1){
     const path=blendPts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ');
-    blendSvg=`<path d="${path}" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    blendSvg=`<path d="${path}" fill="none" stroke="#c0392b" stroke-width="${blendLw}" stroke-linejoin="round" stroke-linecap="round"/>`;
   }
 
   // Chart title
@@ -2628,15 +2640,18 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     ?`Semi-Log Aggregate Grading Chart — ${mt}${info.hasRAP==='Yes'?' RAP':''}`
     :`0.45 Power Aggregate Grading Chart — ${mt}${info.hasRAP==='Yes'?' RAP':''}`;
 
-  // Legend — bottom-right corner (curve is high there, legend stays low)
-  const legW=150, legH=52;
+  // Legend — bottom-right corner; size scales with font
+  const legW=forPrint?310:150, legH=forPrint?106:52;
   const legX=PL+cW-legW-10, legY=PT+cH-legH-10;
+  const legLH=forPrint?44:22; // legend line height
+  const legLW=forPrint?32:16; // legend line sample width
+  const legSq=forPrint?16:8;  // legend square size
   const legendSvg=`
-    <rect x="${legX-6}" y="${legY-6}" width="${legW+12}" height="${legH+10}" fill="rgba(255,255,255,0.92)" stroke="#ccc" stroke-width="1" rx="4"/>
-    <line x1="${legX}" y1="${legY+8}" x2="${legX+20}" y2="${legY+8}" stroke="#c0392b" stroke-width="1.5"/>
-    <text x="${legX+26}" y="${legY+13}" font-size="10" fill="#333" font-family="'Segoe UI',sans-serif">Trial ${trial.id} Blend</text>
-    <rect x="${legX}" y="${legY+26}" width="8" height="8" fill="#1f3864" opacity="0.85"/>
-    <text x="${legX+26}" y="${legY+35}" font-size="10" fill="#333" font-family="'Segoe UI',sans-serif">Spec Limit</text>`;
+    <rect x="${legX-8}" y="${legY-8}" width="${legW+16}" height="${legH+12}" fill="rgba(255,255,255,0.94)" stroke="#bbb" stroke-width="${forPrint?2:1}" rx="4"/>
+    <line x1="${legX}" y1="${legY+legLH*0.4}" x2="${legX+legLW}" y2="${legY+legLH*0.4}" stroke="#c0392b" stroke-width="${blendLw}"/>
+    <text x="${legX+legLW+8}" y="${legY+legLH*0.55}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">Trial ${trial.id} Blend</text>
+    <rect x="${legX}" y="${legY+legLH-legSq/2}" width="${legSq}" height="${legSq}" fill="#1f3864" opacity="0.85"/>
+    <text x="${legX+legLW+8}" y="${legY+legLH+legLH*0.55}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">Spec Limit</text>`;
 
   return`<div style="margin-bottom:${forPrint?0:12}px">
     <svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:'Segoe UI',sans-serif;${forPrint?'':'max-width:'+W+'px'}">
@@ -2644,17 +2659,17 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
       ${yGrid}
       ${xGrid}
       ${bandSvg}
-      <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" stroke="#888" stroke-width="1.5"/>
-      <line x1="${PL}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#888" stroke-width="1.5"/>
+      <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" stroke="#888" stroke-width="${axisLw}"/>
+      <line x1="${PL}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#888" stroke-width="${axisLw}"/>
       <line x1="${PL+cW}" y1="${PT}" x2="${PL+cW}" y2="${PT+cH}" stroke="#ccc" stroke-width="1"/>
       <line x1="${PL}" y1="${PT}" x2="${PL+cW}" y2="${PT}" stroke="#ccc" stroke-width="1"/>
       ${blendSvg}
       ${xLbls}
       ${legendSvg}
-      <text x="${PL+cW/2}" y="${PT-16}" font-size="13" font-weight="700" fill="#1f3864" text-anchor="middle">${chartTitle}</text>
-      <text x="${PL+cW/2}" y="${PT-4}" font-size="9" fill="#888" text-anchor="middle">Trial ${trial.id} — ${info.spec||''} — ${info.mixNo||''}</text>
-      <text x="${PL-38}" y="${PT+cH/2}" font-size="10" fill="#666" text-anchor="middle" transform="rotate(-90,${PL-38},${PT+cH/2})">PERCENT PASSING (%)</text>
-      <text x="${PL+cW/2}" y="${H-1}" font-size="9" fill="#888" text-anchor="middle">SIEVE SIZE (mm) &nbsp;|&nbsp; ← Finer &nbsp;&nbsp;&nbsp; Coarser →</text>
+      <text x="${PL+cW/2}" y="${PT-fsTitle*0.6}" font-size="${fsTitle}" font-weight="800" fill="#1f3864" text-anchor="middle">${chartTitle}</text>
+      <text x="${PL+cW/2}" y="${PT-fsSub*0.2}" font-size="${fsSub}" fill="#666" text-anchor="middle">Trial ${trial.id} — ${info.spec||''} — ${info.mixNo||''}</text>
+      <text x="${yLabelX}" y="${PT+cH/2}" font-size="${fsYLabel}" font-weight="700" fill="#555" text-anchor="middle" transform="rotate(-90,${yLabelX},${PT+cH/2})">PERCENT PASSING (%)</text>
+      <text x="${PL+cW/2}" y="${H-fsSub*0.3}" font-size="${fsSub}" fill="#777" text-anchor="middle">SIEVE SIZE (mm) &nbsp;|&nbsp; ← Finer &nbsp;&nbsp;&nbsp; Coarser →</text>
     </svg>
   </div>`;
 }
@@ -2750,7 +2765,7 @@ function printTrial(trialIdx){
   const page1=`
   <div style="page-break-after:always">
     <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:48px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:96px">
       <div>
         <div style="font-size:16px;font-weight:900;color:#1f3864">MIX DESIGN — TRIAL BLEND ${trial.id}</div>
         <div style="font-size:10px;color:#666;margin-top:2px">
@@ -2801,7 +2816,7 @@ function printTrial(trialIdx){
   const page2=`
   <div style="page-break-after:always">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #1f3864">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:34px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:68px">
       <div>
         <div style="font-size:13px;font-weight:900;color:#1f3864">AGGREGATE GRADING CHART — TRIAL ${trial.id}</div>
         <div style="font-size:10px;color:#666">${info.mixNo||'—'} &nbsp;|&nbsp; ${mt}${rapLabel} &nbsp;|&nbsp; ${info.pgac||'—'} &nbsp;|&nbsp; Pb: ${Number(trial.Pb).toFixed(1)}% &nbsp;|&nbsp; ${info.spec||''}</div>
@@ -4340,7 +4355,7 @@ function printSelected(){
 
   const _brSel=calcBinderReplacement(selTrial.blendPct,selTrial.Pb);
   const hdr=`<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #1f3864">
-    <img src="${LOGO_SRC}" alt="Capital Paving" style="height:46px">
+    <img src="${LOGO_SRC}" alt="Capital Paving" style="height:92px">
     <div>
       <div style="font-size:15px;font-weight:900;color:#1f3864">MIX DESIGN — SELECTED BLEND: Trial ${selTrial.id}</div>
       <div style="font-size:10px;color:#666;margin-top:2px">
@@ -4452,7 +4467,7 @@ function printSelected(){
   const chartSvg=renderGradChart(selTrial,aggs,bands,blendGrad,info,true);
   const page3=`<div style="page-break-after:always;display:flex;flex-direction:column;height:100%">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;padding-bottom:6px;border-bottom:2px solid #1f3864;flex-shrink:0">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:36px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:72px">
       <div style="font-size:12px;font-weight:900;color:#1f3864">Grading Chart — Trial ${selTrial.id} &nbsp;|&nbsp; <span style="font-weight:400">${info.mixNo||'—'} — ${mt}${rapLabel} — Pb ${selTrial.Pb.toFixed(1)}%</span></div>
     </div>
     <div style="flex:1;width:100%">${chartSvg}</div>
