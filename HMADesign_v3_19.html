@@ -3085,18 +3085,19 @@ function calcEstimatedProps(res, trial, info, blendGsb, blendGrad){
   return{Pb_est,VMA_est,VFA_est,pGmmNini_est,Pbe_est,DP_est};
 }
 
+function roundAvg(arr,dec){const m=Math.pow(10,dec);return Math.round(arr.reduce((s,v)=>s+Math.round(v*m),0)/arr.length)/m;}
 function calcVol(trial,info,blendGsb){
   const vol=trial.vol;
   if(!vol)return null;
   // Average two Gmm readings if both present
   const Gmm1=vol.GmmA, Gmm2=vol.GmmB;
-  const Gmm=Gmm1&&Gmm2?((Gmm1+Gmm2)/2):Gmm1||(vol.Gmm||null);
+  const Gmm=Gmm1&&Gmm2?roundAvg([Gmm1,Gmm2],3):Gmm1||(vol.Gmm||null);
   if(!Gmm)return null;
   const fam=info.family||'',Pb=trial.Pb/100,Gb=info.Gb||1.022;
   // Gmb specimens
   const gmbs=[vol.GmbA,vol.GmbB,vol.GmbC].filter(v=>v!==null&&v!==undefined&&!isNaN(v));
   if(!gmbs.length)return null;
-  const avgGmb=gmbs.reduce((a,b)=>a+b,0)/gmbs.length;
+  const avgGmb=roundAvg(gmbs,3);
   const Va=(1-avgGmb/Gmm)*100;
   const Gsb=blendGsb||2.7;
   const Gse=(1-Pb)/(1/Gmm-Pb/Gb);
