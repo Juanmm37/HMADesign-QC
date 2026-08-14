@@ -4431,7 +4431,7 @@ function printSelected(){
       const v=gmod!=null?gmod:gm;
       const isMod=gmod!=null;
       const disp=v!=null?Number(v).toFixed(1):'100.0';
-      return`<td style="text-align:right;font-size:10px;color:${v==null?'#aaa':isMod?'#e65100':'#333'};font-weight:${isMod?'700':'400'};padding:3px 4px;border-right:1px solid #eee">${disp}${isMod?'⚡':''}</td>`;
+      return`<td style="text-align:right;font-size:10px;color:${v==null?'#aaa':isMod?'#e65100':'#333'};font-weight:${isMod?'700':'600'};padding:3px 4px;border-right:1px solid #eee">${disp}${isMod?'⚡':''}</td>`;
     }).join('');
     let bc='#1f3864',bb='';
     if(band&&bv!=null){if(bv>=band[0]&&bv<=band[1]){bc='#1a6b1a';bb='background:#c6efce33';}else{bc='#9c0006';bb='background:#ffc7ce55';}}
