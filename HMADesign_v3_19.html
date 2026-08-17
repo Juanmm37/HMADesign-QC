@@ -2982,14 +2982,19 @@ function printTrial(trialIdx){
     <div style="margin-bottom:8px">
       <div style="font-size:10px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px">Aggregate Gradation &amp; Blend</div>
       <table style="border-collapse:collapse;font-size:11px;width:100%;table-layout:fixed">
+        <colgroup>
+          <col style="width:72px"><col style="width:44px">
+          ${aggs.map(()=>'<col>').join('')}
+          <col style="width:62px"><col style="width:38px"><col style="width:38px">
+        </colgroup>
         <thead>
           <tr style="background:#1f3864;color:#fff">
-            <th style="text-align:left;padding:5px 6px;width:72px;border-right:1px solid rgba(255,255,255,0.25)">Sieve</th>
-            <th style="padding:5px 4px;width:44px;border-right:1px solid rgba(255,255,255,0.25)">US</th>
+            <th style="text-align:left;padding:5px 6px;border-right:1px solid rgba(255,255,255,0.25)">Sieve</th>
+            <th style="padding:5px 4px;border-right:1px solid rgba(255,255,255,0.25)">US</th>
             ${aggHeaders}
-            <th style="padding:5px 6px;width:62px;border-right:1px solid rgba(255,255,255,0.25)">Blend</th>
-            <th style="padding:5px 4px;width:38px;border-right:1px solid rgba(255,255,255,0.25)">Min</th>
-            <th style="padding:5px 4px;width:38px">Max</th>
+            <th style="padding:5px 6px;border-right:1px solid rgba(255,255,255,0.25)">Blend</th>
+            <th style="padding:5px 4px;border-right:1px solid rgba(255,255,255,0.25)">Min</th>
+            <th style="padding:5px 4px">Max</th>
           </tr>
           <tr style="background:#f0f0f0">
             <td colspan="2" style="font-size:8px;color:#888;padding:2px 6px;font-style:italic;border-right:1px solid #dde">Source</td>
