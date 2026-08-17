@@ -614,6 +614,11 @@ function render(){
         if(all[window._consFocusAfterRender])all[window._consFocusAfterRender].focus();
         window._consFocusAfterRender=null;
       }
+      if(window._acFocusAfterRender!=null){
+        const el=document.querySelector(`[data-acfield="${window._acFocusAfterRender}"]`);
+        if(el){el.focus();el.select();}
+        window._acFocusAfterRender=null;
+      }
     },0);
   }
   else if(view==='records')el.innerHTML=renderRec();
