@@ -4754,11 +4754,15 @@ function printSelected(){
         </div>
       </div>
       <div style="overflow-x:auto">
-      <table style="border-collapse:collapse;font-size:11px;width:100%;min-width:600px">
+      <table style="border-collapse:collapse;font-size:11px;width:100%;table-layout:fixed">
+        <colgroup>
+          <col style="width:55px"><col style="width:50px">
+          ${rows.map(()=>'<col>').join('')}
+        </colgroup>
         <thead>
           <tr style="background:#1f3864;color:#fff">
-            <th style="padding:6px 8px;min-width:55px;text-align:left;border-right:1px solid rgba(255,255,255,0.2)">Pass</th>
-            <th style="padding:6px 8px;min-width:55px;text-align:left;border-right:1px solid rgba(255,255,255,0.2)">Ret.</th>
+            <th style="padding:6px 8px;text-align:left;border-right:1px solid rgba(255,255,255,0.2)">Pass</th>
+            <th style="padding:6px 8px;text-align:left;border-right:1px solid rgba(255,255,255,0.2)">Ret.</th>
             ${colHdrs}
           </tr>
           <tr style="background:#f0f0f0">
