@@ -1583,8 +1583,8 @@ function calcWeighCard(trial, cardType){
     // Match Excel ROUND sequence: for RAP, compute agg-only first then derive full weight by ratio
     let aggMass, rapBinder=0;
     if(agg.isRAP){
-      const rapAggOnly=Math.round(aggTotalMass*stockpilePct*10)/10;
-      aggMass=rapAggOnly>0?Math.round(rapAggOnly*(blendPct/stockpilePct)*10)/10:0;
+      const rapAggOnly=Math.round(aggTotalMass*stockpilePct*1000)/1000;
+      aggMass=rapAggOnly>0?Math.round(rapAggOnly*(blendPct/stockpilePct)*1000)/1000:0;
       rapBinder=aggMass-rapAggOnly;
     }else{
       aggMass=aggTotalMass*stockpilePct;
