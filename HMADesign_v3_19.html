@@ -6319,7 +6319,10 @@ function renderS8TSR(){
 
     <div class="row" style="justify-content:space-between;margin-top:14px">
       <button class="btn" onclick="ms.step=8;render()">← Back</button>
-      <button class="btn btn-gold" onclick="printStep('TSR Batching')">🖨 Print</button>
+      <div class="row" style="gap:8px">
+        <button class="btn btn-gold" onclick="printStep('TSR Batching')">🖨 Print Batch Cards</button>
+        <button class="btn btn-gold" onclick="printTSRReport()">🖨 Print TSR Report</button>
+      </div>
       <button class="btn btn-primary" onclick="ms.step=10;render()">Next: ${fam==='SMA'?'Aggregate Testing':'Nmax'} →</button>
     </div>
   </div>`;
