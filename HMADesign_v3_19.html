@@ -5011,7 +5011,22 @@ function renderS6VolSelected(){
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
   if(!selTrial)return`<div class="card"><div class="wbox">No blend selected. Go back to Step 6.</div></div>`;
   if(!ms.acPoints.length)initACPoints();
-  const Gsb=calcBlendProps(selTrial).blendGsb||2.7;
+  const {blendGsb,blendGsa,blendGrad}=calcBlendProps(selTrial);
+  const Gsb=blendGsb||2.7;
+  const Gsa=blendGsa;
+  const Gb=ms.info.Gb||1.022;
+  const P0075=blendGrad&&(blendGrad['0.075']!=null?blendGrad['0.075']:blendGrad['#200'])||0;
+  const Gse_est=(Gsb&&Gsa)?Gsb+0.8*(Gsa-Gsb):null;
+  const Pba_est=Gse_est?100*Gb*(Gse_est-Gsb)/(Gsb*Gse_est):null;
+  const mt=ms.info.mixType||'';
+  const tc=ms.info.traffic||'B';
+  const vmaMin=SP_VOL.VMA[mt]||14;
+  const vfaRange=(SP_VOL.VFA_by_traffic[tc]||{})[mt]||(SP_VOL.VFA_by_traffic[tc]||{})['default']||[65,78];
+  const pNiniMax=SP_VOL['%GmmNini'][tc]||90.5;
+  const pbeMin=SP_VOL.minPbe[mt]||3.5;
+  const fn3=v=>(v!=null&&!isNaN(v))?v.toFixed(3):'—';
+  const fn2=v=>(v!=null&&!isNaN(v))?v.toFixed(2):'—';
+  const fn1=v=>(v!=null&&!isNaN(v))?v.toFixed(1):'—';
 
   function inpV(pi,li,field,val,w=72,step='0.001',ph=''){
     return`<div style="display:flex;justify-content:center;width:100%;height:100%"><input type="text" inputmode="decimal" value="${val||''}"
