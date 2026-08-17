@@ -5127,26 +5127,46 @@ function setACVol(pi,li,field,val){
   render();
 }
 
-function calcVolSelected(pt,info,Gsb){
-  const Gmbs=pt.vols.map(v=>v.Gmb).filter(v=>v&&!isNaN(v));
-  const v0=pt.vols[0]||{};
-  // MRD average
+function calcVolSelected(pt,info,Gsb,p075){
+  const v0=pt.vols[0]||{},v1=pt.vols[1]||{};
   const GmmA=v0.GmmA,GmmB=v0.GmmB;
   const Gmm=GmmA&&GmmB?((GmmA+GmmB)/2):(GmmA||v0.Gmm||null);
+  const GmbA=v0.Gmb,GmbB=v1.Gmb;
+  const Gmbs=[GmbA,GmbB].filter(v=>v&&!isNaN(v));
   if(!Gmbs.length||!Gmm)return null;
   const avgGmb=Gmbs.reduce((a,b)=>a+b,0)/Gmbs.length;
   const Pb=pt.Pb/100,Gb=info.Gb||1.022;
   const Va=(1-avgGmb/Gmm)*100;
-  const Gse=(1-Pb)/(1/Gmm-Pb/Gb);
+  // Per-specimen Gse (uses individual Gmm); avg Gse for Pbe calc
+  const GseA=GmmA?(1-Pb)/(1/GmmA-Pb/Gb):null;
+  const GseB=GmmB?(1-Pb)/(1/GmmB-Pb/Gb):null;
+  const Gse=(1-Pb)/(1/Gmm-Pb/Gb);  // from avg Gmm (backward compat)
+  const avgGse=GseA&&GseB?(GseA+GseB)/2:Gse;
   const VMA=(1-avgGmb*(1-Pb)/(Gsb||2.7))*100;
   const VFA=VMA>0?((VMA-Va)/VMA)*100:null;
-  const hNiniA=pt.vols[0]?.hNiniA,hNiniB=pt.vols[0]?.hNiniB;
-  const hNdesA=pt.vols[0]?.hNdesA,hNdesB=pt.vols[0]?.hNdesB;
-  const hNini=hNiniA&&hNiniB?((hNiniA+hNiniB)/2):(hNiniA||pt.vols[0]?.hNini||null);
-  const hNdes=hNdesA&&hNdesB?((hNdesA+hNdesB)/2):(hNdesA||pt.vols[0]?.hNdes||null);
-  const pGmmNini=hNini&&hNdes?(avgGmb*(hNdes/hNini))/Gmm*100:null;
-  const pGmmNdes=(avgGmb/Gmm)*100;
-  return{avgGmb,Va,VMA,VFA,Gse,pGmmNini,pGmmNdes,Gmm,Stab:pt.vols[0]?.Stab,Flow:pt.vols[0]?.Flow};
+  const hNiniA=v0.hNiniA,hNiniB=v0.hNiniB;
+  const hNdesA=v0.hNdesA,hNdesB=v0.hNdesB;
+  const hNini=hNiniA&&hNiniB?((hNiniA+hNiniB)/2):(hNiniA||v0.hNini||null);
+  const hNdes=hNdesA&&hNdesB?((hNdesA+hNdesB)/2):(hNdesA||v0.hNdes||null);
+  // %GmmNini per specimen: uses per-specimen Gmb + heights, averaged Gmm
+  const pGmmNiniA=hNiniA&&hNdesA&&GmbA?(GmbA*(hNdesA/hNiniA)/Gmm*100):null;
+  const pGmmNiniB=hNiniB&&hNdesB&&GmbB?(GmbB*(hNdesB/hNiniB)/Gmm*100):null;
+  const pGmmNini=pGmmNiniA!=null&&pGmmNiniB!=null?(pGmmNiniA+pGmmNiniB)/2:
+    (hNini&&hNdes?(avgGmb*(hNdes/hNini)/Gmm*100):null);
+  // %GmmNdes per specimen
+  const pGmmNdesA=GmbA?GmbA/Gmm*100:null;
+  const pGmmNdesB=GmbB?GmbB/Gmm*100:null;
+  const pGmmNdes=avgGmb/Gmm*100;
+  // Pbe (effective binder content %)
+  const Pba_pct=Gsb?100*Gb*(avgGse-Gsb)/(Gsb*avgGse):null;
+  const Pbe=Pba_pct!=null?pt.Pb-Pba_pct*(100-pt.Pb)/100:null;
+  // DP
+  const DP=(Pbe&&Pbe>0&&p075!=null)?p075/Pbe:null;
+  return{avgGmb,Va,VMA,VFA,Gse,GseA,GseB,avgGse,
+    pGmmNini,pGmmNiniA,pGmmNiniB,
+    pGmmNdes,pGmmNdesA,pGmmNdesB,
+    Pbe,Pba_pct,DP,
+    Gmm,Stab:v0.Stab,Flow:v0.Flow};
 }
 
 function computePropertyCurves(){
