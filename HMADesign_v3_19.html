@@ -216,9 +216,50 @@ function saveDB(){
 (function(){
   try{
     const s=localStorage.getItem('capmix_session');
-    if(s){const p=JSON.parse(s);if(p&&p.ms&&(p.ms.step>1||p.view==='newmix')){ms=p.ms;if(p.view&&p.view!=='dashboard')view=p.view;}}
+    if(s){
+      const p=JSON.parse(s);
+      if(p&&p.ms){
+        const hasData=Object.keys(p.ms.slots||{}).length>0||(p.ms.trials&&p.ms.trials.length>0)||p.ms.info?.mixNo||(p.ms.acPoints&&p.ms.acPoints.length>0);
+        if(hasData||p.ms.step>1||p.view==='newmix'){
+          ms=p.ms;
+          if(p.view&&p.view!=='dashboard')view=p.view;
+        }
+      }
+    }
   }catch(e){}
 })();
+function exportSession(){
+  try{
+    const data=JSON.stringify({ms,view,db},null,2);
+    const blob=new Blob([data],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='HMADesign_session_'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);URL.revokeObjectURL(url);
+  }catch(e){alert('Export failed: '+e.message);}
+}
+function importSession(){
+  const input=document.createElement('input');
+  input.type='file';input.accept='.json';
+  input.onchange=function(e){
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=function(ev){
+      try{
+        const p=JSON.parse(ev.target.result);
+        if(p.ms){ms=p.ms;}
+        if(p.view){view=p.view;}
+        if(p.db){db=p.db;localStorage.setItem('capmix_v4',JSON.stringify(db));}
+        saveDB();render();
+        alert('Session loaded successfully!');
+      }catch(err){alert('Error loading session: '+err.message);}
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
 
 // ── Tab-navigation helpers ──
 // Tab → move to next input in same TSR column (same specimen, next measurement row).
