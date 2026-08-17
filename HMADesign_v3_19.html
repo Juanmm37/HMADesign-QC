@@ -6784,6 +6784,119 @@ function renderS11AggTesting(){
     <div class="st">Step ${fam==='SMA'?10:11} — Aggregate Testing</div>
     <div class="ibox">Physical test results — for reporting purposes only. Does not affect volumetric calculations.</div>
 
+    <!-- ── NEW: Combined Aggregate Relative Density Calculation ── -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid #e8edf5;padding-bottom:5px">
+        Combined Aggregate Relative Density Calculation
+      </div>
+
+      <!-- Mode selector + Date/Tech -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-bottom:12px">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px">Calculation Method</div>
+          <div style="display:flex;border:1px solid #c5d3ef;border-radius:6px;overflow:hidden">
+            ${[
+              ['simple','Retain 4.75 + Passing 4.75'],
+              ['split','+ Retain 2.36 split'],
+              ['split-rap','+ RAP Fine']
+            ].map(([val,lbl],i)=>`<button style="padding:7px 13px;font-size:10px;font-weight:700;border:none;border-right:${i<2?'1px solid #c5d3ef':'none'};cursor:pointer;white-space:nowrap;
+              background:${cMode===val?'#1f3864':'#f5f8ff'};color:${cMode===val?'#fff':'#1f3864'}"
+              onclick="ms.aggTesting.calcMode='${val}';saveDB();render()">${lbl}</button>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div class="fg" style="margin:0"><label style="font-size:9px">Date Tested</label>
+            <input type="date" value="${at.c_date||''}" style="font-size:11px;width:140px"
+              onchange="ms.aggTesting.c_date=this.value;saveDB()"></div>
+          <div class="fg" style="margin:0"><label style="font-size:9px">Tested By</label>
+            <input value="${at.c_tech||''}" style="font-size:11px;width:110px"
+              onchange="ms.aggTesting.c_tech=this.value;saveDB()"></div>
+        </div>
+      </div>
+
+      ${cMode!=='simple'?`<!-- Fine fraction sieve split inputs -->
+      <div style="background:#eff4fb;border:1px solid #c5d3ef;border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:#1f3864;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.04em">Fine Fraction Sieve Data</span>
+        <span style="color:#555">% passing 4.75: ${cinpSieve('c_pct475',at.c_pct475)}</span>
+        <span style="color:#555">% passing 2.36: ${cinpSieve('c_pct236',at.c_pct236)}</span>
+        ${cP236v!==null?`<span style="color:#1f3864;font-weight:700;font-size:10px">
+          → Retain 2.36 = ${(cR2Frac*100).toFixed(1)}% of fine &nbsp;|&nbsp; Passing 2.36 = ${(cF2Frac*100).toFixed(1)}% of fine
+        </span>`:'<span style="color:#aaa;font-size:10px;font-style:italic">Enter both sieve values to compute split percentages</span>'}
+      </div>`:''}
+
+      <!-- Calculation table -->
+      <div style="overflow-x:auto">
+      <table style="border-collapse:collapse;font-size:11px;width:100%;min-width:520px">
+        <thead>
+          <tr>
+            <th style="${thTL};font-size:10px;min-width:160px">Description</th>
+            <th style="${thT};font-size:10px;width:80px">% (JMF)</th>
+            <th style="${thT};font-size:10px;width:110px">Bulk Relative Density (Gsb)</th>
+            <th style="${thT};font-size:10px;width:110px">Apparent Density (Gsa)</th>
+            <th style="${thT};font-size:10px;width:100px">Absorption (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Retain on 4.75 (Coarse) -->
+          <tr style="background:#fff">
+            <td style="${tdL}">Retain on 4.75 *</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
+            <td style="${tdY}">${cinp('c_coarseGsb',at.c_coarseGsb,3)}</td>
+            <td style="${tdY}">${cinp('c_coarseGsa',at.c_coarseGsa,3)}</td>
+            <td style="${tdY}">${cinp('c_coarseWa',at.c_coarseWa,2)}</td>
+          </tr>
+          ${cMode!=='simple'?`
+          <!-- Retain on 2.36 -->
+          <tr style="background:#f0f4fb">
+            <td style="${tdL}">Retain on 2.36 **</td>
+            <td style="${tdC}">${cP236v!==null?cR236Pct.toFixed(1):'—'}<br><span style="font-size:8px">calc.</span></td>
+            <td style="${tdY}">${cinp('c_r236Gsb',at.c_r236Gsb,3)}</td>
+            <td style="${tdY}">${cinp('c_r236Gsa',at.c_r236Gsa,3)}</td>
+            <td style="${tdY}">${cinp('c_r236Wa',at.c_r236Wa,2)}</td>
+          </tr>
+          <!-- Passing 2.36 -->
+          <tr style="background:#e8f0fe">
+            <td style="${tdL}">Passing 2.36 ***</td>
+            <td style="${tdC}">${cP236v!==null?cF236Pct.toFixed(1):'—'}<br><span style="font-size:8px">calc.</span></td>
+            <td style="${tdY}">${cinp('c_fineGsb',at.c_fineGsb,3)}</td>
+            <td style="${tdY}">${cinp('c_fineGsa',at.c_fineGsa,3)}</td>
+            <td style="${tdY}">${cinp('c_fineWa',at.c_fineWa,2)}</td>
+          </tr>`:`
+          <!-- Passing 4.75 (simple mode) -->
+          <tr style="background:#f0f4fb">
+            <td style="${tdL}">Passing 4.75 **</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${T29.toFixed(1)}</td>
+            <td style="${tdY}">${cinp('c_fineGsb',at.c_fineGsb,3)}</td>
+            <td style="${tdY}">${cinp('c_fineGsa',at.c_fineGsa,3)}</td>
+            <td style="${tdY}">${cinp('c_fineWa',at.c_fineWa,2)}</td>
+          </tr>`}
+          ${cMode==='split-rap'?`
+          <!-- RAP Fine -->
+          <tr style="background:#f0f4f0">
+            <td style="${tdL}">RAP Fine ****</td>
+            <td style="${td0};background:#eef3ee;font-weight:700">${cRapFinePct.toFixed(1)}</td>
+            <td style="${tdY}">${cinp('c_rapGsb',at.c_rapGsb,3)}</td>
+            <td style="${tdY}">${cinp('c_rapGsa',at.c_rapGsa,3)}</td>
+            <td style="${tdY}">${cinp('c_rapWa',at.c_rapWa,2)}</td>
+          </tr>`:''}
+          <!-- Combined Results -->
+          <tr>
+            <td colspan="2" style="${tdBotL}">Aggregate Blend Results</td>
+            <td style="${tdBot};font-size:14px">${cCombGsb!==null?cCombGsb.toFixed(3):'—'}</td>
+            <td style="${tdBot};font-size:14px">${cCombGsa!==null?cCombGsa.toFixed(3):'—'}</td>
+            <td style="${tdBot};font-size:14px">${cCombWa!==null?cCombWa.toFixed(2):'—'}</td>
+          </tr>
+          <!-- Footnotes -->
+          <tr><td colspan="5" style="padding:5px 10px;font-size:9.5px;color:#888;font-style:italic;background:#fafafa;border:1px solid #e0e4ec">
+            * Retained on 4.75mm — LS 604 &nbsp;|&nbsp;
+            ${cMode==='simple'?'** Passing 4.75mm — LS 605':
+              cMode==='split'?'** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; *** Passing 2.36mm — LS 605':
+              '** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; *** Passing 2.36mm — LS 605 &nbsp;|&nbsp; **** RAP fine — LS 605 procedure 6.3'}
+          </td></tr>
+        </tbody>
+      </table></div>
+    </div>
+
     <!-- ── A: Specific Gravity & Absorption — matches Excel "Volumetric Calc. - Design" table layout ── -->
     <div style="margin-bottom:22px">
       <div style="overflow-x:auto">
