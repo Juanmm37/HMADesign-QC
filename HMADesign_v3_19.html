@@ -284,6 +284,18 @@ function _tsrTabDown(el){
     nxt.focus();
   }
 }
+// Tab → move to next Step 7 AC volumetric input (left-to-right, then next row).
+// Stores data-acfield key in window._acFocusAfterRender for post-render restoration.
+function _s7TabDown(el){
+  const all=Array.from(document.querySelectorAll('[data-acfield]'));
+  const idx=all.indexOf(el);
+  if(idx<0)return;
+  const next=all[idx+1]||all[0];
+  if(next){
+    window._acFocusAfterRender=next.dataset.acfield;
+    next.focus();
+  }
+}
 // Tab → move to next consensus property input.
 // Stores index in window._consFocusAfterRender for post-render restoration.
 function _consTabDown(el){
