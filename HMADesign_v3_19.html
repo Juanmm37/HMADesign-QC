@@ -5037,37 +5037,125 @@ function renderS6VolSelected(){
       placeholder="${ph}"></div>`;
   }
 
+  // Helper for pass/fail cell colouring in summary table
+  function pfCell(val,lo,hi,dec=1,goodHi=true){
+    if(val==null||isNaN(val))return`<td style="text-align:center;color:#aaa">—</td>`;
+    const s=val.toFixed(dec);
+    let pass=true;
+    if(lo!=null&&val<lo)pass=false;
+    if(hi!=null&&val>hi)pass=false;
+    if(!goodHi&&hi!=null&&val>hi)pass=false;
+    const col=pass?'#1a6b1a':'#c0392b';
+    return`<td style="text-align:center;font-weight:700;color:${col}">${s}</td>`;
+  }
+
   return`<div class="card card-blue">
     <div class="st">Step 7 — Selected Blend Volumetrics (${fam})</div>
+
+    <!-- AASHTO R 35 Aggregate Properties Block -->
+    <div style="background:#eff4fb;border:1px solid #c5d3ef;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:11px">
+      <div style="font-weight:800;font-size:11px;color:#1f3864;margin-bottom:7px">Aggregate Properties — AASHTO R 35 Initial Estimate</div>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Combined Gsb</div>
+          <div style="font-size:16px;font-weight:900;color:#1f3864">${fn3(blendGsb)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Gse (initial est.)</div>
+          <div style="font-size:16px;font-weight:900;color:#1f3864">${fn3(Gse_est)}</div>
+          <div style="font-size:9px;color:#888">= Gsb + 0.8(Gsa − Gsb)</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Combined Gsa</div>
+          <div style="font-size:16px;font-weight:900;color:#1f3864">${fn3(blendGsa)}</div>
+        </div>
+        <div style="width:1px;background:#c5d3ef;align-self:stretch;margin:0 4px"></div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Pba est. (%)</div>
+          <div style="font-size:16px;font-weight:900;color:#c0392b">${fn2(Pba_est)}</div>
+          <div style="font-size:9px;color:#888">Absorbed binder</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">P₀.₀₇₅ (blend)</div>
+          <div style="font-size:16px;font-weight:900;color:#1f3864">${fn1(P0075)}%</div>
+          <div style="font-size:9px;color:#888">% passing 0.075 mm</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Gb (binder SG)</div>
+          <div style="font-size:16px;font-weight:900;color:#1f3864">${fn3(Gb)}</div>
+        </div>
+      </div>
+    </div>
+
     <button class="btn btn-sm btn-gold" onclick="autoFillACPoints()" style="margin-bottom:8px">📋 Autofill with Same Sample Data</button>
     <div style="overflow-x:auto">
-    <table style="border-collapse:collapse;width:100%;font-size:11px;min-width:800px;table-layout:fixed">
+    <table style="border-collapse:collapse;font-size:11px;white-space:nowrap">
       <thead>
         <tr style="background:#1f3864;color:#fff">
-          <th style="padding:6px 8px;text-align:left;min-width:60px">AC Pt.</th>
-          <th style="padding:6px 8px;text-align:center;min-width:44px">Pb%</th>
-          <!-- BRD (Gmb) -->
-          <th style="padding:6px 8px;text-align:center;min-width:88px">BRD A</th>
-          <th style="padding:6px 8px;text-align:center;min-width:88px">BRD B</th>
-          ${isM?`<th style="padding:6px 8px;text-align:center;min-width:88px">BRD C</th>`:''}
-          <th style="padding:6px 8px;text-align:center;min-width:80px;background:#162d52">Avg BRD</th>
-          <!-- MRD (Gmm) -->
-          <th style="padding:6px 8px;text-align:center;min-width:88px">MRD A</th>
-          <th style="padding:6px 8px;text-align:center;min-width:88px">MRD B</th>
-          <th style="padding:6px 8px;text-align:center;min-width:80px;background:#162d52">Avg MRD</th>
+          <th style="padding:6px 8px;text-align:left;min-width:55px" rowspan="2">AC Pt.</th>
+          <th style="padding:6px 8px;text-align:center;min-width:40px" rowspan="2">Pb%</th>
+          <!-- BRD group -->
+          <th style="padding:4px 8px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.3)" colspan="${isM?4:3}">BRD (Gmb)</th>
+          <!-- MRD group -->
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3)" colspan="3">MRD (Gmm)</th>
           ${isSP||isSMA?`
-          <!-- Heights -->
-          <th style="padding:6px 8px;text-align:center;min-width:76px">hNini A</th>
-          <th style="padding:6px 8px;text-align:center;min-width:76px">hNini B</th>
-          <th style="padding:6px 8px;text-align:center;min-width:70px;background:#162d52">Avg Nini</th>
-          <th style="padding:6px 8px;text-align:center;min-width:76px">hNdes A</th>
-          <th style="padding:6px 8px;text-align:center;min-width:76px">hNdes B</th>
-          <th style="padding:6px 8px;text-align:center;min-width:70px;background:#162d52">Avg Ndes</th>
+          <!-- Height groups -->
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3)" colspan="3">h @ Nini (mm)</th>
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3)" colspan="3">h @ Ndes (mm)</th>
           `:''}
-          ${isM?`<th style="padding:6px 8px;text-align:center">Stab(N)</th><th style="padding:6px 8px;text-align:center">Flow</th>`:''}
-          <th style="padding:6px 8px;text-align:center;background:#c0392b;min-width:44px">Va%</th>
-          <th style="padding:6px 8px;text-align:center;min-width:44px">VMA%</th>
-          <th style="padding:6px 8px;text-align:center;min-width:44px">VFA%</th>
+          ${isM?`<th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3)" colspan="2">Marshall</th>`:''}
+          <!-- Volumetric results -->
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3)" colspan="3">Volumetrics</th>
+          ${isSP||isSMA?`
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3);background:#0d2040" colspan="3">% Gmm @ Nini</th>
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3);background:#0d2040" colspan="3">% Gmm @ Ndes</th>
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3);background:#0d2040" colspan="3">Gse</th>
+          <th style="padding:4px 8px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);border-bottom:1px solid rgba(255,255,255,0.3);background:#0d2040" rowspan="1">Pbe%</th>
+          <th style="padding:4px 8px;text-align:center;border-left:1px solid rgba(255,255,255,0.2);border-bottom:1px solid rgba(255,255,255,0.3);background:#0d2040" rowspan="1">DP</th>
+          `:''}
+        </tr>
+        <tr style="background:#2a4a7c;color:#fff;font-size:10px">
+          <!-- BRD sub-headers -->
+          <th style="padding:3px 6px;text-align:center">A</th>
+          <th style="padding:3px 6px;text-align:center">B</th>
+          ${isM?`<th style="padding:3px 6px;text-align:center">C</th>`:''}
+          <th style="padding:3px 6px;text-align:center;background:#1e3a6a">Avg</th>
+          <!-- MRD sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3)">A</th>
+          <th style="padding:3px 6px;text-align:center">B</th>
+          <th style="padding:3px 6px;text-align:center;background:#1e3a6a">Avg</th>
+          ${isSP||isSMA?`
+          <!-- hNini sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3)">A</th>
+          <th style="padding:3px 6px;text-align:center">B</th>
+          <th style="padding:3px 6px;text-align:center;background:#1e3a6a">Avg</th>
+          <!-- hNdes sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3)">A</th>
+          <th style="padding:3px 6px;text-align:center">B</th>
+          <th style="padding:3px 6px;text-align:center;background:#1e3a6a">Avg</th>
+          `:''}
+          ${isM?`<th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3)">Stab(N)</th><th style="padding:3px 6px;text-align:center">Flow</th>`:''}
+          <!-- Volumetrics sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);background:#8b0000">Va%</th>
+          <th style="padding:3px 6px;text-align:center">VMA%</th>
+          <th style="padding:3px 6px;text-align:center">VFA%</th>
+          ${isSP||isSMA?`
+          <!-- %GmmNini sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);background:#0a1a30">A</th>
+          <th style="padding:3px 6px;text-align:center;background:#0a1a30">B</th>
+          <th style="padding:3px 6px;text-align:center;background:#071525">Avg</th>
+          <!-- %GmmNdes sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);background:#0a1a30">A</th>
+          <th style="padding:3px 6px;text-align:center;background:#0a1a30">B</th>
+          <th style="padding:3px 6px;text-align:center;background:#071525">Avg</th>
+          <!-- Gse sub-headers -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);background:#0a1a30">A</th>
+          <th style="padding:3px 6px;text-align:center;background:#0a1a30">B</th>
+          <th style="padding:3px 6px;text-align:center;background:#071525">Avg</th>
+          <!-- Pbe, DP (empty 2nd-row cells since they span both header rows above) -->
+          <th style="padding:3px 6px;text-align:center;border-left:2px solid rgba(255,255,255,0.3);background:#0a1a30"></th>
+          <th style="padding:3px 6px;text-align:center;border-left:1px solid rgba(255,255,255,0.2);background:#0a1a30"></th>
+          `:''}
         </tr>
       </thead>
       <tbody>
@@ -5086,45 +5174,124 @@ function renderS6VolSelected(){
           const hNdesA=v0.hNdesA,hNdesB=v0.hNdesB;
           const avgNini=hNiniA&&hNiniB?((hNiniA+hNiniB)/2):(hNiniA||null);
           const avgNdes=hNdesA&&hNdesB?((hNdesA+hNdesB)/2):(hNdesA||null);
-          // Pass to calcVolSelected via pt structure
+          // Sync cached averages for calcVolSelected
           pt.vols[0].Gmm=avgMRD;
           pt.vols[0].hNini=avgNini;
           pt.vols[0].hNdes=avgNdes;
-          const res=calcVolSelected(pt,ms.info,Gsb);
+          const res=calcVolSelected(pt,ms.info,Gsb,P0075);
           const bg=pi%2===0?'#fff':'#fafbfc';
+          const cs='padding:5px 6px;text-align:center';
+          const csAvg='padding:5px 6px;text-align:center;font-weight:800;color:#1f3864;background:#dde8f5';
+          const csCalc='padding:5px 6px;text-align:center;font-weight:700;background:#f0f4fb';
+          const csCalcAvg='padding:5px 6px;text-align:center;font-weight:900;background:#dde8f5;color:#1f3864';
           return`<tr style="background:${bg}">
-            <td style="padding:6px 8px;font-weight:800;color:#1f3864">AC ${pi+1}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:700">${pt.Pb.toFixed(1)}%</td>
+            <td style="padding:5px 8px;font-weight:800;color:#1f3864">AC ${pi+1}</td>
+            <td style="padding:5px 8px;text-align:center;font-weight:700">${pt.Pb.toFixed(1)}%</td>
             <!-- BRD inputs -->
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'Gmb',v0.Gmb?v0.Gmb.toFixed(3):'',70,'0.001','—')}</td>
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,1,'Gmb',v1.Gmb?v1.Gmb.toFixed(3):'',70,'0.001','—')}</td>
-            ${isM?`<td style="padding:6px 8px;text-align:center">${inpV(pi,2,'Gmb',v2.Gmb?v2.Gmb.toFixed(3):'',70,'0.001','—')}</td>`:''}
-            <td style="padding:6px 8px;text-align:center;font-weight:800;color:#1f3864;background:#dde8f5;font-size:12px">${avgBRD?avgBRD.toFixed(3):'—'}</td>
+            <td style="${cs}">${inpV(pi,0,'Gmb',v0.Gmb?v0.Gmb.toFixed(3):'',68,'0.001','—')}</td>
+            <td style="${cs}">${inpV(pi,1,'Gmb',v1.Gmb?v1.Gmb.toFixed(3):'',68,'0.001','—')}</td>
+            ${isM?`<td style="${cs}">${inpV(pi,2,'Gmb',v2.Gmb?v2.Gmb.toFixed(3):'',68,'0.001','—')}</td>`:''}
+            <td style="${csAvg}">${avgBRD?avgBRD.toFixed(3):'—'}</td>
             <!-- MRD inputs -->
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'GmmA',mrdA?mrdA.toFixed(3):'',70,'0.001','—')}</td>
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'GmmB',mrdB?mrdB.toFixed(3):'',70,'0.001','—')}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:800;color:#1f3864;background:#dde8f5;font-size:12px">${avgMRD?avgMRD.toFixed(3):'—'}</td>
+            <td style="${cs};border-left:2px solid #c5d3ef">${inpV(pi,0,'GmmA',mrdA?mrdA.toFixed(3):'',68,'0.001','—')}</td>
+            <td style="${cs}">${inpV(pi,0,'GmmB',mrdB?mrdB.toFixed(3):'',68,'0.001','—')}</td>
+            <td style="${csAvg}">${avgMRD?avgMRD.toFixed(3):'—'}</td>
             ${isSP||isSMA?`
             <!-- Height inputs -->
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'hNiniA',hNiniA?hNiniA.toFixed(1):'',60,'0.1','—')}</td>
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'hNiniB',hNiniB?hNiniB.toFixed(1):'',60,'0.1','—')}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:800;background:#dde8f5;font-size:11px">${avgNini?avgNini.toFixed(1):'—'}</td>
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'hNdesA',hNdesA?hNdesA.toFixed(1):'',60,'0.1','—')}</td>
-            <td style="padding:6px 8px;text-align:center">${inpV(pi,0,'hNdesB',hNdesB?hNdesB.toFixed(1):'',60,'0.1','—')}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:800;background:#dde8f5;font-size:11px">${avgNdes?avgNdes.toFixed(1):'—'}</td>
+            <td style="${cs};border-left:2px solid #c5d3ef">${inpV(pi,0,'hNiniA',hNiniA?hNiniA.toFixed(1):'',58,'0.1','—')}</td>
+            <td style="${cs}">${inpV(pi,0,'hNiniB',hNiniB?hNiniB.toFixed(1):'',58,'0.1','—')}</td>
+            <td style="${csAvg};font-size:11px">${avgNini?avgNini.toFixed(1):'—'}</td>
+            <td style="${cs};border-left:2px solid #c5d3ef">${inpV(pi,0,'hNdesA',hNdesA?hNdesA.toFixed(1):'',58,'0.1','—')}</td>
+            <td style="${cs}">${inpV(pi,0,'hNdesB',hNdesB?hNdesB.toFixed(1):'',58,'0.1','—')}</td>
+            <td style="${csAvg};font-size:11px">${avgNdes?avgNdes.toFixed(1):'—'}</td>
             `:''}
-            ${isM?`<td style="padding:6px 8px;text-align:center">${inpV(pi,0,'Stab',v0.Stab,68,'1','—')}</td><td style="padding:6px 8px;text-align:center">${inpV(pi,0,'Flow',v0.Flow,56,'0.1','—')}</td>`:''}
+            ${isM?`<td style="${cs};border-left:2px solid #c5d3ef">${inpV(pi,0,'Stab',v0.Stab,64,'1','—')}</td><td style="${cs}">${inpV(pi,0,'Flow',v0.Flow,52,'0.1','—')}</td>`:''}
             ${res?`
-            <td style="padding:6px 8px;text-align:center;font-weight:700">${res.Va.toFixed(1)}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:700">${res.VMA.toFixed(1)}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:700">${res.VFA?res.VFA.toFixed(1):'—'}</td>`
-            :`<td colspan="3" style="color:#aaa;text-align:center;font-size:10px">need MRD</td>`}
+            <!-- Volumetrics -->
+            <td style="${cs};border-left:2px solid #c5d3ef;font-weight:700;color:#c0392b">${res.Va.toFixed(1)}</td>
+            <td style="${cs};font-weight:700">${res.VMA.toFixed(1)}</td>
+            <td style="${cs};font-weight:700">${res.VFA!=null?res.VFA.toFixed(1):'—'}</td>
+            ${isSP||isSMA?`
+            <!-- %GmmNini -->
+            <td style="${csCalc};border-left:2px solid #c5d3ef">${res.pGmmNiniA!=null?res.pGmmNiniA.toFixed(1):'—'}</td>
+            <td style="${csCalc}">${res.pGmmNiniB!=null?res.pGmmNiniB.toFixed(1):'—'}</td>
+            <td style="${csCalcAvg}">${res.pGmmNini!=null?res.pGmmNini.toFixed(1):'—'}</td>
+            <!-- %GmmNdes -->
+            <td style="${csCalc};border-left:2px solid #c5d3ef">${res.pGmmNdesA!=null?res.pGmmNdesA.toFixed(1):'—'}</td>
+            <td style="${csCalc}">${res.pGmmNdesB!=null?res.pGmmNdesB.toFixed(1):'—'}</td>
+            <td style="${csCalcAvg}">${res.pGmmNdes!=null?res.pGmmNdes.toFixed(1):'—'}</td>
+            <!-- Gse -->
+            <td style="${csCalc};border-left:2px solid #c5d3ef">${res.GseA!=null?res.GseA.toFixed(3):'—'}</td>
+            <td style="${csCalc}">${res.GseB!=null?res.GseB.toFixed(3):'—'}</td>
+            <td style="${csCalcAvg}">${res.avgGse!=null?res.avgGse.toFixed(3):'—'}</td>
+            <!-- Pbe -->
+            <td style="${csCalcAvg};border-left:2px solid #c5d3ef;color:#c05000">${res.Pbe!=null?res.Pbe.toFixed(2):'—'}</td>
+            <!-- DP -->
+            <td style="${csCalcAvg};border-left:1px solid #c5d3ef;color:#c05000">${res.DP!=null?res.DP.toFixed(2):'—'}</td>
+            `:''}
+            `:`<td colspan="${(isSP||isSMA)?17:3}" style="color:#aaa;text-align:center;font-size:10px">— enter MRD to calculate —</td>`}
           </tr>`;
         }).join('')}
       </tbody>
     </table>
     </div>
-    <div class="row" style="justify-content:space-between;margin-top:14px">
+
+    ${isSP||isSMA?`
+    <!-- Volumetric Properties Summary with Design Criteria -->
+    <div style="margin-top:20px">
+      <div style="font-weight:800;font-size:12px;color:#1f3864;margin-bottom:8px">Volumetric Properties Summary — Traffic Category ${tc}</div>
+      <div style="overflow-x:auto">
+      <table style="border-collapse:collapse;font-size:11px;white-space:nowrap">
+        <thead>
+          <tr style="background:#1f3864;color:#fff">
+            <th style="padding:6px 10px;text-align:left">AC Pt.</th>
+            <th style="padding:6px 10px;text-align:center">Pb%</th>
+            <th style="padding:6px 10px;text-align:center">Va%</th>
+            <th style="padding:6px 10px;text-align:center">VMA%</th>
+            <th style="padding:6px 10px;text-align:center">VFA%</th>
+            <th style="padding:6px 10px;text-align:center">%Gmm@Nini</th>
+            <th style="padding:6px 10px;text-align:center">%Gmm@Ndes</th>
+            <th style="padding:6px 10px;text-align:center">Pbe%</th>
+            <th style="padding:6px 10px;text-align:center">DP</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ms.acPoints.map((pt,pi)=>{
+            pt.vols[0].Gmm=pt.vols[0].GmmA&&pt.vols[0].GmmB?(pt.vols[0].GmmA+pt.vols[0].GmmB)/2:(pt.vols[0].GmmA||null);
+            const res=calcVolSelected(pt,ms.info,Gsb,P0075);
+            if(!res)return`<tr><td colspan="9" style="text-align:center;color:#aaa;padding:6px">AC ${pi+1} — ${pt.Pb.toFixed(1)}% — no data</td></tr>`;
+            const bg=pi%2===0?'#fff':'#fafbfc';
+            const td='padding:6px 10px;';
+            return`<tr style="background:${bg}">
+              <td style="${td}font-weight:800;color:#1f3864">AC ${pi+1}</td>
+              <td style="${td}text-align:center;font-weight:700">${pt.Pb.toFixed(1)}%</td>
+              ${pfCell(res.Va,3.5,4.5)}
+              ${pfCell(res.VMA,vmaMin,null)}
+              ${pfCell(res.VFA,vfaRange[0],vfaRange[1])}
+              ${pfCell(res.pGmmNini,null,pNiniMax)}
+              ${pfCell(res.pGmmNdes,95.5,96.5)}
+              ${pfCell(res.Pbe,pbeMin,null)}
+              ${pfCell(res.DP,0.6,1.2)}
+            </tr>`;
+          }).join('')}
+        </tbody>
+        <tfoot>
+          <tr style="background:#e8f0dc;font-size:10px;font-weight:700;color:#2a5200">
+            <td style="padding:5px 10px" colspan="2">Design Criteria</td>
+            <td style="text-align:center;padding:5px 10px">4.0%</td>
+            <td style="text-align:center;padding:5px 10px">≥${vmaMin}%</td>
+            <td style="text-align:center;padding:5px 10px">${vfaRange[0]}–${vfaRange[1]}%</td>
+            <td style="text-align:center;padding:5px 10px">≤${pNiniMax}%</td>
+            <td style="text-align:center;padding:5px 10px">96.0%</td>
+            <td style="text-align:center;padding:5px 10px">≥${pbeMin}%</td>
+            <td style="text-align:center;padding:5px 10px">0.6–1.2</td>
+          </tr>
+        </tfoot>
+      </table>
+      </div>
+    </div>`:''}
+
+    <div class="row" style="justify-content:space-between;margin-top:16px">
       <button class="btn" onclick="ms.step=6;render()">← Back</button>
       <button class="btn btn-gold" onclick="printStep('Selected Volumetrics')">🖨 Print</button>
       <button class="btn btn-primary" onclick="computePropertyCurves();ms.step=8;render()">Next: Property Curves →</button>
