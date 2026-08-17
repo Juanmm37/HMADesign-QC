@@ -5703,6 +5703,196 @@ function printTSRWeightCards(title,cards){
   win.document.close();win.focus();setTimeout(()=>{win.print();},500);
 }
 
+function printTSRReport(){
+  const td=ms.tsrBatch;
+  if(!td){alert('No TSR data entered yet.');return;}
+  const info=ms.info;
+  const diam=td.diam||150;
+  const Gmm_v=td.Gmm||null;
+  const wet=td.wet||[{},{},{}];
+  const dry=td.dry||[{},{},{}];
+  while(wet.length<3)wet.push({});
+  while(dry.length<3)dry.push({});
+
+  function calc(sp,isCond){
+    const t=sp.t!=null?parseFloat(sp.t):null;
+    const mDry=sp.mDry!=null?parseFloat(sp.mDry):null;
+    const mSSD=sp.mSSD!=null?parseFloat(sp.mSSD):null;
+    const mWat=sp.mWat!=null?parseFloat(sp.mWat):null;
+    const load=sp.load!=null?parseFloat(sp.load):null;
+    const vol=(mSSD!=null&&mWat!=null)?mSSD-mWat:null;
+    const Gmb=(vol&&vol>0&&mDry)?mDry/vol:null;
+    const Va=(Gmb&&Gmm_v)?(1-Gmb/Gmm_v)*100:null;
+    const volAV=(Va!=null&&vol!=null)?Va/100*vol:null;
+    const condT=isCond?(sp.tCond!=null?parseFloat(sp.tCond):null):null;
+    const useT=isCond?(condT||t):t;
+    const ITS=(load&&useT&&diam)?Math.round(2000*load/(3.14*useT*diam)*10)/10:null;
+    let volAbs=null,satPct=null;
+    if(isCond&&sp.mSSDcond!=null&&mDry!=null){volAbs=parseFloat(sp.mSSDcond)-mDry;}
+    if(volAbs!=null&&volAV!=null&&volAV>0){satPct=Math.round(volAbs/volAV*1000)/10;}
+    return{t,mDry,mSSD,mWat,vol,Gmb,Va,volAV,ITS,volAbs,satPct,tCond:condT,mSSDcond:sp.mSSDcond!=null?parseFloat(sp.mSSDcond):null,load};
+  }
+  const wc=wet.map(s=>calc(s,true));
+  const dc=dry.map(s=>calc(s,false));
+
+  function av(arr){const v=arr.filter(x=>x!=null&&!isNaN(x));return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;}
+  const avgWGmb=av(wc.map(c=>c.Gmb)),avgDGmb=av(dc.map(c=>c.Gmb));
+  const avgWVa=av(wc.map(c=>c.Va)),avgDVa=av(dc.map(c=>c.Va));
+  const avgWSat=av(wc.map(c=>c.satPct));
+  const avgWITS=av(wc.map(c=>c.ITS)),avgDITS=av(dc.map(c=>c.ITS));
+  const tsr=(avgWITS&&avgDITS)?Math.round(avgWITS/avgDITS*1000)/10:null;
+
+  const fN=(v,dp)=>v!=null&&!isNaN(v)?Number(v).toFixed(dp):'';
+  const fD=d=>{if(!d)return'—';try{return new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});}catch(e){return d;}};
+  const rapLabel=info.hasRAP==='Yes'?' RAP':'';
+  const mixType=(info.mixType||'—')+rapLabel;
+  const pgac=(info.pgac||'—')+(info.pgacSup?' '+info.pgacSup:'');
+  const dateStr=td.dateCompleted||info.dateCompleted||'';
+  const tech=td.technician||'';
+
+  // Table cell helpers
+  const V=(v,dp)=>v!=null&&!isNaN(v)?`<td class="v">${Number(v).toFixed(dp)}</td>`:`<td class="bl"></td>`;
+  const Y=(v,dp)=>v!=null&&!isNaN(v)?`<td class="y">${Number(v).toFixed(dp)}</td>`:`<td class="bl"></td>`;
+  const A=(v,dp)=>v!=null&&!isNaN(v)?`<td class="av">${Number(v).toFixed(dp)}</td>`:`<td class="bl"></td>`;
+  const NA=()=>`<td class="na">—</td>`;
+  const BL=()=>`<td class="bl"></td>`;
+  const CV=(v,dp)=>v!=null&&!isNaN(v)?`<td class="cv">${Number(v).toFixed(dp)}</td>`:`<td class="bl"></td>`;
+
+  const html=`<!DOCTYPE html><html><head><title>TSR Test Summary Sheet — ${info.mixNo||'Mix Design'}</title><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;font-size:10px;color:#000;background:#fff;padding:14px}
+@page{size:A4 landscape;margin:10mm}
+@media print{body{padding:0}}
+.ph{display:flex;align-items:center;gap:14px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #000}
+.ph img{height:72px}
+.ph-title{font-size:16px;font-weight:bold;text-align:center;flex:1}
+.hi{margin-bottom:12px}
+.hi table{border-collapse:collapse;width:auto}
+.hi td{padding:2px 8px;font-size:10px;border:none}
+.hi td.lbl{font-weight:bold;min-width:130px}
+table.tsr{border-collapse:collapse;width:100%;font-size:9.5px}
+table.tsr th,table.tsr td{border:1px solid #555;padding:3px 5px}
+table.tsr th{font-weight:bold;text-align:center}
+th.hw{background:#cfe2f3}
+th.hd{background:#d9ead3}
+th.hb{background:#fff;text-align:left;font-weight:bold}
+td.lbl{background:#f3f3f3;font-weight:bold;white-space:nowrap}
+td.sym{background:#f3f3f3;font-weight:bold;text-align:center;width:28px}
+td.v{text-align:center}
+td.cv{text-align:center;background:#f9f9f9;color:#333}
+td.av{text-align:center;font-weight:bold;background:#dce6f4}
+td.y{text-align:center;background:#ffff00;font-weight:bold}
+td.bl{background:#efefef}
+td.na{background:#e8e8e8;color:#999;text-align:center}
+.bottom{margin-top:10px;border-collapse:collapse;width:100%;font-size:10px}
+.bottom td{border:1px solid #555;padding:4px 8px}
+.bottom td.lbl{background:#f3f3f3;font-weight:bold;width:55%}
+.bottom td.val{text-align:center;font-size:11px}
+.tsr-val{font-size:14px;font-weight:bold}
+</style>
+</head><body>
+<div class="ph">
+  <img src="${LOGO_SRC}" alt="Capital Paving">
+  <div class="ph-title">TSR Test Summary Sheet</div>
+</div>
+<div class="hi">
+  <table><tbody>
+    <tr><td class="lbl">Mix Number</td><td>${info.mixNo||'—'}</td></tr>
+    <tr><td class="lbl">Mix Type</td><td>${mixType}</td></tr>
+    <tr><td class="lbl">PGAC</td><td>${pgac}</td></tr>
+    <tr><td class="lbl">Date Completed</td><td>${fD(dateStr)}</td></tr>
+    <tr><td class="lbl">Technician</td><td>${tech||'—'}</td></tr>
+  </tbody></table>
+</div>
+<table class="tsr">
+  <thead>
+    <tr>
+      <th class="hb" colspan="2">Sample Condition</th>
+      <th class="hw" colspan="4">Wet Subset</th>
+      <th class="hd" colspan="4">Dry Conditioned Subset</th>
+    </tr>
+    <tr>
+      <th class="hb">Sample Identification</th>
+      <th class="hb"></th>
+      <th class="hw">1</th><th class="hw">2</th><th class="hw">3</th><th class="hw">Average</th>
+      <th class="hd">1</th><th class="hd">2</th><th class="hd">3</th><th class="hd">Average</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td class="lbl">Diameter, mm</td><td class="sym">D</td>
+      ${[0,1,2].map(()=>`<td class="v">${diam}</td>`).join('')}${BL()}
+      ${[0,1,2].map(()=>`<td class="v">${diam}</td>`).join('')}${BL()}</tr>
+    <tr><td class="lbl">Thickness, mm</td><td class="sym">t</td>
+      ${wc.map(c=>V(c.t,1)).join('')}${BL()}
+      ${dc.map(c=>V(c.t,1)).join('')}${BL()}</tr>
+    <tr><td class="lbl">Dry Mass in Air, g</td><td class="sym">A</td>
+      ${wc.map(c=>V(c.mDry,1)).join('')}${BL()}
+      ${dc.map(c=>V(c.mDry,1)).join('')}${BL()}</tr>
+    <tr><td class="lbl">SSD Mass, g</td><td class="sym">B</td>
+      ${wc.map(c=>V(c.mSSD,1)).join('')}${BL()}
+      ${dc.map(c=>V(c.mSSD,1)).join('')}${BL()}</tr>
+    <tr><td class="lbl">Mass in Water, g</td><td class="sym">C</td>
+      ${wc.map(c=>V(c.mWat,1)).join('')}${BL()}
+      ${dc.map(c=>V(c.mWat,1)).join('')}${BL()}</tr>
+    <tr><td class="lbl">Volume (B−C), cm³</td><td class="sym">E</td>
+      ${wc.map(c=>CV(c.vol,1)).join('')}${BL()}
+      ${dc.map(c=>CV(c.vol,1)).join('')}${BL()}</tr>
+    <tr><td class="lbl">Bulk Specific Gravity (A/E)</td><td class="sym">Gmb</td>
+      ${wc.map(c=>CV(c.Gmb,3)).join('')}${A(avgWGmb,3)}
+      ${dc.map(c=>CV(c.Gmb,3)).join('')}${A(avgDGmb,3)}</tr>
+    <tr><td class="lbl">Maximum Specific Gravity</td><td class="sym">Gmm</td>
+      ${[0,1,2].map(()=>Gmm_v!=null?`<td class="cv">${Gmm_v.toFixed(3)}</td>`:'<td class="bl"></td>').join('')}${Gmm_v!=null?A(Gmm_v,3):BL()}
+      ${[0,1,2].map(()=>Gmm_v!=null?`<td class="cv">${Gmm_v.toFixed(3)}</td>`:'<td class="bl"></td>').join('')}${Gmm_v!=null?A(Gmm_v,3):BL()}</tr>
+    <tr><td class="lbl">% Air Voids ([Gmm−Gmb]/Gmm)×100</td><td class="sym">Pa</td>
+      ${wc.map(c=>CV(c.Va,1)).join('')}${A(avgWVa,1)}
+      ${dc.map(c=>CV(c.Va,1)).join('')}${A(avgDVa,1)}</tr>
+    <tr><td class="lbl">Volume of Air Voids (Pa×E/100), cm³</td><td class="sym">Va</td>
+      ${wc.map(c=>CV(c.volAV,1)).join('')}${BL()}
+      ${dc.map(c=>CV(c.volAV,1)).join('')}${BL()}</tr>
+    <tr><td class="lbl">Measured SSD Mass, g</td><td class="sym">B'</td>
+      ${wc.map(c=>V(c.mSSDcond,1)).join('')}${BL()}
+      ${NA()}${NA()}${NA()}${BL()}</tr>
+    <tr><td class="lbl">Volume of Absorbed Water (B'−A), cm³</td><td class="sym">J'</td>
+      ${wc.map(c=>CV(c.volAbs,1)).join('')}${BL()}
+      ${NA()}${NA()}${NA()}${BL()}</tr>
+    <tr><td class="lbl">% Saturation (100×J'/Va)</td><td class="sym">S'</td>
+      ${wc.map(c=>CV(c.satPct,1)).join('')}${A(avgWSat,1)}
+      ${NA()}${NA()}${NA()}${BL()}</tr>
+    <tr><td class="lbl">Load, N</td><td class="sym">P</td>
+      ${wc.map(c=>Y(c.load,0)).join('')}${BL()}
+      ${dc.map(c=>Y(c.load,0)).join('')}${BL()}</tr>
+    <tr><td class="lbl">Tensile Strength [(2000×P)/(πtD)], kPa</td><td class="sym"></td>
+      ${wc.map(c=>CV(c.ITS,1)).join('')}${A(avgWITS,0)}
+      ${dc.map(c=>CV(c.ITS,1)).join('')}${A(avgDITS,0)}</tr>
+  </tbody>
+</table>
+<table class="bottom" style="margin-top:8px">
+  <tr>
+    <td class="lbl">TSR</td>
+    <td class="val" colspan="4"><span class="tsr-val" style="color:${tsr!=null?(tsr>=80?'#1a6b1a':'#c0392b'):'#000'}">${tsr!=null?tsr.toFixed(1):'—'}</span>${tsr!=null?(tsr>=80?' — PASS (≥ 80%)':' — FAIL (< 80%)'):''}
+    </td>
+  </tr>
+  <tr>
+    <td class="lbl">Visual Moisture Damage Rating, No=0 to Most Stripped=5</td>
+    <td class="val" colspan="4">${td.moistDmg!=null&&td.moistDmg!==''?td.moistDmg:'—'}</td>
+  </tr>
+  <tr>
+    <td class="lbl">Cracked/Broken Aggregate? Nil / Slight / Medium / High</td>
+    <td class="val" colspan="4">${td.cracked||'—'}</td>
+  </tr>
+  ${td.astReq==='Yes'?`<tr><td class="lbl">Anti-Stripping Treatment (AST)</td>
+    <td class="val" colspan="4">${td.astTreat||''} ${td.astSup?'— '+td.astSup:''} ${td.astType?'('+td.astType+')':''} ${td.astDose?'@ '+td.astDose:''} ${td.astNotes||''}</td></tr>`:''}
+</table>
+</body></html>`;
+
+  const win=window.open('','_blank');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{win.print();},600);
+}
+
 function renderS8TSR(){
   const fam=ms.info.family||'Superpave';
   if(fam==='Marshall')return renderS10Summary();
