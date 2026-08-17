@@ -4616,7 +4616,7 @@ function printSelected(){
   const srcRow=aggs.map(s=>{const a=getAgg(ms.slots[s]);return`<td style="font-size:8px;color:#555;text-align:center;padding:2px 3px;background:#f0f4fb;border-right:1px solid #dde">${a.supplier||''}</td>`;}).join('');
   const _spSelPrint=calcStockpilePercentages(selTrial);
   const bpRow=`<tr style="background:#1f3864;color:#fff"><td colspan="2" style="font-size:10px;font-weight:700;padding:4px 6px">Blend %</td>${aggs.map(s=>`<td style="text-align:right;font-size:10px;font-weight:700;padding:4px 4px;border-right:1px solid rgba(255,255,255,0.2)">${Number(parseFloat(selTrial.blendPct[s])||0).toFixed(1)}%</td>`).join('')}<td style="text-align:right;font-size:11px;font-weight:800;padding:4px 6px">${totalPct.toFixed(1)}%</td><td colspan="2"></td></tr>
-  <tr style="background:#2a4a7c;color:#cde"><td colspan="2" style="font-size:9px;font-weight:700;padding:3px 6px">Stockpile %</td>${aggs.map(s=>`<td style="text-align:right;font-size:9px;font-weight:600;padding:3px 4px;border-right:1px solid rgba(255,255,255,0.15)">${Number(_spSelPrint[s]||0).toFixed(1)}%</td>`).join('')}<td colspan="3"></td></tr>`;
+  <tr style="background:#dde8f8"><td colspan="2" style="font-size:9px;font-weight:700;padding:3px 6px;color:#1f3864">Stockpile %</td>${aggs.map(s=>`<td style="text-align:right;font-size:9px;font-weight:700;padding:3px 4px;color:#1f3864;border-right:1px solid #c0d0e8">${Number(_spSelPrint[s]||0).toFixed(1)}%</td>`).join('')}<td colspan="3"></td></tr>`;
   const gRows=SIEVES.map((sv,ri)=>{
     const band=bands[sv],bv=blendGrad[sv];
     const avs=aggs.map(s=>{
