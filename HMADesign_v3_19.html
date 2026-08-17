@@ -5800,13 +5800,11 @@ td.na{background:#f0f3f8;color:#aaa;text-align:center}
   <div class="ph-title">TSR Test Summary Sheet</div>
 </div>
 <div class="hi">
-  <table><tbody>
-    <tr><td class="lbl">Mix Number</td><td>${info.mixNo||'—'}</td></tr>
-    <tr><td class="lbl">Mix Type</td><td>${mixType}</td></tr>
-    <tr><td class="lbl">PGAC</td><td>${pgac}</td></tr>
-    <tr><td class="lbl">Date Completed</td><td>${fD(dateStr)}</td></tr>
-    <tr><td class="lbl">Technician</td><td>${tech||'—'}</td></tr>
-  </tbody></table>
+  <div class="hi-item"><div class="hi-lbl">Mix Number</div><div class="hi-val">${info.mixNo||'—'}</div></div>
+  <div class="hi-item"><div class="hi-lbl">Mix Type</div><div class="hi-val">${mixType}</div></div>
+  <div class="hi-item"><div class="hi-lbl">PGAC</div><div class="hi-val">${pgac}</div></div>
+  <div class="hi-item"><div class="hi-lbl">Date Completed</div><div class="hi-val">${fD(dateStr)||'—'}</div></div>
+  <div class="hi-item"><div class="hi-lbl">Technician</div><div class="hi-val">${tech||'—'}</div></div>
 </div>
 <table class="tsr">
   <thead>
