@@ -4686,9 +4686,9 @@ function printSelected(){
     const hasRAP=wcData.rapTotalMass>0;
 
     const colHdrs=rows.map(r=>`
-      <th style="min-width:60px;padding:4px 5px;border-right:1px solid rgba(255,255,255,0.2);text-align:center">
+      <th style="padding:4px 5px;border-right:1px solid rgba(255,255,255,0.2);text-align:center;overflow:hidden">
         <div style="font-weight:800;font-size:11px">${r.slot}</div>
-        <div style="font-weight:400;font-size:9px;opacity:0.85;white-space:normal;line-height:1.2;word-break:break-word">${r.agg.material}</div>
+        <div style="font-weight:400;font-size:9px;opacity:0.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.agg.material}</div>
       </th>`).join('');
 
     const sourceRow=rows.map(r=>`<td style="font-size:9px;color:#555;text-align:center;padding:2px 4px;border-right:1px solid #eee;background:#f5f8ff">${r.agg.supplier}</td>`).join('');
