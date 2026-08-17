@@ -6278,16 +6278,22 @@ function renderS8TSR(){
             <div class="mv" style="font-size:22px;color:${tsr!==null?(tsr>=80?'#1a6b1a':'#c0392b'):'#1f3864'}">${tsr!==null?tsr.toFixed(1):'—'}</div>
             ${tsr!==null?`<div style="margin-top:3px">${tsr>=80?'<span class="pass">PASS ≥ 80%</span>':'<span class="fail">FAIL &lt; 80%</span>'}</div>`:''}
           </div>
-          <div style="background:#fff;border:1px solid #d4dcf0;border-radius:6px;padding:10px;min-width:180px">
+          <div style="background:#fff;border:1px solid #d4dcf0;border-radius:6px;padding:10px;min-width:220px">
             <div style="font-size:10px;color:#888;margin-bottom:6px;font-weight:700">QC Observations</div>
             <div class="fg" style="margin-bottom:6px"><label style="font-size:10px">Visual Damage (0–5)</label>
               <input type="number" min="0" max="5" step="1" value="${td.moistDmg!==null&&td.moistDmg!==undefined?td.moistDmg:''}" style="width:60px;text-align:center"
                 onchange="ms.tsrBatch.moistDmg=parseFloat(this.value)??null;saveDB()"></div>
-            <div class="fg" style="margin:0"><label style="font-size:10px">Cracked Aggregate</label>
+            <div class="fg" style="margin-bottom:6px"><label style="font-size:10px">Cracked Aggregate</label>
               <select style="font-size:11px" onchange="ms.tsrBatch.cracked=this.value;saveDB()">
                 <option value="" ${!td.cracked?'selected':''}>—</option>
                 ${['Nil','Slight','Medium','High'].map(v=>`<option value="${v}" ${td.cracked===v?'selected':''}>${v}</option>`).join('')}
               </select></div>
+            <div class="fg" style="margin-bottom:6px"><label style="font-size:10px">Technician</label>
+              <input value="${td.technician||''}" style="font-size:11px"
+                onchange="ms.tsrBatch.technician=this.value;saveDB()"></div>
+            <div class="fg" style="margin:0"><label style="font-size:10px">Date Tested</label>
+              <input type="date" value="${td.dateCompleted||''}" style="font-size:11px"
+                onchange="ms.tsrBatch.dateCompleted=this.value;saveDB()"></div>
           </div>
         </div>
 
