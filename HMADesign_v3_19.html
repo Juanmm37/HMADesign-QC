@@ -6690,6 +6690,20 @@ function renderS11AggTesting(){
       onblur="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null">`;
   }
   function inpCP(field,val,step){return step==='2'?inp2(field,val):inp3(field,val);}
+  function cinp(field,val,dp=3){
+    const n=parseFloat(val);const display=!isNaN(n)&&val!==null?n.toFixed(dp):'';
+    return`<input type="text" inputmode="decimal" value="${display}" placeholder="—"
+      style="width:70px;padding:3px 5px;border:1px solid #c5d3ef;border-radius:4px;font-size:11px;text-align:center;background:#fffde7"
+      onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null;saveDB();render()"
+      onblur="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null">`;
+  }
+  function cinpSieve(field,val){
+    const n=parseFloat(val);const display=!isNaN(n)&&val!==null?n.toFixed(1):'';
+    return`<input type="text" inputmode="decimal" value="${display}" placeholder="—"
+      style="width:56px;padding:2px 4px;border:1px solid #c5d3ef;border-radius:4px;font-size:11px;text-align:center;background:#fffde7"
+      onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null;saveDB();render()"
+      onblur="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null">`;
+  }
   function pf(val,rng){
     if(val===null||val===undefined)return'<span style="color:#bbb">—</span>';
     let ok;
