@@ -6688,18 +6688,22 @@ function renderS11AggDensity(){
     const tot=fracs.reduce((a,b)=>a+b,0);
     return fracs.reduce((s,p,i)=>s+p*vals[i],0)/tot;
   }
-  const withRap=cRapFinePct>0;
+  const withRap=rapFineEntries.length>0;
+  const rapFracs=rapFineEntries.map(e=>e.pct);
+  const rapGsbs_=rapFineEntries.map(e=>at[e.gsbKey]);
+  const rapGsas_=rapFineEntries.map(e=>at[e.gsaKey]);
+  const rapWas_=rapFineEntries.map(e=>at[e.waKey]);
   let cFrs=[],cGsbs=[],cGsas=[],cWas=[];
   if(cMode==='simple'){
-    cFrs=withRap?[cCoarsePct,cVirginPct,cRapFinePct]:[cCoarsePct,cVirginPct];
-    cGsbs=withRap?[at.c_coarseGsb,at.c_fineGsb,at.c_rapGsb]:[at.c_coarseGsb,at.c_fineGsb];
-    cGsas=withRap?[at.c_coarseGsa,at.c_fineGsa,at.c_rapGsa]:[at.c_coarseGsa,at.c_fineGsa];
-    cWas=withRap?[at.c_coarseWa,at.c_fineWa,at.c_rapWa]:[at.c_coarseWa,at.c_fineWa];
+    cFrs=[cCoarsePct,cVirginPct,...rapFracs];
+    cGsbs=[at.c_coarseGsb,at.c_fineGsb,...rapGsbs_];
+    cGsas=[at.c_coarseGsa,at.c_fineGsa,...rapGsas_];
+    cWas=[at.c_coarseWa,at.c_fineWa,...rapWas_];
   }else{
-    cFrs=withRap?[cCoarsePct,cR236Pct,cF236Pct,cRapFinePct]:[cCoarsePct,cR236Pct,cF236Pct];
-    cGsbs=withRap?[at.c_coarseGsb,at.c_r236Gsb,at.c_fineGsb,at.c_rapGsb]:[at.c_coarseGsb,at.c_r236Gsb,at.c_fineGsb];
-    cGsas=withRap?[at.c_coarseGsa,at.c_r236Gsa,at.c_fineGsa,at.c_rapGsa]:[at.c_coarseGsa,at.c_r236Gsa,at.c_fineGsa];
-    cWas=withRap?[at.c_coarseWa,at.c_r236Wa,at.c_fineWa,at.c_rapWa]:[at.c_coarseWa,at.c_r236Wa,at.c_fineWa];
+    cFrs=[cCoarsePct,cR236Pct,cF236Pct,...rapFracs];
+    cGsbs=[at.c_coarseGsb,at.c_r236Gsb,at.c_fineGsb,...rapGsbs_];
+    cGsas=[at.c_coarseGsa,at.c_r236Gsa,at.c_fineGsa,...rapGsas_];
+    cWas=[at.c_coarseWa,at.c_r236Wa,at.c_fineWa,...rapWas_];
   }
   const cCombGsb=cComb(cFrs,cGsbs);
   const cCombGsa=cComb(cFrs,cGsas);
