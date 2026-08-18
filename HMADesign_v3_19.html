@@ -7052,14 +7052,14 @@ function renderS11AggDensity(){
             <td style="${tdC};font-size:12px;font-weight:700">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
           </tr>`}
-          ${withRap?`
+          ${rapFineEntries.map(e=>`
           <tr style="background:#eef3ee">
-            <td style="${tdL}">${cMode==='simple'?'Passing 4.75 (RAP)':'RAP Fine'} <span style="font-size:9px;color:#888;font-weight:400">— annual</span></td>
-            <td style="${td0};background:#eef3ee;font-weight:700">${cRapFinePct.toFixed(1)}</td>
-            <td style="${tdY}">${cinp('c_rapGsb',at.c_rapGsb,3)}</td>
-            <td style="${tdY}">${cinp('c_rapGsa',at.c_rapGsa,3)}</td>
-            <td style="${tdY}">${cinp('c_rapWa',at.c_rapWa,2)}</td>
-          </tr>`:''}
+            <td style="${tdL}">${cMode==='simple'?'Passing 4.75':'RAP Fine'} — ${getName(e.slot)} <span style="font-size:9px;color:#888;font-weight:400">annual</span></td>
+            <td style="${td0};background:#eef3ee;font-weight:700">${e.pct.toFixed(1)}</td>
+            <td style="${tdY}">${cinp(e.gsbKey,at[e.gsbKey],3)}</td>
+            <td style="${tdY}">${cinp(e.gsaKey,at[e.gsaKey],3)}</td>
+            <td style="${tdY}">${cinp(e.waKey,at[e.waKey],2)}</td>
+          </tr>`).join('')}
           <tr>
             <td colspan="2" style="${tdBotL}">Aggregate Blend Results</td>
             <td style="${tdBot};font-size:15px">${eCombGsb!=null?eCombGsb.toFixed(3):'—'}</td>
