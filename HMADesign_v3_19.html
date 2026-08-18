@@ -6328,7 +6328,7 @@ function renderS8TSR(){
         <button class="btn btn-gold" onclick="(()=>{const cards=[...document.querySelectorAll('#mc .wc-wrap')].map(el=>el.outerHTML);if(!cards.length){alert('No weigh cards to print.');return;}printTSRWeightCards('TSR Batch Weigh Cards',cards);})()">🖨 Print Batch Cards</button>
         <button class="btn btn-gold" onclick="printTSRReport()">🖨 Print TSR Report</button>
       </div>
-      <button class="btn btn-primary" onclick="ms.step=10;render()">Next: ${fam==='SMA'?'Aggregate Testing':'Nmax'} →</button>
+      <button class="btn btn-primary" onclick="ms.step=10;render()">Next: ${fam==='SMA'?'Agg Densities':'Nmax'} →</button>
     </div>
   </div>`;
 }
