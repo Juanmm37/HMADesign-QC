@@ -2944,6 +2944,135 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   </div>`;
 }
 
+// ── CMD Deviation Chart (SVG) ──
+function renderCMDChart(trial, blendGrad, info, forPrint=false){
+  const mt=info.mixType||'';
+  const fam=info.family||'';
+  const isMarshall=fam==='Marshall';
+  const NMAS_MAP={
+    'SP 4.75':4.75,'HL2':4.75,
+    'SP 9.5':9.5,'SMA 9.5':9.5,'DFC':9.5,
+    'SP 12.5':12.5,'SP 12.5 FC1':12.5,'SP 12.5 FC2':12.5,'SMA 12.5':12.5,
+    'HL1':12.5,'HL3':12.5,'HL3HS':12.5,'HL3F':12.5,
+    'SP 19.0':19.0,'SMA 19.0':19.0,'HL4':19.0,'HL4F':19.0,
+    'SP 25.0':25.0,'MDBC':25.0,'HDBC':25.0,'HL8':25.0,
+    'SP 37.5':37.5
+  };
+  const nmas=NMAS_MAP[mt]||null;
+  if(!nmas)return'';
+
+  const W=forPrint?1600:920, H=forPrint?900:400;
+  const PL=forPrint?72:52, PR=forPrint?32:24, PT=forPrint?72:36, PB=forPrint?88:64;
+  const cW=W-PL-PR, cH=H-PT-PB;
+  const chartSieves=['25','19','16','13.2','12.5','9.5','6.7','4.75','2.36','1.18','0.6','0.3','0.15','0.075'];
+
+  function xOf(s){
+    const i=chartSieves.indexOf(s);if(i<0)return null;
+    const v=parseFloat(s);
+    if(isMarshall){
+      const logMin=Math.log10(parseFloat(chartSieves[chartSieves.length-1]));
+      const logMax=Math.log10(parseFloat(chartSieves[0]));
+      return PL+((Math.log10(v)-logMin)/(logMax-logMin))*cW;
+    }
+    const powMin=Math.pow(parseFloat(chartSieves[chartSieves.length-1]),0.45);
+    const powMax=Math.pow(parseFloat(chartSieves[0]),0.45);
+    return PL+((Math.pow(v,0.45)-powMin)/(powMax-powMin))*cW;
+  }
+
+  const devMin=-25, devMax=25;
+  const yOfDev=v=>PT+cH*(1-(Math.max(devMin,Math.min(devMax,v))-devMin)/(devMax-devMin));
+
+  const fsAxis=forPrint?18:10, fsAxisX=forPrint?16:9, fsLeg=forPrint?14:10;
+  const fsTitle=forPrint?20:13, fsSub=forPrint?14:9, fsYLabel=forPrint?16:10;
+  const axisLw=forPrint?3:1.5, blendLw=forPrint?4:1.5, dotR=forPrint?8:4;
+  const yLabelX=forPrint?PL-46:PL-38;
+
+  // Y grid
+  const devVals=[-25,-20,-15,-10,-5,0,5,10,15,20,25];
+  const yGrid=devVals.map(v=>`
+    <line x1="${PL}" y1="${yOfDev(v)}" x2="${PL+cW}" y2="${yOfDev(v)}"
+      stroke="${v===0?'#1f3864':v%10===0?'#ccc':'#eee'}"
+      stroke-width="${v===0?(forPrint?3:2):v%10===0?1:0.5}"/>
+    <text x="${PL-5}" y="${yOfDev(v)+fsAxis*0.4}" font-size="${fsAxis}" fill="${v===0?'#1f3864':'#555'}"
+      font-weight="${v===0?'800':'600'}" text-anchor="end">${v>0?'+':''}${v}</text>`).join('');
+
+  // X grid + labels
+  const xGrid=chartSieves.map(s=>`<line x1="${xOf(s)}" y1="${PT}" x2="${xOf(s)}" y2="${PT+cH}" stroke="#e8edf5" stroke-width="0.8"/>`).join('');
+  const SIEVE_LABELS={'25':'25.0','19':'19.0','16':'16.0','13.2':'13.2','12.5':'12.5',
+    '9.5':'9.5','6.7':'6.7','4.75':'4.75','2.36':'2.36','1.18':'1.18',
+    '0.6':'0.600','0.3':'0.300','0.15':'0.150','0.075':'0.075'};
+  const xLbls=chartSieves.map(s=>{
+    const x=xOf(s),y=PT+cH+8;
+    return`<text x="${x}" y="${y}" font-size="${fsAxisX}" fill="#444" font-weight="600" text-anchor="end"
+      transform="rotate(-90,${x},${y})">${SIEVE_LABELS[s]||s}</text>`;}).join('');
+
+  // ±5 band (subtle green zone)
+  const zeroBand=`<rect x="${PL}" y="${yOfDev(5)}" width="${cW}" height="${yOfDev(-5)-yOfDev(5)}" fill="#e8f5e9" opacity="0.5"/>`;
+
+  // NMAS vertical marker
+  const nmasStr=nmas%1===0?String(nmas):String(nmas);
+  // find the sieve key that matches NMAS
+  const nmasKey=chartSieves.find(s=>Math.abs(parseFloat(s)-nmas)<0.01)||null;
+  const nmasX=nmasKey?xOf(nmasKey):null;
+  const nmasSvg=nmasX!==null?`
+    <line x1="${nmasX}" y1="${PT}" x2="${nmasX}" y2="${PT+cH}" stroke="#e74c3c"
+      stroke-width="${forPrint?2.5:1.5}" stroke-dasharray="${forPrint?'14,7':'7,3'}"/>
+    <text x="${nmasX+6}" y="${PT+fsAxis+4}" font-size="${fsAxis}" fill="#e74c3c" font-weight="700">NMAS ${nmas}mm</text>`:'';
+
+  // Compute deviations and plot
+  const pts=[];
+  chartSieves.forEach(s=>{
+    const d=parseFloat(s),blend=blendGrad[s];
+    if(blend===null||blend===undefined)return;
+    if(xOf(s)===null)return;
+    const cmdP=Math.pow(d/nmas,0.45)*100;
+    const dev=blend-cmdP;
+    pts.push({x:xOf(s),y:yOfDev(dev),dev});
+  });
+
+  let devSvg='';
+  if(pts.length>1){
+    const path=pts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+    devSvg=`
+      <path d="${path}" fill="none" stroke="#2471a3" stroke-width="${blendLw}" stroke-linejoin="round" stroke-linecap="round"/>
+      ${pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${dotR}" fill="#2471a3" stroke="#fff" stroke-width="${forPrint?2:1}"/>`).join('')}`;
+  }
+
+  // Legend
+  const legW=forPrint?310:195, legH=forPrint?76:52;
+  const legX=PL+cW-legW-10, legY=PT+10;
+  const legLH=forPrint?32:22, legLW=forPrint?24:16;
+  const r1cy=legY+legLH/2, r2cy=legY+legLH*1.5;
+  const legendSvg=`
+    <rect x="${legX-8}" y="${legY-8}" width="${legW+16}" height="${legH+12}" fill="rgba(255,255,255,0.94)" stroke="#bbb" stroke-width="${forPrint?2:1}" rx="4"/>
+    <line x1="${legX}" y1="${r1cy}" x2="${legX+legLW}" y2="${r1cy}" stroke="#2471a3" stroke-width="${blendLw}"/>
+    <circle cx="${legX+legLW/2}" cy="${r1cy}" r="${dotR*0.8}" fill="#2471a3" stroke="#fff" stroke-width="${forPrint?2:1}"/>
+    <text x="${legX+legLW+6}" y="${r1cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">Blend Deviation from CMD</text>
+    <line x1="${legX}" y1="${r2cy}" x2="${legX+legLW}" y2="${r2cy}" stroke="#e74c3c" stroke-width="${forPrint?2.5:1.5}" stroke-dasharray="${forPrint?'14,7':'7,3'}"/>
+    <text x="${legX+legLW+6}" y="${r2cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">NMAS (${nmas}mm)</text>`;
+
+  return`<div style="margin-bottom:${forPrint?0:12}px">
+    <svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:'Segoe UI',sans-serif;${forPrint?'':'max-width:'+W+'px'}">
+      <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff" rx="2"/>
+      ${zeroBand}
+      ${yGrid}
+      ${xGrid}
+      ${nmasSvg}
+      <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" stroke="#888" stroke-width="${axisLw}"/>
+      <line x1="${PL}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#888" stroke-width="${axisLw}"/>
+      <line x1="${PL+cW}" y1="${PT}" x2="${PL+cW}" y2="${PT+cH}" stroke="#ccc" stroke-width="1"/>
+      <line x1="${PL}" y1="${PT}" x2="${PL+cW}" y2="${PT}" stroke="#ccc" stroke-width="1"/>
+      ${devSvg}
+      ${xLbls}
+      ${legendSvg}
+      <text x="${PL+cW/2}" y="${PT/2-fsSub/2-4}" font-size="${fsTitle}" font-weight="800" fill="#1f3864" text-anchor="middle">Continuous Maximum Density (CMD) Deviation Plot — ${mt}${info.hasRAP==='Yes'?' RAP':''}</text>
+      <text x="${PL+cW/2}" y="${PT/2+fsSub/2+6}" font-size="${fsSub}" fill="#666" text-anchor="middle">Deviations above zero = coarser than max density | Below zero = finer than max density | NMAS = ${nmas}mm</text>
+      <text x="${yLabelX}" y="${PT+cH/2}" font-size="${fsYLabel}" font-weight="700" fill="#555" text-anchor="middle" transform="rotate(-90,${yLabelX},${PT+cH/2})">DEVIATION FROM CMD (%)</text>
+      <text x="${PL+cW/2}" y="${H-fsSub*0.3}" font-size="${fsSub}" fill="#777" text-anchor="middle">SIEVE SIZE (mm) &nbsp;|&nbsp; ← Finer &nbsp;&nbsp;&nbsp; Coarser →</text>
+    </svg>
+  </div>`;
+}
+
 function printTrial(trialIdx){
   const trial=ms.trials[trialIdx];
   const info=ms.info,mt=info.mixType||'';
