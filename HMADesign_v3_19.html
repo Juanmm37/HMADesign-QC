@@ -3229,6 +3229,20 @@ function printTrial(trialIdx){
     <div style="width:100%">${chartHtml}</div>
   </div>`;
 
+  // ── PAGE 2b: CMD Deviation Chart ──
+  const cmdChartHtml=renderCMDChart(trial,blendGrad,info,true);
+  const page2b=cmdChartHtml?`
+  <div style="page-break-after:always">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #1f3864">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:68px">
+      <div>
+        <div style="font-size:13px;font-weight:900;color:#1f3864">CMD DEVIATION CHART — TRIAL ${trial.id}</div>
+        <div style="font-size:10px;color:#666">${info.mixNo||'—'} &nbsp;|&nbsp; ${mt}${rapLabel} &nbsp;|&nbsp; ${info.pgac||'—'} &nbsp;|&nbsp; Pb: ${Number(trial.Pb).toFixed(1)}% &nbsp;|&nbsp; ${info.spec||''}</div>
+      </div>
+    </div>
+    <div style="width:100%">${cmdChartHtml}</div>
+  </div>`:'';
+
   // ── PAGE 3: BRD ──
   const brdHtml=renderWeighCard(trial,'BRD',true);
   const page3=`
