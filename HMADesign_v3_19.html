@@ -6980,11 +6980,10 @@ function renderS11AggDensity(){
           <div style="font-size:9px;font-weight:700;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px">Calculation Method</div>
           <div style="display:flex;border:1px solid #c5d3ef;border-radius:6px;overflow:hidden">
             ${[
-              ['simple','Retain 4.75 + Passing 4.75'],
-              ['split','+ Retain 2.36 split'],
-              ['split-rap','+ RAP Fine']
-            ].map(([val,lbl],i)=>`<button style="padding:7px 13px;font-size:10px;font-weight:700;border:none;border-right:${i<2?'1px solid #c5d3ef':'none'};cursor:pointer;white-space:nowrap;
-              background:${cMode===val?'#1f3864':'#f5f8ff'};color:${cMode===val?'#fff':'#1f3864'}"
+              ['simple','4.75 Split'],
+              ['split','+ 2.36 Split']
+            ].map(([val,lbl],i)=>`<button style="padding:7px 13px;font-size:10px;font-weight:700;border:none;border-right:${i<1?'1px solid #c5d3ef':'none'};cursor:pointer;white-space:nowrap;
+              background:${(cMode===val||(cMode==='split-rap'&&val==='split'))?'#1f3864':'#f5f8ff'};color:${(cMode===val||(cMode==='split-rap'&&val==='split'))?'#fff':'#1f3864'}"
               onclick="ms.aggTesting.calcMode='${val}';saveDB();render()">${lbl}</button>`).join('')}
           </div>
         </div>
