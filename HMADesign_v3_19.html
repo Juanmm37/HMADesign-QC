@@ -2801,6 +2801,7 @@ function renderS3(){
         <div class="st" style="margin-bottom:8px">Aggregate Gradation &amp; Blend</div>
         ${gradTable}
         <div id="live-grad-chart">${chart}</div>
+        ${cmdChart?`<div id="live-cmd-chart">${cmdChart}</div>`:''}
       </div>
     </div>
     ${weighSection}
