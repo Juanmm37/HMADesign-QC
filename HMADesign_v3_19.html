@@ -6678,6 +6678,64 @@ function renderS11AggDensity(){
   const cCombGsa=cComb(cFrs,cGsas);
   const cCombWa=cWAvg(cFrs,cWas);
 
+  // ── Test model init ──
+  if(!at.tests)at.tests={};
+  ['coarse','r236','fine','rap'].forEach(k=>{
+    if(!at.tests[k])at.tests[k]={};
+    ['ss1','ss2'].forEach(s=>{if(!at.tests[k][s])at.tests[k][s]={};});
+  });
+  const tD=at.tests;
+
+  // LS 604 calc (coarse — wire basket): SSD, OD, Water → Gsb, Gsa, Absorption
+  function calc604(ss){
+    const S=ss.ssd,O=ss.od,W=ss.water;
+    if(!S||!O||!W)return null;
+    return{gsb:O/(S-W),gsbSsd:S/(S-W),gsa:O/(O-W),absp:(S-O)/O*100};
+  }
+  // LS 605 calc (fine — pycnometer): A=OD, B=PycWater, C=PycSpecWater, D=SSD
+  function calc605(ss){
+    const A=ss.od,B=ss.pW,C=ss.psW,D=ss.ssd;
+    if(!A||!B||!C||!D)return null;
+    const vol=B+D-C;
+    return{gsb:A/vol,gsbSsd:D/vol,gsa:A/(B+A-C),absp:(D-A)/A*100};
+  }
+  function avgR(r1,r2){
+    if(!r1&&!r2)return null;if(!r1)return r2;if(!r2)return r1;
+    return{gsb:(r1.gsb+r2.gsb)/2,gsbSsd:(r1.gsbSsd+r2.gsbSsd)/2,gsa:(r1.gsa+r2.gsa)/2,absp:(r1.absp+r2.absp)/2};
+  }
+  // Per-fraction computed results
+  const tCoarse=[calc604(tD.coarse.ss1),calc604(tD.coarse.ss2)];
+  const tR236=[calc605(tD.r236.ss1),calc605(tD.r236.ss2)];
+  const tFine=[calc605(tD.fine.ss1),calc605(tD.fine.ss2)];
+  const tRap=[calc605(tD.rap.ss1),calc605(tD.rap.ss2)];
+  const avgCoarse=avgR(tCoarse[0],tCoarse[1]);
+  const avgR236=avgR(tR236[0],tR236[1]);
+  const avgFine=avgR(tFine[0],tFine[1]);
+  const avgRap=avgR(tRap[0],tRap[1]);
+
+  // Use Section 1 averages to override Section 2 manual values where available
+  const effCoarseGsb=avgCoarse?.gsb||at.c_coarseGsb;
+  const effCoarseGsa=avgCoarse?.gsa||at.c_coarseGsa;
+  const effCoarseWa=avgCoarse?.absp||at.c_coarseWa;
+  const effR236Gsb=avgR236?.gsb||at.c_r236Gsb;
+  const effR236Gsa=avgR236?.gsa||at.c_r236Gsa;
+  const effR236Wa=avgR236?.absp||at.c_r236Wa;
+  const effFineGsb=avgFine?.gsb||at.c_fineGsb;
+  const effFineGsa=avgFine?.gsa||at.c_fineGsa;
+  const effFineWa=avgFine?.absp||at.c_fineWa;
+  const effRapGsb=avgRap?.gsb||at.c_rapGsb;
+  const effRapGsa=avgRap?.gsa||at.c_rapGsa;
+  const effRapWa=avgRap?.absp||at.c_rapWa;
+
+  // Recompute combined using effective values
+  let eFrs=[],eGsbs=[],eGsas=[],eWas=[];
+  if(cMode==='simple'){eFrs=[cCoarsePct,T29];eGsbs=[effCoarseGsb,effFineGsb];eGsas=[effCoarseGsa,effFineGsa];eWas=[effCoarseWa,effFineWa];}
+  else if(cMode==='split'){eFrs=[cCoarsePct,cR236Pct,cF236Pct];eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb];eGsas=[effCoarseGsa,effR236Gsa,effFineGsa];eWas=[effCoarseWa,effR236Wa,effFineWa];}
+  else{eFrs=[cCoarsePct,cR236Pct,cF236Pct,cRapFinePct];eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb,effRapGsb];eGsas=[effCoarseGsa,effR236Gsa,effFineGsa,effRapGsa];eWas=[effCoarseWa,effR236Wa,effFineWa,effRapWa];}
+  const eCombGsb=cComb(eFrs,eGsbs)||cCombGsb;
+  const eCombGsa=cComb(eFrs,eGsas)||cCombGsa;
+  const eCombWa=cWAvg(eFrs,eWas)||cCombWa;
+
   // ── Row lists ──
   const caRows=['CA1','CA2','CA3',...(slots.CA4?['CA4']:[])];
   const faRows=['FA1','FA2','FA3','FA4'];
