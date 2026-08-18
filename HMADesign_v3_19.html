@@ -7020,52 +7020,43 @@ function renderS11AggDensity(){
           </tr>
         </thead>
         <tbody>
-          <!-- Retain on 4.75 — total in simple/split, virgin-only in split-rap -->
+          <!-- Retain on 4.75 — virgin + RAP coarse tested together (LS 604) -->
           <tr style="background:#fff">
-            <td style="${tdL}">${cMode==='split-rap'?'Retain on 4.75 — Virgin *':'Retain on 4.75 *'}</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${(cMode==='split-rap'?cVirginCoarsePct:cCoarsePct).toFixed(1)}</td>
+            <td style="${tdL}">Retain on 4.75 *</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
             <td style="${tdY}">${cinp('c_coarseGsb',at.c_coarseGsb,3)}</td>
             <td style="${tdY}">${cinp('c_coarseGsa',at.c_coarseGsa,3)}</td>
             <td style="${tdY}">${cinp('c_coarseWa',at.c_coarseWa,2)}</td>
           </tr>
-          ${cMode==='split-rap'&&cRapCoarsePct>0?`
-          <!-- RAP Coarse — annual value, entered directly -->
-          <tr style="background:#f0f4f0">
-            <td style="${tdL}">Retain on 4.75 — RAP **</td>
-            <td style="${td0};background:#eef3ee;font-weight:700">${cRapCoarsePct.toFixed(1)}</td>
-            <td style="${tdY}">${cinp('c_rapCoarseGsb',at.c_rapCoarseGsb,3)}</td>
-            <td style="${tdY}">${cinp('c_rapCoarseGsa',at.c_rapCoarseGsa,3)}</td>
-            <td style="${tdY}">${cinp('c_rapCoarseWa',at.c_rapCoarseWa,2)}</td>
-          </tr>`:''}
           ${cMode!=='simple'?`
-          <!-- Retain on 2.36 -->
+          <!-- Retain on 2.36 — virgin fine only -->
           <tr style="background:#f0f4fb">
-            <td style="${tdL}">Retain on 2.36 **</td>
+            <td style="${tdL}">Retain on 2.36 (Virgin) **</td>
             <td style="${tdC}">${cP236v!==null?cR236Pct.toFixed(1):'—'}<br><span style="font-size:8px">calc.</span></td>
             <td style="${tdY}">${cinp('c_r236Gsb',at.c_r236Gsb,3)}</td>
             <td style="${tdY}">${cinp('c_r236Gsa',at.c_r236Gsa,3)}</td>
             <td style="${tdY}">${cinp('c_r236Wa',at.c_r236Wa,2)}</td>
           </tr>
-          <!-- Passing 2.36 -->
+          <!-- Passing 2.36 — virgin fine only -->
           <tr style="background:#e8f0fe">
-            <td style="${tdL}">Passing 2.36 ***</td>
+            <td style="${tdL}">Passing 2.36 (Virgin) ***</td>
             <td style="${tdC}">${cP236v!==null?cF236Pct.toFixed(1):'—'}<br><span style="font-size:8px">calc.</span></td>
             <td style="${tdY}">${cinp('c_fineGsb',at.c_fineGsb,3)}</td>
             <td style="${tdY}">${cinp('c_fineGsa',at.c_fineGsa,3)}</td>
             <td style="${tdY}">${cinp('c_fineWa',at.c_fineWa,2)}</td>
           </tr>`:`
-          <!-- Passing 4.75 (simple mode) -->
+          <!-- Passing 4.75 — virgin fine only (LS 605) -->
           <tr style="background:#f0f4fb">
-            <td style="${tdL}">Passing 4.75 **</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${T29.toFixed(1)}</td>
+            <td style="${tdL}">Passing 4.75 (Virgin) **</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cVirginPct.toFixed(1)}</td>
             <td style="${tdY}">${cinp('c_fineGsb',at.c_fineGsb,3)}</td>
             <td style="${tdY}">${cinp('c_fineGsa',at.c_fineGsa,3)}</td>
             <td style="${tdY}">${cinp('c_fineWa',at.c_fineWa,2)}</td>
           </tr>`}
-          ${cMode==='split-rap'?`
-          <!-- RAP Fine -->
+          ${withRap?`
+          <!-- RAP Fine — annual value entered directly -->
           <tr style="background:#f0f4f0">
-            <td style="${tdL}">RAP Fine ****</td>
+            <td style="${tdL}">${cMode==='simple'?'Passing 4.75 (RAP) ***':'RAP Fine ****'}</td>
             <td style="${td0};background:#eef3ee;font-weight:700">${cRapFinePct.toFixed(1)}</td>
             <td style="${tdY}">${cinp('c_rapGsb',at.c_rapGsb,3)}</td>
             <td style="${tdY}">${cinp('c_rapGsa',at.c_rapGsa,3)}</td>
@@ -7080,10 +7071,10 @@ function renderS11AggDensity(){
           </tr>
           <!-- Footnotes -->
           <tr><td colspan="5" style="padding:5px 10px;font-size:9.5px;color:#888;font-style:italic;background:#fafafa;border:1px solid #e0e4ec">
-            * Retain on 4.75mm — Virgin — LS 604 &nbsp;|&nbsp;
-            ${cMode==='simple'?'** Passing 4.75mm — LS 605':
-              cMode==='split'?'** Retain on 4.75mm — RAP (annual) &nbsp;|&nbsp; *** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; **** Passing 2.36mm — LS 605':
-              (cRapCoarsePct>0?'** Retain on 4.75mm — RAP (annual) &nbsp;|&nbsp; ':'')+'** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; *** Passing 2.36mm — LS 605 &nbsp;|&nbsp; **** RAP fine (annual)'}
+            * Retain on 4.75mm — LS 604 (virgin + RAP coarse combined) &nbsp;|&nbsp;
+            ${cMode==='simple'
+              ?`** Passing 4.75mm — LS 605 (virgin only)${withRap?' &nbsp;|&nbsp; *** Passing 4.75mm — RAP fine (annual)':''}`
+              :`** Retain on 2.36mm — LS 605 / AASHTO T84 (virgin) &nbsp;|&nbsp; *** Passing 2.36mm — LS 605 (virgin)${withRap?' &nbsp;|&nbsp; **** RAP fine (annual)':''}`}
           </td></tr>
         </tbody>
       </table></div>
