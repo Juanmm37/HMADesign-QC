@@ -6829,7 +6829,7 @@ function renderS11AggDensity(){
   const tcAvg=(v,dp=3)=>v!=null?`<td style="padding:4px 8px;font-size:12px;font-weight:800;text-align:center;background:#1f3864;color:#fff;border:1px solid #1f3864">${v.toFixed(dp)}</td>`:`<td style="padding:4px 8px;text-align:center;background:#ddd;color:#aaa;border:1px solid #ccc">—</td>`;
   const tcInp=(key,ss,field,val,dp=1)=>{
     const n=parseFloat(val);const dsp=!isNaN(n)&&val!=null?n.toFixed(dp):'';
-    return`<td style="padding:3px 5px;border:1px solid #c5d3ef"><input type="text" inputmode="decimal" value="${dsp}" placeholder="—"
+    return`<td style="padding:3px 5px;border:1px solid #c5d3ef;text-align:center"><input type="text" inputmode="decimal" value="${dsp}" placeholder="—"
       style="width:80px;padding:2px 4px;border:1px solid #c5d3ef;border-radius:3px;font-size:11px;text-align:center;background:#fffde7"
       onchange="setTestVal('${key}','${ss}','${field}',this.value)"
       onblur="setTestValQ('${key}','${ss}','${field}',this.value)"></td>`;
