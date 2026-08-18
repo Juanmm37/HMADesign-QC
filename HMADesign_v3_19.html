@@ -6736,9 +6736,17 @@ function renderS11AggDensity(){
 
   // Recompute combined using effective values
   let eFrs=[],eGsbs=[],eGsas=[],eWas=[];
-  if(cMode==='simple'){eFrs=[cCoarsePct,T29];eGsbs=[effCoarseGsb,effFineGsb];eGsas=[effCoarseGsa,effFineGsa];eWas=[effCoarseWa,effFineWa];}
-  else if(cMode==='split'){eFrs=[cCoarsePct,cR236Pct,cF236Pct];eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb];eGsas=[effCoarseGsa,effR236Gsa,effFineGsa];eWas=[effCoarseWa,effR236Wa,effFineWa];}
-  else{eFrs=[cVirginCoarsePct,cRapCoarsePct,cR236Pct,cF236Pct,cRapFinePct];eGsbs=[effCoarseGsb,effRapCoarseGsb,effR236Gsb,effFineGsb,effRapGsb];eGsas=[effCoarseGsa,effRapCoarseGsa,effR236Gsa,effFineGsa,effRapGsa];eWas=[effCoarseWa,effRapCoarseWa,effR236Wa,effFineWa,effRapWa];}
+  if(cMode==='simple'){
+    eFrs=withRap?[cCoarsePct,cVirginPct,cRapFinePct]:[cCoarsePct,cVirginPct];
+    eGsbs=withRap?[effCoarseGsb,effFineGsb,effRapGsb]:[effCoarseGsb,effFineGsb];
+    eGsas=withRap?[effCoarseGsa,effFineGsa,effRapGsa]:[effCoarseGsa,effFineGsa];
+    eWas=withRap?[effCoarseWa,effFineWa,effRapWa]:[effCoarseWa,effFineWa];
+  }else{
+    eFrs=withRap?[cCoarsePct,cR236Pct,cF236Pct,cRapFinePct]:[cCoarsePct,cR236Pct,cF236Pct];
+    eGsbs=withRap?[effCoarseGsb,effR236Gsb,effFineGsb,effRapGsb]:[effCoarseGsb,effR236Gsb,effFineGsb];
+    eGsas=withRap?[effCoarseGsa,effR236Gsa,effFineGsa,effRapGsa]:[effCoarseGsa,effR236Gsa,effFineGsa];
+    eWas=withRap?[effCoarseWa,effR236Wa,effFineWa,effRapWa]:[effCoarseWa,effR236Wa,effFineWa];
+  }
   const eCombGsb=cComb(eFrs,eGsbs)||cCombGsb;
   const eCombGsa=cComb(eFrs,eGsas)||cCombGsa;
   const eCombWa=cWAvg(eFrs,eWas)||cCombWa;
