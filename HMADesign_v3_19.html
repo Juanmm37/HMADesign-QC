@@ -7017,10 +7017,10 @@ function renderS11AggDensity(){
           </tr>
         </thead>
         <tbody>
-          <!-- Retain on 4.75 (Virgin Coarse) -->
+          <!-- Retain on 4.75 — total in simple/split, virgin-only in split-rap -->
           <tr style="background:#fff">
-            <td style="${tdL}">Retain on 4.75 — Virgin *</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${cVirginCoarsePct.toFixed(1)}</td>
+            <td style="${tdL}">${cMode==='split-rap'?'Retain on 4.75 — Virgin *':'Retain on 4.75 *'}</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${(cMode==='split-rap'?cVirginCoarsePct:cCoarsePct).toFixed(1)}</td>
             <td style="${tdY}">${cinp('c_coarseGsb',at.c_coarseGsb,3)}</td>
             <td style="${tdY}">${cinp('c_coarseGsa',at.c_coarseGsa,3)}</td>
             <td style="${tdY}">${cinp('c_coarseWa',at.c_coarseWa,2)}</td>
