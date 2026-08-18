@@ -7072,9 +7072,254 @@ function renderS11AggDensity(){
 
     <div class="row" style="justify-content:space-between;margin-top:14px">
       <button class="btn" onclick="ms.step=${fam==='SMA'?9:10};render()">← Back</button>
+      <button class="btn btn-gold" onclick="printAggDensity()">🖨 Print Report</button>
       <button class="btn btn-primary" onclick="ms.step=${fam==='SMA'?11:12};render()">Next: Consensus →</button>
     </div>
   </div>`;
+}
+
+function printAggDensity(){
+  const at=ms.aggTesting||{};
+  const info=ms.info||{};
+  const slots=ms.aggregates||{};
+  const selTrial=ms.selectedTrialIdx!==null?ms.trials?.[ms.selectedTrialIdx]:null;
+  const _sp=selTrial?calcStockpilePercentages(selTrial):{};
+  const getName=s=>slots[s]?(slots[s].material||s):s;
+  const fN=(v,d=3)=>(v===null||v===undefined||isNaN(v))?'—':Number(v).toFixed(d);
+
+  // T29 / T30
+  let T29=0,T30=0;
+  if(selTrial){Object.keys(selTrial.blendPct||{}).forEach(s=>{
+    const pct=_sp[s]||0;if(!pct||!slots[s])return;
+    const agg=slots[s];
+    const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
+    if(g===null||g===undefined)return;
+    T29+=(pct/100)*(g/100)*100;
+    if(!s.startsWith('RAP'))T30+=(pct/100)*(g/100)*100;
+  });}
+  const cCoarsePct=100-T29,cVirginPct=T30;
+
+  // Per-RAP fine fractions
+  function rap475(slot){
+    if(!selTrial||!slots[slot])return 0;
+    const pct=_sp[slot]||0;const agg=slots[slot];
+    const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
+    return(g!==null&&g!==undefined)?(pct/100)*(g/100)*100:0;
+  }
+  const r1p=rap475('RAP1'),r2p=rap475('RAP2');
+  const rapFine=[];
+  if(r1p>0)rapFine.push({slot:'RAP1',pct:r1p,gsbKey:'c_rapGsb',gsaKey:'c_rapGsa',waKey:'c_rapWa'});
+  if(r2p>0)rapFine.push({slot:'RAP2',pct:r2p,gsbKey:'c_rap2Gsb',gsaKey:'c_rap2Gsa',waKey:'c_rap2Wa'});
+  const cRapFinePct=rapFine.reduce((s,e)=>s+e.pct,0);
+  const totalFinePct=cVirginPct+cRapFinePct;
+
+  // 2.36 split (auto from JMF)
+  let T236v=0;
+  if(selTrial){Object.keys(selTrial.blendPct||{}).forEach(s=>{
+    if(s.startsWith('RAP')||!slots[s])return;
+    const pct=_sp[s]||0;const agg=slots[s];
+    const g=(agg.gradation_mod||{})['2.36']!==undefined&&(agg.gradation_mod||{})['2.36']!==null?(agg.gradation_mod||{})['2.36']:(agg.gradation||{})['2.36'];
+    if(g===null||g===undefined)return;
+    T236v+=(pct/100)*(g/100)*100;
+  });}
+  const cR236Pct=Math.max(0,cVirginPct-T236v);
+  const cF236Pct=Math.min(cVirginPct,T236v);
+
+  // Section 1 test card averages
+  function calc604(ss){const S=ss.ssd,O=ss.od,W=ss.water;if(!S||!O||!W)return null;return{gsb:O/(S-W),gsa:O/(O-W),absp:(S-O)/O*100};}
+  function calc605(ss){const A=ss.od,B=ss.pW,C=ss.psW,D=ss.ssd;if(!A||!B||!C||!D)return null;const vol=B+D-C;return{gsb:A/vol,gsa:A/(B+A-C),absp:(D-A)/A*100};}
+  function avgR(r1,r2){if(!r1&&!r2)return null;if(!r1)return r2;if(!r2)return r1;return{gsb:(r1.gsb+r2.gsb)/2,gsa:(r1.gsa+r2.gsa)/2,absp:(r1.absp+r2.absp)/2};}
+  const tD=at.tests||{coarse:{ss1:{},ss2:{}},r236:{ss1:{},ss2:{}},fine:{ss1:{},ss2:{}}};
+  ['coarse','r236','fine'].forEach(k=>{if(!tD[k])tD[k]={ss1:{},ss2:{}};['ss1','ss2'].forEach(s=>{if(!tD[k][s])tD[k][s]={};});});
+  const avgCoarse=avgR(calc604(tD.coarse.ss1),calc604(tD.coarse.ss2));
+  const avgR236=avgR(calc605(tD.r236.ss1),calc605(tD.r236.ss2));
+  const avgFine=avgR(calc605(tD.fine.ss1),calc605(tD.fine.ss2));
+  const effCoarseGsb=avgCoarse?.gsb||at.c_coarseGsb;
+  const effCoarseGsa=avgCoarse?.gsa||at.c_coarseGsa;
+  const effCoarseWa=avgCoarse?.absp||at.c_coarseWa;
+  const effR236Gsb=avgR236?.gsb||at.c_r236Gsb;
+  const effR236Gsa=avgR236?.gsa||at.c_r236Gsa;
+  const effR236Wa=avgR236?.absp||at.c_r236Wa;
+  const effFineGsb=avgFine?.gsb||at.c_fineGsb;
+  const effFineGsa=avgFine?.gsa||at.c_fineGsa;
+  const effFineWa=avgFine?.absp||at.c_fineWa;
+
+  // Harmonic mean / weighted avg
+  function cComb(fr,vs){for(let i=0;i<fr.length;i++)if(!vs[i])return null;const t=fr.reduce((a,b)=>a+b,0);const d=fr.reduce((s,p,i)=>s+p/vs[i],0);return d?t/d:null;}
+  function cWAvg(fr,vs){for(let i=0;i<fr.length;i++)if(vs[i]===null||vs[i]===undefined)return null;const t=fr.reduce((a,b)=>a+b,0);return fr.reduce((s,p,i)=>s+p*vs[i],0)/t;}
+
+  const cMode=at.calcMode||'simple';
+  const rapFracs=rapFine.map(e=>e.pct);
+  const rapGsbs=rapFine.map(e=>at[e.gsbKey]);
+  const rapGsas=rapFine.map(e=>at[e.gsaKey]);
+  const rapWas=rapFine.map(e=>at[e.waKey]);
+
+  let eFrs,eGsbs,eGsas,eWas;
+  if(cMode==='simple'){
+    eFrs=[cCoarsePct,cVirginPct,...rapFracs];eGsbs=[effCoarseGsb,effFineGsb,...rapGsbs];
+    eGsas=[effCoarseGsa,effFineGsa,...rapGsas];eWas=[effCoarseWa,effFineWa,...rapWas];
+  }else{
+    eFrs=[cCoarsePct,cR236Pct,cF236Pct,...rapFracs];eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb,...rapGsbs];
+    eGsas=[effCoarseGsa,effR236Gsa,effFineGsa,...rapGsas];eWas=[effCoarseWa,effR236Wa,effFineWa,...rapWas];
+  }
+  const eCombGsb=cComb(eFrs,eGsbs);
+  const eCombGsa=cComb(eFrs,eGsas);
+  const eCombWa=cWAvg(eFrs,eWas);
+
+  // Blended Fine group values
+  let fineFracs,fineGsbs,fineGsas,fineWas;
+  if(cMode==='simple'){
+    fineFracs=[cVirginPct,...rapFracs];fineGsbs=[effFineGsb,...rapGsbs];
+    fineGsas=[effFineGsa,...rapGsas];fineWas=[effFineWa,...rapWas];
+  }else{
+    fineFracs=[cR236Pct,cF236Pct,...rapFracs];fineGsbs=[effR236Gsb,effFineGsb,...rapGsbs];
+    fineGsas=[effR236Gsa,effFineGsa,...rapGsas];fineWas=[effR236Wa,effFineWa,...rapWas];
+  }
+  const eCombFineGsb=cComb(fineFracs,fineGsbs);
+  const eCombFineGsa=cComb(fineFracs,fineGsas);
+  const eCombFineWa=cWAvg(fineFracs,fineWas);
+
+  // ── Build fine sub-rows ──
+  const virginSubRows=cMode==='simple'?1:2;
+  const totalFineRows=virginSubRows+rapFine.length;
+  const hasMultiFine=totalFineRows>1;
+
+  const thS='padding:7px 10px;border:1px solid #ccc;text-align:center;background:#1f3864;color:#fff;font-size:10px;font-weight:700';
+  const thSL='padding:7px 10px;border:1px solid #ccc;text-align:left;background:#1f3864;color:#fff;font-size:10px;font-weight:700';
+  const tdS='padding:6px 10px;border:1px solid #ccc;text-align:center;font-size:11px';
+  const tdSL='padding:6px 10px;border:1px solid #ccc;text-align:left;font-size:11px';
+  const tdSG='padding:6px 10px;border:1px solid #ccc;text-align:center;font-size:11px;font-weight:700';
+
+  let virginRows='';
+  if(cMode==='simple'){
+    virginRows=`<tr style="background:#f0f4fb">
+      <td style="${tdSL}">Passing 4.75mm (Virgin)</td>
+      <td style="${tdS}">${fN(cVirginPct,1)}</td>
+      <td style="${tdSG}">${fN(effFineGsb)}</td>
+      <td style="${tdSG}">${fN(effFineGsa)}</td>
+      <td style="${tdSG}">${fN(effFineWa,2)}</td>
+    </tr>`;
+  }else{
+    virginRows=`<tr style="background:#f0f4fb">
+      <td style="${tdSL}">Retain on 2.36mm (Virgin)</td>
+      <td style="${tdS}">${fN(cR236Pct,1)}</td>
+      <td style="${tdSG}">${fN(effR236Gsb)}</td>
+      <td style="${tdSG}">${fN(effR236Gsa)}</td>
+      <td style="${tdSG}">${fN(effR236Wa,2)}</td>
+    </tr>
+    <tr style="background:#e8f0fe">
+      <td style="${tdSL}">Passing 2.36mm (Virgin)</td>
+      <td style="${tdS}">${fN(cF236Pct,1)}</td>
+      <td style="${tdSG}">${fN(effFineGsb)}</td>
+      <td style="${tdSG}">${fN(effFineGsa)}</td>
+      <td style="${tdSG}">${fN(effFineWa,2)}</td>
+    </tr>`;
+  }
+
+  const rapFineHtml=rapFine.map(e=>`<tr style="background:#eef3ee">
+    <td style="${tdSL}">RAP Fine — ${getName(e.slot)} <span style="font-size:9px;color:#555">(annual)</span></td>
+    <td style="${tdS}">${fN(e.pct,1)}</td>
+    <td style="${tdSG}">${fN(at[e.gsbKey])}</td>
+    <td style="${tdSG}">${fN(at[e.gsaKey])}</td>
+    <td style="${tdSG}">${fN(at[e.waKey],2)}</td>
+  </tr>`).join('');
+
+  const fineBlendRow=hasMultiFine?`<tr style="background:#d4dff7;font-weight:700">
+    <td style="${tdSL}">Fine Aggregate — Total</td>
+    <td style="${tdS}">${fN(totalFinePct,1)}</td>
+    <td style="${tdS};font-size:13px">${fN(eCombFineGsb)}</td>
+    <td style="${tdS};font-size:13px">${fN(eCombFineGsa)}</td>
+    <td style="${tdS};font-size:13px">${fN(eCombFineWa,2)}</td>
+  </tr>`:'';
+
+  const mixLabel=`${info.mixNo||'Mix Design'} — ${info.mixType||''}${info.hasRAP==='Yes'?' RAP':''}`;
+  const dateStr=info.date?new Date(info.date).toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):'';
+
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Aggregate Blend Density — ${mixLabel}</title><meta charset="UTF-8">
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;color:#1a1a2e;background:#fff;padding:16px}
+  @page{size:A4 landscape;margin:10mm}@media print{body{padding:0}.no-print{display:none}}
+  table{border-collapse:collapse;width:100%}
+  .info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 20px;margin-bottom:16px;border:1px solid #ccc;padding:10px;border-radius:4px}
+  .info-item label{font-size:9px;font-weight:700;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:1px}
+  .info-item span{font-size:12px;font-weight:600}
+  h2{font-size:14px;font-weight:800;color:#1f3864;text-align:center;margin-bottom:12px;padding:8px;border:2px solid #1f3864;border-radius:4px}
+  .footnote{margin-top:10px;font-size:9px;color:#555;border-top:1px solid #ccc;padding-top:6px}
+  </style></head><body>
+
+  <!-- Header with logo -->
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #1f3864">
+    <img src="${LOGO_SRC}" alt="Capital Paving" style="height:70px">
+    <div>
+      <div style="font-size:9px;font-style:italic;color:#555;line-height:1.5">Quality Construction<br>by Quality People</div>
+    </div>
+    <div style="flex:1"></div>
+    <h2 style="flex:2;border:2px solid #1f3864;padding:10px 16px;border-radius:4px;font-size:14px;font-weight:800;color:#1f3864;text-align:center;margin:0">
+      Aggregate Blend Relative Density and Absorption Summary Table
+    </h2>
+  </div>
+
+  <!-- Mix info -->
+  <div class="info-grid">
+    <div class="info-item"><label>Mix No.</label><span>${info.mixNo||'—'}</span></div>
+    <div class="info-item"><label>Mix Type</label><span>${(info.mixType||'—')}${info.hasRAP==='Yes'?' RAP':''}</span></div>
+    <div class="info-item"><label>PGAC</label><span>${info.pgac||'—'}</span></div>
+    <div class="info-item"><label>Date Tested</label><span>${at.c_date?new Date(at.c_date+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):'—'}</span></div>
+    <div class="info-item"><label>Tested By</label><span>${at.c_tech||'—'}</span></div>
+    <div class="info-item"><label>Fine Fraction Split</label><span>${cMode==='simple'?'4.75mm Split':'+2.36mm Split'}</span></div>
+  </div>
+
+  <!-- Summary Table -->
+  <table>
+    <thead>
+      <tr>
+        <th style="${thSL}">Description</th>
+        <th style="${thS};width:90px">Percentages (%)</th>
+        <th style="${thS};width:130px">Bulk Relative Density (Gsb)</th>
+        <th style="${thS};width:130px">Apparent Density (Gsa)</th>
+        <th style="${thS};width:110px">Absorption (%)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- ── COARSE AGGREGATE ── -->
+      <tr style="background:#e8edf5">
+        <td colspan="5" style="${tdSL};font-weight:800;color:#1f3864;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px">Coarse Aggregate</td>
+      </tr>
+      <tr>
+        <td style="${tdSL}">Retain on 4.75mm</td>
+        <td style="${tdS}">${fN(cCoarsePct,1)}</td>
+        <td style="${tdSG};font-size:13px">${fN(effCoarseGsb)}</td>
+        <td style="${tdSG};font-size:13px">${fN(effCoarseGsa)}</td>
+        <td style="${tdSG};font-size:13px">${fN(effCoarseWa,2)}</td>
+      </tr>
+      <!-- ── FINE AGGREGATE ── -->
+      <tr style="background:#e8edf5">
+        <td colspan="5" style="${tdSL};font-weight:800;color:#1f3864;font-size:10px;text-transform:uppercase;letter-spacing:0.05em;padding:4px 10px">Fine Aggregate</td>
+      </tr>
+      ${virginRows}
+      ${rapFineHtml}
+      ${fineBlendRow}
+      <!-- ── AGGREGATE BLEND RESULTS ── -->
+      <tr style="background:#1f3864;color:#fff">
+        <td colspan="2" style="padding:8px 10px;border:1px solid #ccc;text-align:center;font-size:11px;font-weight:800;color:#fff">Aggregate Blend Results</td>
+        <td style="padding:8px 10px;border:1px solid #ccc;text-align:center;font-size:16px;font-weight:900;color:#fff">${fN(eCombGsb)}</td>
+        <td style="padding:8px 10px;border:1px solid #ccc;text-align:center;font-size:16px;font-weight:900;color:#fff">${fN(eCombGsa)}</td>
+        <td style="padding:8px 10px;border:1px solid #ccc;text-align:center;font-size:16px;font-weight:900;color:#fff">${fN(eCombWa,2)}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footnote">
+    * Coarse aggregate (Retain on 4.75mm) density determined by AASHTO T85 / LS-604 (wire basket method).<br>
+    * Virgin fine aggregate density determined by AASHTO T84 / LS-605 (pycnometer method).<br>
+    * RAP fine aggregate density and absorption values determined annually per procedure 6.3 on LS-605.
+  </div>
+
+  <div class="no-print" style="margin-top:20px;text-align:center">
+    <button onclick="window.print()" style="padding:10px 30px;font-size:13px;font-weight:700;background:#1f3864;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨 Print / Save as PDF</button>
+  </div>
+  </body></html>`);
+  win.document.close();win.focus();setTimeout(()=>win.print(),600);
 }
 
 function renderS12Consensus(){
