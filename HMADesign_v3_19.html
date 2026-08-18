@@ -6929,9 +6929,33 @@ function renderS11AggDensity(){
   }
 
   return`<div class="card card-blue">
-    <div class="st">Step ${fam==='SMA'?10:11} — Aggregate Testing</div>
-    <div class="ibox">Physical test results — for reporting purposes only. Does not affect volumetric calculations.</div>
+    <div class="st">Step ${fam==='SMA'?10:11} — Aggregate Densities</div>
 
+    <!-- ── SECTION 1: Test Calculations ── -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid #e8edf5;padding-bottom:5px">
+        Section 1 — Test Calculations
+      </div>
+      <div style="font-size:11px;color:#666;margin-bottom:14px">
+        Enter raw lab measurements. Gsb, Gsa, and Absorption are computed automatically and carried into Section 2.
+        Yellow cells = measurements. Blue = calculated.
+      </div>
+      <!-- Cards laid out in responsive flex rows -->
+      <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
+        ${renderTestCard604('coarse','Retain on 4.75mm',cCoarsePct,tD.coarse.ss1,tD.coarse.ss2,tCoarse[0],tCoarse[1],avgCoarse)}
+        ${cMode==='simple'
+          ?renderTestCard605('fine','Passing 4.75mm',T29,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
+          :renderTestCard605('r236','Retain on 2.36mm',cP236v!==null?cR236Pct:0,tD.r236.ss1,tD.r236.ss2,tR236[0],tR236[1],avgR236,'AASHTO T84')}
+        ${cMode!=='simple'
+          ?renderTestCard605('fine','Passing 2.36mm',cP236v!==null?cF236Pct:0,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
+          :''}
+        ${cMode==='split-rap'
+          ?renderTestCard605('rap','RAP Fine',cRapFinePct,tD.rap.ss1,tD.rap.ss2,tRap[0],tRap[1],avgRap,'LS 605 §6.3')
+          :''}
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: Combined Aggregate Relative Density Calculation ── -->
     <!-- ── NEW: Combined Aggregate Relative Density Calculation ── -->
     <div style="margin-bottom:24px">
       <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid #e8edf5;padding-bottom:5px">
