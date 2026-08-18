@@ -6729,15 +6729,19 @@ function renderS11AggDensity(){
   const effFineGsb=avgFine?.gsb||at.c_fineGsb;
   const effFineGsa=avgFine?.gsa||at.c_fineGsa;
   const effFineWa=avgFine?.absp||at.c_fineWa;
-  const effRapGsb=avgRap?.gsb||at.c_rapGsb;
-  const effRapGsa=avgRap?.gsa||at.c_rapGsa;
-  const effRapWa=avgRap?.absp||at.c_rapWa;
+  const effRapGsb=at.c_rapGsb;
+  const effRapGsa=at.c_rapGsa;
+  const effRapWa=at.c_rapWa;
+  // RAP coarse: annual values entered directly — no Section 1 test card
+  const effRapCoarseGsb=at.c_rapCoarseGsb;
+  const effRapCoarseGsa=at.c_rapCoarseGsa;
+  const effRapCoarseWa=at.c_rapCoarseWa;
 
   // Recompute combined using effective values
   let eFrs=[],eGsbs=[],eGsas=[],eWas=[];
   if(cMode==='simple'){eFrs=[cCoarsePct,T29];eGsbs=[effCoarseGsb,effFineGsb];eGsas=[effCoarseGsa,effFineGsa];eWas=[effCoarseWa,effFineWa];}
   else if(cMode==='split'){eFrs=[cCoarsePct,cR236Pct,cF236Pct];eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb];eGsas=[effCoarseGsa,effR236Gsa,effFineGsa];eWas=[effCoarseWa,effR236Wa,effFineWa];}
-  else{eFrs=[cCoarsePct,cR236Pct,cF236Pct,cRapFinePct];eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb,effRapGsb];eGsas=[effCoarseGsa,effR236Gsa,effFineGsa,effRapGsa];eWas=[effCoarseWa,effR236Wa,effFineWa,effRapWa];}
+  else{eFrs=[cVirginCoarsePct,cRapCoarsePct,cR236Pct,cF236Pct,cRapFinePct];eGsbs=[effCoarseGsb,effRapCoarseGsb,effR236Gsb,effFineGsb,effRapGsb];eGsas=[effCoarseGsa,effRapCoarseGsa,effR236Gsa,effFineGsa,effRapGsa];eWas=[effCoarseWa,effRapCoarseWa,effR236Wa,effFineWa,effRapWa];}
   const eCombGsb=cComb(eFrs,eGsbs)||cCombGsb;
   const eCombGsa=cComb(eFrs,eGsas)||cCombGsa;
   const eCombWa=cWAvg(eFrs,eWas)||cCombWa;
