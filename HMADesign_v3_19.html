@@ -6957,9 +6957,9 @@ function renderS11AggDensity(){
       </div>
       <!-- Cards laid out in responsive flex rows -->
       <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
-        ${renderTestCard604('coarse',`Retain on 4.75mm (Virgin${cRapCoarsePct>0?' only':''})`,cVirginCoarsePct,tD.coarse.ss1,tD.coarse.ss2,tCoarse[0],tCoarse[1],avgCoarse)}
+        ${renderTestCard604('coarse','Retain on 4.75mm',cCoarsePct,tD.coarse.ss1,tD.coarse.ss2,tCoarse[0],tCoarse[1],avgCoarse)}
         ${cMode==='simple'
-          ?renderTestCard605('fine','Passing 4.75mm',T29,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
+          ?renderTestCard605('fine','Passing 4.75mm (Virgin)',cVirginPct,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
           :renderTestCard605('r236','Retain on 2.36mm',cP236v!==null?cR236Pct:0,tD.r236.ss1,tD.r236.ss2,tR236[0],tR236[1],avgR236,'AASHTO T84')}
         ${cMode!=='simple'
           ?renderTestCard605('fine','Passing 2.36mm',cP236v!==null?cF236Pct:0,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
