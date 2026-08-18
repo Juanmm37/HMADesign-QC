@@ -6959,7 +6959,7 @@ function renderS11AggDensity(){
         Section 1 — Test Calculations
       </div>
       <div style="font-size:11px;color:#666;margin-bottom:14px">
-        Enter raw lab measurements. Gsb, Gsa, and Absorption are computed automatically and carried into Section 2.
+        Enter raw lab measurements. Results auto-populate the summary below.
         Yellow cells = measurements. Blue = calculated.
       </div>
       <!-- Cards laid out in responsive flex rows -->
@@ -6967,177 +6967,80 @@ function renderS11AggDensity(){
         ${renderTestCard604('coarse','Retain on 4.75mm',cCoarsePct,tD.coarse.ss1,tD.coarse.ss2,tCoarse[0],tCoarse[1],avgCoarse)}
         ${cMode==='simple'
           ?renderTestCard605('fine','Passing 4.75mm (Virgin)',cVirginPct,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
-          :renderTestCard605('r236','Retain on 2.36mm',cP236v!==null?cR236Pct:0,tD.r236.ss1,tD.r236.ss2,tR236[0],tR236[1],avgR236,'AASHTO T84')}
+          :renderTestCard605('r236','Retain on 2.36mm (Virgin)',cR236Pct,tD.r236.ss1,tD.r236.ss2,tR236[0],tR236[1],avgR236,'AASHTO T84')}
         ${cMode!=='simple'
-          ?renderTestCard605('fine','Passing 2.36mm',cP236v!==null?cF236Pct:0,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
+          ?renderTestCard605('fine','Passing 2.36mm (Virgin)',cF236Pct,tD.fine.ss1,tD.fine.ss2,tFine[0],tFine[1],avgFine,'LS 605')
           :''}
       </div>
     </div>
 
-    <!-- ── SECTION 2: Combined Aggregate Relative Density Calculation ── -->
-    <!-- ── NEW: Combined Aggregate Relative Density Calculation ── -->
-    <div style="margin-bottom:24px">
-      <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid #e8edf5;padding-bottom:5px">
-        Combined Aggregate Relative Density Calculation
-      </div>
-
-      <!-- Mode selector + Date/Tech -->
-      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-bottom:12px">
+    <!-- ── Summary ── -->
+    <div style="margin-bottom:14px">
+      <!-- Mode selector + Date/Tech inline bar -->
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:10px">
         <div>
-          <div style="font-size:9px;font-weight:700;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:5px">Calculation Method</div>
+          <div style="font-size:9px;font-weight:700;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px">Fine Fraction Split</div>
           <div style="display:flex;border:1px solid #c5d3ef;border-radius:6px;overflow:hidden">
-            ${[
-              ['simple','4.75 Split'],
-              ['split','+ 2.36 Split']
-            ].map(([val,lbl],i)=>`<button style="padding:7px 13px;font-size:10px;font-weight:700;border:none;border-right:${i<1?'1px solid #c5d3ef':'none'};cursor:pointer;white-space:nowrap;
-              background:${(cMode===val||(cMode==='split-rap'&&val==='split'))?'#1f3864':'#f5f8ff'};color:${(cMode===val||(cMode==='split-rap'&&val==='split'))?'#fff':'#1f3864'}"
-              onclick="ms.aggTesting.calcMode='${val}';saveDB();render()">${lbl}</button>`).join('')}
+            ${[['simple','4.75 Split'],['split','+ 2.36 Split']].map(([val,lbl],i)=>`
+              <button style="padding:6px 13px;font-size:10px;font-weight:700;border:none;border-right:${i<1?'1px solid #c5d3ef':'none'};cursor:pointer;white-space:nowrap;
+                background:${(cMode===val||(cMode==='split-rap'&&val==='split'))?'#1f3864':'#f5f8ff'};color:${(cMode===val||(cMode==='split-rap'&&val==='split'))?'#fff':'#1f3864'}"
+                onclick="ms.aggTesting.calcMode='${val}';saveDB();render()">${lbl}</button>`).join('')}
           </div>
         </div>
-        <div style="display:flex;gap:10px;align-items:flex-end">
-          <div class="fg" style="margin:0"><label style="font-size:9px">Date Tested</label>
-            <input type="date" value="${at.c_date||''}" style="font-size:11px;width:140px"
-              onchange="ms.aggTesting.c_date=this.value;saveDB()"></div>
-          <div class="fg" style="margin:0"><label style="font-size:9px">Tested By</label>
-            <input value="${at.c_tech||''}" style="font-size:11px;width:110px"
-              onchange="ms.aggTesting.c_tech=this.value;saveDB()"></div>
-        </div>
+        <div class="fg" style="margin:0"><label style="font-size:9px">Date Tested</label>
+          <input type="date" value="${at.c_date||''}" style="font-size:11px;width:140px"
+            onchange="ms.aggTesting.c_date=this.value;saveDB()"></div>
+        <div class="fg" style="margin:0"><label style="font-size:9px">Tested By</label>
+          <input value="${at.c_tech||''}" style="font-size:11px;width:110px"
+            onchange="ms.aggTesting.c_tech=this.value;saveDB()"></div>
       </div>
 
-      ${cMode!=='simple'?`<!-- Fine fraction sieve split inputs -->
-      <div style="background:#eff4fb;border:1px solid #c5d3ef;border-radius:6px;padding:8px 14px;margin-bottom:12px;font-size:11px;color:#1f3864;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-        <span style="font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:0.04em">Fine Fraction Sieve Data</span>
-        <span style="color:#555">% passing 4.75: ${cinpSieve('c_pct475',at.c_pct475)}</span>
-        <span style="color:#555">% passing 2.36: ${cinpSieve('c_pct236',at.c_pct236)}</span>
-        ${cP236v!==null?`<span style="color:#1f3864;font-weight:700;font-size:10px">
-          → Retain 2.36 = ${(cR2Frac*100).toFixed(1)}% of fine &nbsp;|&nbsp; Passing 2.36 = ${(cF2Frac*100).toFixed(1)}% of fine
-        </span>`:'<span style="color:#aaa;font-size:10px;font-style:italic">Enter both sieve values to compute split percentages</span>'}
-      </div>`:''}
-
-      <!-- Calculation table -->
       <div style="overflow-x:auto">
-      <table style="border-collapse:collapse;font-size:11px;width:100%;min-width:520px">
-        <thead>
-          <tr>
-            <th style="${thTL};font-size:10px;min-width:160px">Description</th>
-            <th style="${thT};font-size:10px;width:80px">% (JMF)</th>
-            <th style="${thT};font-size:10px;width:110px">Bulk Relative Density (Gsb)</th>
-            <th style="${thT};font-size:10px;width:110px">Apparent Density (Gsa)</th>
-            <th style="${thT};font-size:10px;width:100px">Absorption (%)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Retain on 4.75 — virgin + RAP coarse tested together (LS 604) -->
-          <tr style="background:#fff">
-            <td style="${tdL}">Retain on 4.75 *</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
-            <td style="${tdY}">${cinp('c_coarseGsb',at.c_coarseGsb,3)}</td>
-            <td style="${tdY}">${cinp('c_coarseGsa',at.c_coarseGsa,3)}</td>
-            <td style="${tdY}">${cinp('c_coarseWa',at.c_coarseWa,2)}</td>
-          </tr>
-          ${cMode!=='simple'?`
-          <!-- Retain on 2.36 — virgin fine only -->
-          <tr style="background:#f0f4fb">
-            <td style="${tdL}">Retain on 2.36 (Virgin) **</td>
-            <td style="${tdC}">${cP236v!==null?cR236Pct.toFixed(1):'—'}<br><span style="font-size:8px">calc.</span></td>
-            <td style="${tdY}">${cinp('c_r236Gsb',at.c_r236Gsb,3)}</td>
-            <td style="${tdY}">${cinp('c_r236Gsa',at.c_r236Gsa,3)}</td>
-            <td style="${tdY}">${cinp('c_r236Wa',at.c_r236Wa,2)}</td>
-          </tr>
-          <!-- Passing 2.36 — virgin fine only -->
-          <tr style="background:#e8f0fe">
-            <td style="${tdL}">Passing 2.36 (Virgin) ***</td>
-            <td style="${tdC}">${cP236v!==null?cF236Pct.toFixed(1):'—'}<br><span style="font-size:8px">calc.</span></td>
-            <td style="${tdY}">${cinp('c_fineGsb',at.c_fineGsb,3)}</td>
-            <td style="${tdY}">${cinp('c_fineGsa',at.c_fineGsa,3)}</td>
-            <td style="${tdY}">${cinp('c_fineWa',at.c_fineWa,2)}</td>
-          </tr>`:`
-          <!-- Passing 4.75 — virgin fine only (LS 605) -->
-          <tr style="background:#f0f4fb">
-            <td style="${tdL}">Passing 4.75 (Virgin) **</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${cVirginPct.toFixed(1)}</td>
-            <td style="${tdY}">${cinp('c_fineGsb',at.c_fineGsb,3)}</td>
-            <td style="${tdY}">${cinp('c_fineGsa',at.c_fineGsa,3)}</td>
-            <td style="${tdY}">${cinp('c_fineWa',at.c_fineWa,2)}</td>
-          </tr>`}
-          ${withRap?`
-          <!-- RAP Fine — annual value entered directly -->
-          <tr style="background:#f0f4f0">
-            <td style="${tdL}">${cMode==='simple'?'Passing 4.75 (RAP) ***':'RAP Fine ****'}</td>
-            <td style="${td0};background:#eef3ee;font-weight:700">${cRapFinePct.toFixed(1)}</td>
-            <td style="${tdY}">${cinp('c_rapGsb',at.c_rapGsb,3)}</td>
-            <td style="${tdY}">${cinp('c_rapGsa',at.c_rapGsa,3)}</td>
-            <td style="${tdY}">${cinp('c_rapWa',at.c_rapWa,2)}</td>
-          </tr>`:''}
-          <!-- Combined Results -->
-          <tr>
-            <td colspan="2" style="${tdBotL}">Aggregate Blend Results</td>
-            <td style="${tdBot};font-size:14px">${cCombGsb!==null?cCombGsb.toFixed(3):'—'}</td>
-            <td style="${tdBot};font-size:14px">${cCombGsa!==null?cCombGsa.toFixed(3):'—'}</td>
-            <td style="${tdBot};font-size:14px">${cCombWa!==null?cCombWa.toFixed(2):'—'}</td>
-          </tr>
-          <!-- Footnotes -->
-          <tr><td colspan="5" style="padding:5px 10px;font-size:9.5px;color:#888;font-style:italic;background:#fafafa;border:1px solid #e0e4ec">
-            * Retain on 4.75mm — LS 604 (virgin + RAP coarse combined) &nbsp;|&nbsp;
-            ${cMode==='simple'
-              ?`** Passing 4.75mm — LS 605 (virgin only)${withRap?' &nbsp;|&nbsp; *** Passing 4.75mm — RAP fine (annual)':''}`
-              :`** Retain on 2.36mm — LS 605 / AASHTO T84 (virgin) &nbsp;|&nbsp; *** Passing 2.36mm — LS 605 (virgin)${withRap?' &nbsp;|&nbsp; **** RAP fine (annual)':''}`}
-          </td></tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <!-- ── SECTION 3: Summary Table ── -->
-    <div style="margin-bottom:14px">
-      <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid #e8edf5;padding-bottom:5px">
-        Section 3 — Summary
-      </div>
-      <div style="overflow-x:auto">
-      <table style="border-collapse:collapse;font-size:11px;min-width:480px">
+      <table style="border-collapse:collapse;font-size:11px;min-width:480px;width:100%">
         <thead><tr>
           <th style="${thTL};font-size:10px">Description</th>
-          <th style="${thT};font-size:10px;width:75px">% (JMF)</th>
+          <th style="${thT};font-size:10px;width:75px">% (Stockpile)</th>
           <th style="${thT};font-size:10px;width:110px">Bulk Relative Density (Gsb)</th>
           <th style="${thT};font-size:10px;width:110px">Apparent Density (Gsa)</th>
           <th style="${thT};font-size:10px;width:100px">Absorption (%)</th>
         </tr></thead>
         <tbody>
           <tr style="background:#fff">
-            <td style="${tdL}">${cMode==='split-rap'?'Retain on 4.75 — Virgin':'Retain on 4.75'}</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${(cMode==='split-rap'?cVirginCoarsePct:cCoarsePct).toFixed(1)}</td>
-            <td style="${tdC};font-size:11px">${effCoarseGsb!=null?effCoarseGsb.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effCoarseGsa!=null?effCoarseGsa.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effCoarseWa!=null?effCoarseWa.toFixed(2):'—'}</td>
+            <td style="${tdL}">Retain on 4.75</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effCoarseGsb!=null?effCoarseGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effCoarseGsa!=null?effCoarseGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effCoarseWa!=null?effCoarseWa.toFixed(2):'—'}</td>
           </tr>
           ${cMode!=='simple'?`
           <tr style="background:#f0f4fb">
             <td style="${tdL}">Retain on 2.36 (Virgin)</td>
-            <td style="${tdC}">${cP236v!==null?cR236Pct.toFixed(1):'—'}</td>
-            <td style="${tdC};font-size:11px">${effR236Gsb!=null?effR236Gsb.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effR236Gsa!=null?effR236Gsa.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effR236Wa!=null?effR236Wa.toFixed(2):'—'}</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cR236Pct.toFixed(1)}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effR236Gsb!=null?effR236Gsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effR236Gsa!=null?effR236Gsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effR236Wa!=null?effR236Wa.toFixed(2):'—'}</td>
           </tr>
           <tr style="background:#e8f0fe">
             <td style="${tdL}">Passing 2.36 (Virgin)</td>
-            <td style="${tdC}">${cP236v!==null?cF236Pct.toFixed(1):'—'}</td>
-            <td style="${tdC};font-size:11px">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cF236Pct.toFixed(1)}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
           </tr>`:`
           <tr style="background:#f0f4fb">
             <td style="${tdL}">Passing 4.75 (Virgin)</td>
             <td style="${td0};background:#f5f8ff;font-weight:700">${cVirginPct.toFixed(1)}</td>
-            <td style="${tdC};font-size:11px">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:12px;font-weight:700">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
           </tr>`}
           ${withRap?`
-          <tr style="background:#f0f4f0">
-            <td style="${tdL}">${cMode==='simple'?'Passing 4.75 (RAP)':'RAP Fine'}</td>
+          <tr style="background:#eef3ee">
+            <td style="${tdL}">${cMode==='simple'?'Passing 4.75 (RAP)':'RAP Fine'} <span style="font-size:9px;color:#888;font-weight:400">— annual</span></td>
             <td style="${td0};background:#eef3ee;font-weight:700">${cRapFinePct.toFixed(1)}</td>
-            <td style="${tdC};font-size:11px">${effRapGsb!=null?effRapGsb.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effRapGsa!=null?effRapGsa.toFixed(3):'—'}</td>
-            <td style="${tdC};font-size:11px">${effRapWa!=null?effRapWa.toFixed(2):'—'}</td>
+            <td style="${tdY}">${cinp('c_rapGsb',at.c_rapGsb,3)}</td>
+            <td style="${tdY}">${cinp('c_rapGsa',at.c_rapGsa,3)}</td>
+            <td style="${tdY}">${cinp('c_rapWa',at.c_rapWa,2)}</td>
           </tr>`:''}
           <tr>
             <td colspan="2" style="${tdBotL}">Aggregate Blend Results</td>
