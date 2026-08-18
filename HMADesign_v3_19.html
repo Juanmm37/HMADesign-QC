@@ -6096,9 +6096,11 @@ function renderS8TSR(){
         const mSSD=parseFloat(sp.mSSD)||null, mWat=parseFloat(sp.mWat)||null;
         const load=parseFloat(sp.load)||null;
         const vol=(mSSD!==null&&mWat!==null)?mSSD-mWat:null;
-        const Gmb=(vol&&vol>0&&mDry)?mDry/vol:null;
-        const Va=(Gmb&&Gmm_tsr)?(1-Gmb/Gmm_tsr)*100:null;
-        const volAV=(Va!==null&&vol!==null)?Va/100*vol:null;
+        const GmbRaw=(vol&&vol>0&&mDry)?mDry/vol:null;
+        const Gmb=GmbRaw!==null?Math.round(GmbRaw*1000)/1000:null;       // round to 3 dp (matches Excel)
+        const VaRaw=(Gmb&&Gmm_tsr)?(1-Gmb/Gmm_tsr)*100:null;
+        const Va=VaRaw!==null?Math.round(VaRaw*10)/10:null;              // round to 1 dp before computing Va volume
+        const volAV=(Va!==null&&vol!==null)?Math.round(Va/100*vol*10)/10:null; // Va volume, 1 dp
         // ITS: use 3.14 to match =2000*Load/(3.14*Thickness*Diameter) in Excel
         const condT=isCond?(parseFloat(sp.tCond)||null):null;
         const useT=isCond?(condT||t):t;
