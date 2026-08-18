@@ -1230,8 +1230,8 @@ function renderNewMix(){
   const steps=fam2==='Marshall'
     ?['Project Info','Aggregates','Trial Blend Analysis','Trial Blends','Trial Volumetrics','Select Blend','Selected Volumetrics','Property Curves','Summary']
     :fam2==='SMA'
-    ?['Project Info','Aggregates','Trial Blend Analysis','Trial Blends','Trial Volumetrics','Select Blend','Selected Volumetrics','Property Curves','TSR','Aggregate Testing','Summary']
-    :['Project Info','Aggregates','Trial Blend Analysis','Trial Blends','Trial Volumetrics','Select Blend','Selected Volumetrics','Property Curves','TSR','Nmax','Aggregate Testing','Summary'];
+    ?['Project Info','Aggregates','Trial Blend Analysis','Trial Blends','Trial Volumetrics','Select Blend','Selected Volumetrics','Property Curves','TSR','Agg Densities','Consensus','Summary']
+    :['Project Info','Aggregates','Trial Blend Analysis','Trial Blends','Trial Volumetrics','Select Blend','Selected Volumetrics','Property Curves','TSR','Nmax','Agg Densities','Consensus','Summary'];
   const bar=`<div class="steps-bar">${steps.map((st,i)=>{
     const n=i+1,cls=n<ms.step?'sd':n===ms.step?'sa':'sf';
     return(i>0?`<div class="sc ${n<=ms.step?'done':''}"></div>`:'')+
