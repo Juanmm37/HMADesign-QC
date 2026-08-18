@@ -6643,6 +6643,22 @@ function renderS11AggDensity(){
   const cRapCoarsePct=hasRAP?Math.max(0,totalRapPct-cRapFinePct):0;
   const cVirginCoarsePct=cCoarsePct-cRapCoarsePct;  // virgin coarse only (LS 604 fraction)
 
+  // Per-RAP fine fractions (each RAP's stockpile% × its gradation passing 4.75)
+  function rapFine475(slot){
+    if(!selTrial||!slots[slot])return 0;
+    const pct=_stockpilePcts[slot]||0;
+    const agg=slots[slot];
+    const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null
+      ?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
+    return(g!==null&&g!==undefined)?(pct/100)*(g/100)*100:0;
+  }
+  const cRap1FinePct=rapFine475('RAP1');
+  const cRap2FinePct=rapFine475('RAP2');
+  // rapFineEntries: ordered list of {slot, pct, gsbKey, gsaKey, waKey} for each RAP with fine fraction
+  const rapFineEntries=[];
+  if(cRap1FinePct>0)rapFineEntries.push({slot:'RAP1',pct:cRap1FinePct,gsbKey:'c_rapGsb',gsaKey:'c_rapGsa',waKey:'c_rapWa'});
+  if(cRap2FinePct>0)rapFineEntries.push({slot:'RAP2',pct:cRap2FinePct,gsbKey:'c_rap2Gsb',gsaKey:'c_rap2Gsa',waKey:'c_rap2Wa'});
+
   // Auto-compute virgin fine split at 2.36mm from JMF gradation (stockpile basis)
   let T_236_virgin=0;
   if(selTrial){
