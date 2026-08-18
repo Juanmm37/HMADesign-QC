@@ -6557,7 +6557,22 @@ function renderS9Nmax(){
 }
 
 // ── STEP 11 — AGGREGATE TESTING (Blended Gsb + Consensus Properties) ──
-function renderS11AggTesting(){
+function setTestVal(key,ss,field,val){
+  if(!ms.aggTesting)ms.aggTesting={};
+  if(!ms.aggTesting.tests)ms.aggTesting.tests={};
+  const t=ms.aggTesting.tests;
+  if(!t[key])t[key]={};if(!t[key][ss])t[key][ss]={};
+  t[key][ss][field]=parseFloat(val)||null;saveDB();render();
+}
+function setTestValQ(key,ss,field,val){
+  if(!ms.aggTesting)ms.aggTesting={};
+  if(!ms.aggTesting.tests)ms.aggTesting.tests={};
+  const t=ms.aggTesting.tests;
+  if(!t[key])t[key]={};if(!t[key][ss])t[key][ss]={};
+  t[key][ss][field]=parseFloat(val)||null;
+}
+
+function renderS11AggDensity(){
   const fam=ms.info.family||'Superpave';
   const tc=ms.info.traffic||'B';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
