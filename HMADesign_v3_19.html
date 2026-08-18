@@ -7179,63 +7179,56 @@ function printAggDensity(){
   const eCombFineGsa=cComb(fineFracs,fineGsas);
   const eCombFineWa=cWAvg(fineFracs,fineWas);
 
-  // ── Fine sub-row descriptors ──
-  const fineSubRows=[];
+  // ── Build table rows exactly matching the Step 11 on-screen summary ──
+  const B='border:1px solid #bbb;';
+  const thH=`${B}padding:8px 12px;text-align:center;background:#1f3864;color:#fff;font-size:10px;font-weight:700;vertical-align:middle`;
+  const thHL=`${B}padding:8px 12px;text-align:left;background:#1f3864;color:#fff;font-size:10px;font-weight:700;vertical-align:middle`;
+  const td =`${B}padding:8px 12px;text-align:center;font-size:11px;vertical-align:middle`;
+  const tdL=`${B}padding:8px 12px;text-align:left;font-size:11px;vertical-align:middle`;
+  const tdB=`${B}padding:8px 12px;text-align:center;font-size:13px;font-weight:700;vertical-align:middle;color:#1f3864`;
+  const tdRes=`${B}padding:9px 12px;text-align:left;font-size:12px;font-weight:800;color:#a07830;background:#f5e9d0;vertical-align:middle`;
+  const tdResV=`${B}padding:9px 12px;text-align:center;font-size:16px;font-weight:900;background:#f5e9d0;color:#1a1a2e;vertical-align:middle`;
+
+  // Build body rows — same order as on-screen table
+  let bodyRows='';
+  // Coarse
+  bodyRows+=`<tr><td style="${tdL}">Retain on 4.75</td>
+    <td style="${td};font-weight:700">${fN(cCoarsePct,1)}</td>
+    <td style="${tdB}">${fN(effCoarseGsb)}</td>
+    <td style="${tdB}">${fN(effCoarseGsa)}</td>
+    <td style="${tdB}">${fN(effCoarseWa,2)}</td></tr>`;
+  // Virgin fine
   if(cMode==='simple'){
-    fineSubRows.push({lbl:'Virgin',pct:cVirginPct,gsb:effFineGsb,gsa:effFineGsa,wa:effFineWa,rap:false});
+    bodyRows+=`<tr style="background:#f0f4fb"><td style="${tdL}">Passing 4.75 (Virgin)</td>
+      <td style="${td};font-weight:700">${fN(cVirginPct,1)}</td>
+      <td style="${tdB}">${fN(effFineGsb)}</td>
+      <td style="${tdB}">${fN(effFineGsa)}</td>
+      <td style="${tdB}">${fN(effFineWa,2)}</td></tr>`;
   }else{
-    fineSubRows.push({lbl:'Retain\n2.36\nVirgin',pct:cR236Pct,gsb:effR236Gsb,gsa:effR236Gsa,wa:effR236Wa,rap:false});
-    fineSubRows.push({lbl:'Pass\n2.36\nVirgin',pct:cF236Pct,gsb:effFineGsb,gsa:effFineGsa,wa:effFineWa,rap:false});
+    bodyRows+=`<tr style="background:#f0f4fb"><td style="${tdL}">Retain on 2.36 (Virgin)</td>
+      <td style="${td};font-weight:700">${fN(cR236Pct,1)}</td>
+      <td style="${tdB}">${fN(effR236Gsb)}</td>
+      <td style="${tdB}">${fN(effR236Gsa)}</td>
+      <td style="${tdB}">${fN(effR236Wa,2)}</td></tr>`;
+    bodyRows+=`<tr style="background:#e8f0fe"><td style="${tdL}">Passing 2.36 (Virgin)</td>
+      <td style="${td};font-weight:700">${fN(cF236Pct,1)}</td>
+      <td style="${tdB}">${fN(effFineGsb)}</td>
+      <td style="${tdB}">${fN(effFineGsa)}</td>
+      <td style="${tdB}">${fN(effFineWa,2)}</td></tr>`;
   }
-  rapFine.forEach(e=>fineSubRows.push({lbl:getName(e.slot),pct:e.pct,gsb:at[e.gsbKey],gsa:at[e.gsaKey],wa:at[e.waKey],rap:true}));
-  const n=fineSubRows.length;
-  const singleFine=n===1;
-
-  // ── Cell styles ──
-  const B='border:1px solid #aaa;';
-  const thH=`${B}padding:7px 10px;text-align:center;background:#1f3864;color:#fff;font-size:10px;font-weight:700;vertical-align:middle`;
-  const thHL=`${B}padding:7px 10px;text-align:left;background:#1f3864;color:#fff;font-size:10px;font-weight:700;vertical-align:middle`;
-  const td =`${B}padding:7px 10px;text-align:center;font-size:11px;vertical-align:middle`;
-  const tdL=`${B}padding:7px 10px;text-align:left;font-size:11px;vertical-align:middle`;
-  const tdB=`${B}padding:7px 10px;text-align:center;font-size:13px;font-weight:700;vertical-align:middle`;
-  const tdV=`${B}padding:4px 3px;text-align:center;font-size:9px;font-weight:700;color:#444;writing-mode:vertical-rl;transform:rotate(180deg);vertical-align:middle;width:22px`;
-  const tdGrp=`${B}padding:7px 10px;text-align:center;font-size:14px;font-weight:800;background:#dbe5f9;vertical-align:middle`;
-  const tdRes=`${B}padding:8px 10px;text-align:center;font-size:10px;font-weight:700;background:#1f3864;color:#fff;vertical-align:middle`;
-  const tdResV=`${B}padding:8px 10px;text-align:center;font-size:18px;font-weight:900;background:#1f3864;color:#fff;vertical-align:middle`;
-
-  // ── Build Fine rows HTML (10-col structure) ──
-  // Cols: 1=group 2=subtype 3=indiv% 4=group% 5=indiv Gsb 6=group Gsb 7=indiv Gsa 8=group Gsa 9=indiv Abs 10=group Abs
-  let fineHtml='';
-  if(n===0){
-    fineHtml='';
-  } else if(singleFine){
-    // No sub-split: colspan=2 for all value pairs (same as Coarse row)
-    const r=fineSubRows[0];
-    fineHtml=`<tr style="background:#f0f4fb">
-      <td colspan="2" style="${tdL}">Fine</td>
-      <td colspan="2" style="${td}">${fN(r.pct,1)}</td>
-      <td colspan="2" style="${tdB}">${fN(r.gsb)}</td>
-      <td colspan="2" style="${tdB}">${fN(r.gsa)}</td>
-      <td colspan="2" style="${tdB}">${fN(r.wa,2)}</td>
-    </tr>`;
-  } else {
-    fineHtml=fineSubRows.map((r,i)=>{
-      const bg=r.rap?'#eef3ee':(i%2===0?'#f0f4fb':'#e8f0fe');
-      const isFirst=i===0;
-      return `<tr style="background:${bg}">
-        ${isFirst?`<td rowspan="${n}" style="${tdL};font-weight:800;font-size:13px;text-align:center">Fine</td>`:''}
-        <td style="${tdV}">${r.lbl}</td>
-        <td style="${td}">${fN(r.pct,1)}</td>
-        ${isFirst?`<td rowspan="${n}" style="${tdGrp}">${fN(totalFinePct,1)}</td>`:''}
-        <td style="${tdB}">${fN(r.gsb)}</td>
-        ${isFirst?`<td rowspan="${n}" style="${tdGrp}">${fN(eCombFineGsb)}</td>`:''}
-        <td style="${tdB}">${fN(r.gsa)}</td>
-        ${isFirst?`<td rowspan="${n}" style="${tdGrp}">${fN(eCombFineGsa)}</td>`:''}
-        <td style="${tdB}">${fN(r.wa,2)}</td>
-        ${isFirst?`<td rowspan="${n}" style="${tdGrp}">${fN(eCombFineWa,2)}</td>`:''}
-      </tr>`;
-    }).join('');
-  }
+  // RAP fine (one row per stockpile)
+  rapFine.forEach(e=>{
+    bodyRows+=`<tr style="background:#eef3ee"><td style="${tdL}">${cMode==='simple'?'Passing 4.75':'RAP Fine'} — ${getName(e.slot)} <span style="font-size:9px;color:#888">annual</span></td>
+      <td style="${td};font-weight:700">${fN(e.pct,1)}</td>
+      <td style="${td}">${fN(at[e.gsbKey])}</td>
+      <td style="${td}">${fN(at[e.gsaKey])}</td>
+      <td style="${td}">${fN(at[e.waKey],2)}</td></tr>`;
+  });
+  // Blend results
+  bodyRows+=`<tr><td colspan="2" style="${tdRes}">Aggregate Blend Results</td>
+    <td style="${tdResV}">${fN(eCombGsb)}</td>
+    <td style="${tdResV}">${fN(eCombGsa)}</td>
+    <td style="${tdResV}">${fN(eCombWa,2)}</td></tr>`;
 
   const mixLabel=`${info.mixNo||'Mix Design'} — ${info.mixType||''}${info.hasRAP==='Yes'?' RAP':''}`;
   const testedDate=at.c_date?new Date(at.c_date+'T12:00:00').toLocaleDateString('en-CA',{year:'numeric',month:'long',day:'numeric'}):'—';
@@ -7245,77 +7238,48 @@ function printAggDensity(){
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;color:#1a1a2e;background:#fff;padding:14px}
-    @page{size:A4 landscape;margin:9mm}
+    @page{size:A4 portrait;margin:10mm}
     @media print{body{padding:0}.no-print{display:none}}
     table{border-collapse:collapse;width:100%}
-    .info-row{display:flex;gap:0;margin-bottom:3px;font-size:11px}
-    .info-row strong{font-weight:700;min-width:110px;display:inline-block}
-    .footnote{margin-top:10px;font-size:9px;color:#555;border-top:1px solid #ccc;padding-top:6px}
+    .info-row{display:flex;margin-bottom:4px;font-size:11px}
+    .info-row strong{font-weight:700;min-width:120px;display:inline-block}
+    .footnote{margin-top:12px;font-size:9px;color:#555;border-top:1px solid #ccc;padding-top:6px;line-height:1.6}
   </style></head><body>
 
-  <!-- ── Page header: logo left, title box right ── -->
-  <div style="display:flex;align-items:stretch;gap:0;margin-bottom:12px;border:1.5px solid #1f3864">
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 16px;border-right:1.5px solid #1f3864;min-width:160px">
-      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:64px;margin-bottom:4px">
-      <div style="font-size:8px;font-style:italic;color:#555;text-align:center;line-height:1.4">Quality Construction<br>by Quality People</div>
+  <!-- ── Page header ── -->
+  <div style="display:flex;align-items:stretch;margin-bottom:14px;border:1.5px solid #1f3864">
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 18px;border-right:1.5px solid #1f3864;min-width:140px">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:60px;margin-bottom:4px">
+      <div style="font-size:8px;font-style:italic;color:#555;text-align:center;line-height:1.5">Quality Construction<br>by Quality People</div>
     </div>
     <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:12px 20px">
-      <div style="font-size:15px;font-weight:800;color:#1f3864;text-align:center;letter-spacing:0.01em">
+      <div style="font-size:14px;font-weight:800;color:#1f3864;text-align:center">
         Aggregate Blend Relative Density and Absorption Summary Table
       </div>
     </div>
   </div>
 
-  <!-- ── Mix info block ── -->
-  <div style="margin-bottom:12px">
-    <div class="info-row"><strong>Mix No.:</strong> ${info.mixNo||'—'}</div>
-    <div class="info-row"><strong>Mix Type:</strong> ${(info.mixType||'—')}${info.hasRAP==='Yes'?' RAP':''}</div>
-    <div class="info-row"><strong>PGAC:</strong> ${info.pgac||'—'}</div>
-    <div class="info-row"><strong>Date Tested:</strong> ${testedDate}</div>
-    <div class="info-row"><strong>Tested by:</strong> ${at.c_tech||'—'}</div>
+  <!-- ── Mix info ── -->
+  <div style="margin-bottom:14px">
+    <div class="info-row"><strong>Mix No.:</strong>${info.mixNo||'—'}</div>
+    <div class="info-row"><strong>Mix Type:</strong>${(info.mixType||'—')}${info.hasRAP==='Yes'?' RAP':''}</div>
+    <div class="info-row"><strong>PGAC:</strong>${info.pgac||'—'}</div>
+    <div class="info-row"><strong>Date Tested:</strong>${testedDate}</div>
+    <div class="info-row"><strong>Tested by:</strong>${at.c_tech||'—'}</div>
   </div>
 
-  <!-- ── 10-column Summary Table ── -->
-  <!-- Cols: [1 group][2 subtype][3 indiv%][4 grp%][5 indiv Gsb][6 grp Gsb][7 indiv Gsa][8 grp Gsa][9 indiv Abs][10 grp Abs] -->
+  <!-- ── Summary Table (5 cols, exact match to Step 11 UI) ── -->
   <table>
-    <colgroup>
-      <col style="width:100px"><col style="width:22px">
-      <col style="width:60px"><col style="width:60px">
-      <col style="width:80px"><col style="width:80px">
-      <col style="width:80px"><col style="width:80px">
-      <col style="width:72px"><col style="width:72px">
-    </colgroup>
     <thead>
       <tr>
-        <th colspan="2" style="${thHL}">Description</th>
-        <th colspan="2" style="${thH}">Percentages</th>
-        <th colspan="2" style="${thH}">Bulk Relative Density</th>
-        <th colspan="2" style="${thH}">Apparent Density</th>
-        <th colspan="2" style="${thH}">Absorption %</th>
+        <th style="${thHL}">Description</th>
+        <th style="${thH};width:100px">% (Stockpile)</th>
+        <th style="${thH};width:150px">Bulk Relative Density (Gsb)</th>
+        <th style="${thH};width:150px">Apparent Density (Gsa)</th>
+        <th style="${thH};width:120px">Absorption (%)</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- ── COARSE ── -->
-      <tr style="background:#f5f7fc">
-        <td colspan="2" style="${tdL}">Coarse</td>
-        <td colspan="2" style="${td}">${fN(cCoarsePct,1)}</td>
-        <td colspan="2" style="${tdB}">${fN(effCoarseGsb)}</td>
-        <td colspan="2" style="${tdB}">${fN(effCoarseGsa)}</td>
-        <td colspan="2" style="${tdB}">${fN(effCoarseWa,2)}</td>
-      </tr>
-      <!-- ── FINE ── -->
-      ${fineHtml}
-      <!-- ── AGGREGATE BLEND RESULTS ── -->
-      <tr>
-        <td colspan="4" style="${tdRes}">Aggregate Blend Results</td>
-        <td style="${tdRes};font-size:9px;font-weight:700">Bulk Relative<br>Density</td>
-        <td style="${tdResV}">${fN(eCombGsb)}</td>
-        <td style="${tdRes};font-size:9px;font-weight:700">Apparent Relative<br>Density</td>
-        <td style="${tdResV}">${fN(eCombGsa)}</td>
-        <td style="${tdRes};font-size:9px;font-weight:700">Absorption %</td>
-        <td style="${tdResV}">${fN(eCombWa,2)}</td>
-      </tr>
-    </tbody>
+    <tbody>${bodyRows}</tbody>
   </table>
 
   <div class="footnote">
@@ -7324,7 +7288,7 @@ function printAggDensity(){
     * RAP fine aggregate density and absorption values determined annually per procedure 6.3 on LS-605.
   </div>
 
-  <div class="no-print" style="margin-top:18px;text-align:center">
+  <div class="no-print" style="margin-top:20px;text-align:center">
     <button onclick="window.print()" style="padding:10px 30px;font-size:13px;font-weight:700;background:#1f3864;color:#fff;border:none;border-radius:6px;cursor:pointer">🖨 Print / Save as PDF</button>
   </div>
   </body></html>`);
