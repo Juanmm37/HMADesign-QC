@@ -7081,8 +7081,8 @@ function renderS11AggDensity(){
 function printAggDensity(){
   const at=ms.aggTesting||{};
   const info=ms.info||{};
-  const slots=ms.aggregates||{};
-  const selTrial=ms.selectedTrialIdx!==null?ms.trials?.[ms.selectedTrialIdx]:null;
+  const slots=ms.slots||{};
+  const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
   const _sp=selTrial?calcStockpilePercentages(selTrial):{};
   const getName=s=>slots[s]?(slots[s].material||s):s;
   const fN=(v,d=3)=>(v===null||v===undefined||isNaN(Number(v)))?'—':Number(v).toFixed(d);
