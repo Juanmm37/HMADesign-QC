@@ -7283,7 +7283,7 @@ function renderS10Summary(){
       <textarea class="notes-area" onchange="ms.notes=this.value" onblur="ms.notes=this.value" placeholder="Key decisions, selected design point...">${ms.notes||''}</textarea>
     </div>
     <div class="row" style="justify-content:space-between">
-      <button class="btn" onclick="ms.step=${fam==='Superpave'?10:fam==='SMA'?9:8};render()">← Back</button>
+      <button class="btn" onclick="ms.step=${fam==='Superpave'?12:fam==='SMA'?11:8};render()">← Back</button>
       <div class="row" style="gap:8px">
         <button class="btn btn-gold" onclick="saveMix('In Progress')">Save — In Progress</button>
         <button class="btn" onclick="printStep('Summary of Results')">🖨 Print</button>
