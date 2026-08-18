@@ -6781,6 +6781,77 @@ function renderS11AggDensity(){
       onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null;saveDB();render()"
       onblur="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null">`;
   }
+  // ── Test card helpers ──
+  const tcTH=`padding:5px 8px;font-size:10px;font-weight:700;background:#1f3864;color:#fff;border:1px solid #1f3864;text-align:center`;
+  const tcTHL=`${tcTH};text-align:left`;
+  const tcLabel=(t,s='')=>`<td style="padding:4px 8px;font-size:10px;font-weight:600;background:#f5f8ff;border:1px solid #c5d3ef;white-space:nowrap">${t}</td><td style="padding:4px 6px;font-size:10px;font-weight:800;text-align:center;background:#e8f0fe;border:1px solid #c5d3ef;min-width:26px;color:#1f3864">${s}</td>`;
+  const tcCalc=(v,dp=3)=>v!=null?`<td style="padding:4px 6px;font-size:11px;text-align:center;background:#f0f4fb;border:1px solid #c5d3ef">${v.toFixed(dp)}</td>`:`<td style="padding:4px 6px;text-align:center;background:#f8f8f8;color:#ccc;border:1px solid #ddd">—</td>`;
+  const tcAvg=(v,dp=3)=>v!=null?`<td style="padding:4px 8px;font-size:12px;font-weight:800;text-align:center;background:#1f3864;color:#fff;border:1px solid #1f3864">${v.toFixed(dp)}</td>`:`<td style="padding:4px 8px;text-align:center;background:#ddd;color:#aaa;border:1px solid #ccc">—</td>`;
+  const tcInp=(key,ss,field,val,dp=1)=>{
+    const n=parseFloat(val);const dsp=!isNaN(n)&&val!=null?n.toFixed(dp):'';
+    return`<td style="padding:3px 5px;border:1px solid #c5d3ef"><input type="text" inputmode="decimal" value="${dsp}" placeholder="—"
+      style="width:80px;padding:2px 4px;border:1px solid #c5d3ef;border-radius:3px;font-size:11px;text-align:center;background:#fffde7"
+      onchange="setTestVal('${key}','${ss}','${field}',this.value)"
+      onblur="setTestValQ('${key}','${ss}','${field}',this.value)"></td>`;
+  };
+  const tcSep=(label)=>`<tr><td colspan="5" style="padding:3px 8px;font-size:9px;font-weight:700;color:#888;background:#f5f8ff;border:1px solid #e0e4ec;text-transform:uppercase;letter-spacing:0.06em">${label}</td></tr>`;
+
+  function renderTestCard604(key,label,pct,ss1d,ss2d,r1,r2,avg){
+    return`<div style="background:#fff;border:1px solid #c5d3ef;border-radius:8px;padding:12px;flex:1;min-width:360px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:800;color:#1f3864">${label}</div>
+        <div style="font-size:10px;color:#666;background:#e8f0fe;border:1px solid #c5d3ef;border-radius:4px;padding:2px 8px">LS 604 &nbsp;|&nbsp; % = <strong>${pct.toFixed(1)}</strong></div>
+      </div>
+      <div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:10px;width:100%">
+        <thead><tr>
+          <th colspan="2" style="${tcTHL}">Parameter</th>
+          <th style="${tcTH}">Sub-sample 1</th>
+          <th style="${tcTH}">Sub-sample 2</th>
+          <th style="${tcTH};background:#2c4f87">Average</th>
+        </tr></thead>
+        <tbody>
+          ${tcSep('Measurements')}
+          <tr>${tcLabel('SSD Mass, g','SSD')}${tcInp(key,'ss1','ssd',ss1d.ssd)}${tcInp(key,'ss2','ssd',ss2d.ssd)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          <tr>${tcLabel('Oven-Dry Mass, g','OD')}${tcInp(key,'ss1','od',ss1d.od)}${tcInp(key,'ss2','od',ss2d.od)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          <tr>${tcLabel('Mass in Water, g','W')}${tcInp(key,'ss1','water',ss1d.water)}${tcInp(key,'ss2','water',ss2d.water)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          ${tcSep('Calculated Values')}
+          <tr>${tcLabel('Bulk Sp. Gravity (OD)','Gsb')}${tcCalc(r1?.gsb)}${tcCalc(r2?.gsb)}${tcAvg(avg?.gsb)}</tr>
+          <tr>${tcLabel('Bulk Sp. Gravity (SSD)','')}${tcCalc(r1?.gsbSsd)}${tcCalc(r2?.gsbSsd)}${tcAvg(avg?.gsbSsd)}</tr>
+          <tr>${tcLabel('Apparent Sp. Gravity','Gsa')}${tcCalc(r1?.gsa)}${tcCalc(r2?.gsa)}${tcAvg(avg?.gsa)}</tr>
+          <tr>${tcLabel('Absorption, %','')}${tcCalc(r1?.absp,2)}${tcCalc(r2?.absp,2)}${tcAvg(avg?.absp,2)}</tr>
+        </tbody>
+      </table></div>
+    </div>`;
+  }
+
+  function renderTestCard605(key,label,pct,ss1d,ss2d,r1,r2,avg,std){
+    return`<div style="background:#fff;border:1px solid #c5d3ef;border-radius:8px;padding:12px;flex:1;min-width:360px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:800;color:#1f3864">${label}</div>
+        <div style="font-size:10px;color:#666;background:#e8f0fe;border:1px solid #c5d3ef;border-radius:4px;padding:2px 8px">${std||'LS 605'} &nbsp;|&nbsp; % = <strong>${pct.toFixed(1)}</strong></div>
+      </div>
+      <div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:10px;width:100%">
+        <thead><tr>
+          <th colspan="2" style="${tcTHL}">Parameter</th>
+          <th style="${tcTH}">Sub-sample 1</th>
+          <th style="${tcTH}">Sub-sample 2</th>
+          <th style="${tcTH};background:#2c4f87">Average</th>
+        </tr></thead>
+        <tbody>
+          ${tcSep('Measurements')}
+          <tr>${tcLabel('Oven-Dry Mass, g','A')}${tcInp(key,'ss1','od',ss1d.od)}${tcInp(key,'ss2','od',ss2d.od)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          <tr>${tcLabel('Mass Pyc + Water, g','B')}${tcInp(key,'ss1','pW',ss1d.pW)}${tcInp(key,'ss2','pW',ss2d.pW)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          <tr>${tcLabel('Pyc + Spec + Water, g','C')}${tcInp(key,'ss1','psW',ss1d.psW)}${tcInp(key,'ss2','psW',ss2d.psW)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          <tr>${tcLabel('SSD Mass, g','D')}${tcInp(key,'ss1','ssd',ss1d.ssd)}${tcInp(key,'ss2','ssd',ss2d.ssd)}<td style="background:#f0f0f0;border:1px solid #ddd;text-align:center;color:#aaa">—</td></tr>
+          ${tcSep('Calculated Values')}
+          <tr>${tcLabel('Bulk Sp. Gravity (OD) = A/(B+D−C)','Gsb')}${tcCalc(r1?.gsb)}${tcCalc(r2?.gsb)}${tcAvg(avg?.gsb)}</tr>
+          <tr>${tcLabel('Bulk Sp. Gravity (SSD) = D/(B+D−C)','')}${tcCalc(r1?.gsbSsd)}${tcCalc(r2?.gsbSsd)}${tcAvg(avg?.gsbSsd)}</tr>
+          <tr>${tcLabel('Apparent Sp. Gravity = A/(B+A−C)','Gsa')}${tcCalc(r1?.gsa)}${tcCalc(r2?.gsa)}${tcAvg(avg?.gsa)}</tr>
+          <tr>${tcLabel('Absorption = (D−A)/A × 100, %','')}${tcCalc(r1?.absp,2)}${tcCalc(r2?.absp,2)}${tcAvg(avg?.absp,2)}</tr>
+        </tbody>
+      </table></div>
+    </div>`;
+  }
   function pf(val,rng){
     if(val===null||val===undefined)return'<span style="color:#bbb">—</span>';
     let ok;
