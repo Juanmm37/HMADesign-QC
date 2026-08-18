@@ -6648,7 +6648,7 @@ function renderS11AggDensity(){
   const cP236v=at.c_pct236;
   let cR2Frac=0,cF2Frac=1;
   if(cP236v!==null&&cP475v>0){cR2Frac=(cP475v-cP236v)/cP475v;cF2Frac=cP236v/cP475v;}
-  const cSplitBase=cMode==='split-rap'?cVirginPct:T29; // fine basis for 2.36 split
+  const cSplitBase=cVirginPct; // 2.36 split always on virgin fine only (T30)
   const cR236Pct=cSplitBase*cR2Frac;
   const cF236Pct=cSplitBase*cF2Frac;
 
