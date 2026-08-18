@@ -7076,10 +7076,10 @@ function renderS11AggDensity(){
           </tr>
           <!-- Footnotes -->
           <tr><td colspan="5" style="padding:5px 10px;font-size:9.5px;color:#888;font-style:italic;background:#fafafa;border:1px solid #e0e4ec">
-            * Retained on 4.75mm — LS 604 &nbsp;|&nbsp;
+            * Retain on 4.75mm — Virgin — LS 604 &nbsp;|&nbsp;
             ${cMode==='simple'?'** Passing 4.75mm — LS 605':
-              cMode==='split'?'** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; *** Passing 2.36mm — LS 605':
-              '** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; *** Passing 2.36mm — LS 605 &nbsp;|&nbsp; **** RAP fine — LS 605 procedure 6.3'}
+              cMode==='split'?'** Retain on 4.75mm — RAP (annual) &nbsp;|&nbsp; *** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; **** Passing 2.36mm — LS 605':
+              (cRapCoarsePct>0?'** Retain on 4.75mm — RAP (annual) &nbsp;|&nbsp; ':'')+'** Retained on 2.36mm — AASHTO T84 &nbsp;|&nbsp; *** Passing 2.36mm — LS 605 &nbsp;|&nbsp; **** RAP fine (annual)'}
           </td></tr>
         </tbody>
       </table></div>
