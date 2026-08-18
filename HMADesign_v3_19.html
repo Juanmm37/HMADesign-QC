@@ -1244,7 +1244,11 @@ function renderNewMix(){
     ms.step===1?renderS1():ms.step===2?renderS2():ms.step===3?renderS3TrialBlendAnalysis():
     ms.step===4?renderS3():ms.step===5?renderS4():ms.step===6?renderS5Select():
     ms.step===7?renderS6VolSelected():ms.step===8?renderS7PropCurves():
-    ms.step===9?(fam2==='Marshall'?renderS10Summary():renderS8TSR()):ms.step===10?(fam2==='Marshall'?renderS10Summary():fam2==='SMA'?renderS11AggTesting():renderS9Nmax()):ms.step===11?(fam2==='Superpave'?renderS11AggTesting():renderS10Summary()):renderS10Summary());
+    ms.step===9?(fam2==='Marshall'?renderS10Summary():renderS8TSR()):
+    ms.step===10?(fam2==='Marshall'?renderS10Summary():fam2==='SMA'?renderS11AggDensity():renderS9Nmax()):
+    ms.step===11?(fam2==='Superpave'?renderS11AggDensity():fam2==='SMA'?renderS12Consensus():renderS10Summary()):
+    ms.step===12?(fam2==='Superpave'?renderS12Consensus():renderS10Summary()):
+    renderS10Summary());
 }
 
 // ── STEP 1 ──
