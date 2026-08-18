@@ -6754,26 +6754,23 @@ function renderS11AggDensity(){
   const effFineGsb=avgFine?.gsb||at.c_fineGsb;
   const effFineGsa=avgFine?.gsa||at.c_fineGsa;
   const effFineWa=avgFine?.absp||at.c_fineWa;
-  const effRapGsb=at.c_rapGsb;
-  const effRapGsa=at.c_rapGsa;
-  const effRapWa=at.c_rapWa;
-  // RAP coarse: annual values entered directly — no Section 1 test card
-  const effRapCoarseGsb=at.c_rapCoarseGsb;
-  const effRapCoarseGsa=at.c_rapCoarseGsa;
-  const effRapCoarseWa=at.c_rapCoarseWa;
+  // RAP fine: annual values entered directly per stockpile
+  const effRapGsbs_=rapFineEntries.map(e=>at[e.gsbKey]);
+  const effRapGsas_=rapFineEntries.map(e=>at[e.gsaKey]);
+  const effRapWas_=rapFineEntries.map(e=>at[e.waKey]);
 
   // Recompute combined using effective values
   let eFrs=[],eGsbs=[],eGsas=[],eWas=[];
   if(cMode==='simple'){
-    eFrs=withRap?[cCoarsePct,cVirginPct,cRapFinePct]:[cCoarsePct,cVirginPct];
-    eGsbs=withRap?[effCoarseGsb,effFineGsb,effRapGsb]:[effCoarseGsb,effFineGsb];
-    eGsas=withRap?[effCoarseGsa,effFineGsa,effRapGsa]:[effCoarseGsa,effFineGsa];
-    eWas=withRap?[effCoarseWa,effFineWa,effRapWa]:[effCoarseWa,effFineWa];
+    eFrs=[cCoarsePct,cVirginPct,...rapFracs];
+    eGsbs=[effCoarseGsb,effFineGsb,...effRapGsbs_];
+    eGsas=[effCoarseGsa,effFineGsa,...effRapGsas_];
+    eWas=[effCoarseWa,effFineWa,...effRapWas_];
   }else{
-    eFrs=withRap?[cCoarsePct,cR236Pct,cF236Pct,cRapFinePct]:[cCoarsePct,cR236Pct,cF236Pct];
-    eGsbs=withRap?[effCoarseGsb,effR236Gsb,effFineGsb,effRapGsb]:[effCoarseGsb,effR236Gsb,effFineGsb];
-    eGsas=withRap?[effCoarseGsa,effR236Gsa,effFineGsa,effRapGsa]:[effCoarseGsa,effR236Gsa,effFineGsa];
-    eWas=withRap?[effCoarseWa,effR236Wa,effFineWa,effRapWa]:[effCoarseWa,effR236Wa,effFineWa];
+    eFrs=[cCoarsePct,cR236Pct,cF236Pct,...rapFracs];
+    eGsbs=[effCoarseGsb,effR236Gsb,effFineGsb,...effRapGsbs_];
+    eGsas=[effCoarseGsa,effR236Gsa,effFineGsa,...effRapGsas_];
+    eWas=[effCoarseWa,effR236Wa,effFineWa,...effRapWas_];
   }
   const eCombGsb=cComb(eFrs,eGsbs)||cCombGsb;
   const eCombGsa=cComb(eFrs,eGsas)||cCombGsa;
