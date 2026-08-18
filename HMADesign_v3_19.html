@@ -7138,6 +7138,107 @@ function renderS11AggDensity(){
   </div>`;
 }
 
+function renderS12Consensus(){
+  const fam=ms.info.family||'Superpave';
+  const fam2=fam;
+  if(!ms.aggTesting)ms.aggTesting={};
+  const at=ms.aggTesting;
+  const tc=ms.info.traffic||'B';
+  const stepNum=fam==='SMA'?11:12;
+  const backStep=fam==='SMA'?10:11;
+  const nextStep=fam==='SMA'?12:13;
+
+  const thC='padding:7px 10px;font-size:10px;font-weight:700;background:#1f3864;color:#fff;text-align:center;border:1px solid #1f3864';
+  const thCL=`${thC};text-align:left`;
+  const td2='padding:6px 10px;font-size:12px;text-align:center;border-bottom:1px solid #eee;border:1px solid #e0e4ec';
+  const td2L=`${td2};text-align:left;font-weight:600`;
+
+  function inpCons(field,val,step='0.1',w=80,ph=''){
+    const n=parseFloat(val);const display=!isNaN(n)&&val!==null?n.toFixed(1):'';
+    return`<input type="text" inputmode="decimal" data-consfield="1" value="${display}" placeholder="${ph}"
+      style="width:${w}px;padding:4px 6px;border:1px solid #d0d5dd;border-radius:4px;font-size:12px;text-align:center"
+      onkeydown="if(event.key==='Tab'&&!event.shiftKey){event.preventDefault();_consTabDown(this);}"
+      onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null;saveDB();render()"
+      onblur="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['${field}']=parseFloat(this.value)||null">`;
+  }
+  function pf(val,rng){
+    if(val===null||val===undefined)return'<span style="color:#bbb">—</span>';
+    let ok;
+    if(Array.isArray(rng)){if(rng[0]!==null&&rng[1]!==null)ok=val>=rng[0]&&val<=rng[1];else if(rng[0]!==null)ok=val>=rng[0];else ok=val<=rng[1];}
+    else ok=true;
+    return ok?'<span class="pass">PASS</span>':'<span class="fail">FAIL</span>';
+  }
+
+  return`<div class="card card-blue">
+    <div class="st">Step ${stepNum} — Consensus Properties</div>
+    <div style="font-size:11px;color:#666;margin-bottom:12px">Enter final test results. Criteria per OPSS.MUNI 1151. Traffic Category: <strong>${tc}</strong>.</div>
+    <div style="overflow-x:auto">
+    <table style="border-collapse:collapse;width:100%;min-width:620px">
+      <thead><tr>
+        <th style="${thCL}">Property</th>
+        <th style="${thC}">Test Result</th>
+        <th style="${thC}">Criteria</th>
+        <th style="${thC}">Pass / Fail</th>
+      </tr></thead>
+      <tbody>
+        <tr style="background:#fff">
+          <td style="${td2L}">Sand Equivalent (%)</td>
+          <td style="${td2}">${inpCons('sandEq',at.sandEq,'0.1',80,'e.g. 65')}</td>
+          <td style="${td2};color:#666">≥ 45 %</td>
+          <td style="${td2}">${pf(at.sandEq,[45,null])}</td>
+        </tr>
+        <tr style="background:#f8fbff">
+          <td style="${td2L}">Uncompacted Void Content (%)</td>
+          <td style="${td2}">${inpCons('uvContent',at.uvContent,'0.1',80,'e.g. 47')}</td>
+          <td style="${td2};color:#666">≥ 45 % (≤100mm depth)<br><span style="font-size:10px;color:#888">43% acceptable per Note 1</span></td>
+          <td style="${td2}">${pf(at.uvContent,[43,null])}</td>
+        </tr>
+        <tr style="background:#fff">
+          <td style="${td2L}">Flat &amp; Elongated Particles (%)</td>
+          <td style="${td2}">${inpCons('fe',at.fe,'0.1',80,'e.g. 4')}</td>
+          <td style="${td2};color:#666">≤ 10 %</td>
+          <td style="${td2}">${pf(at.fe,[null,10])}</td>
+        </tr>
+        <tr style="background:#f8fbff">
+          <td style="${td2L}">Fractured Particles — 1-face ≤100mm (%)</td>
+          <td style="${td2}">${inpCons('fpSh1',at.fpSh1,'0.1',80,'e.g. 97')}</td>
+          <td style="${td2};color:#666">≥ 95 %</td>
+          <td style="${td2}">${pf(at.fpSh1,[95,null])}</td>
+        </tr>
+        <tr style="background:#fff">
+          <td style="${td2L}">Fractured Particles — 2-face ≤100mm (%)</td>
+          <td style="${td2}">${inpCons('fpSh2',at.fpSh2,'0.1',80,'e.g. 92')}</td>
+          <td style="${td2};color:#666">≥ 90 %</td>
+          <td style="${td2}">${pf(at.fpSh2,[90,null])}</td>
+        </tr>
+        <tr style="background:#f8fbff">
+          <td style="${td2L}">Fractured Particles — 1-face >100mm (%)</td>
+          <td style="${td2}">${inpCons('fpDp1',at.fpDp1,'0.1',80,'e.g. 82')}</td>
+          <td style="${td2};color:#666">≥ 80 %</td>
+          <td style="${td2}">${pf(at.fpDp1,[80,null])}</td>
+        </tr>
+        <tr style="background:#fff">
+          <td style="${td2L}">Fractured Particles — 2-face >100mm (%)</td>
+          <td style="${td2}">${inpCons('fpDp2',at.fpDp2,'0.1',80,'e.g. 78')}</td>
+          <td style="${td2};color:#666">≥ 75 %</td>
+          <td style="${td2}">${pf(at.fpDp2,[75,null])}</td>
+        </tr>
+      </tbody>
+    </table></div>
+
+    <div class="fg" style="margin-top:10px;max-width:400px">
+      <label>Notes</label>
+      <textarea style="width:100%;height:50px;padding:6px;border:1px solid #d0d5dd;border-radius:4px;font-size:11px;resize:vertical"
+        onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting.notes=this.value;saveDB()">${at.notes||''}</textarea>
+    </div>
+
+    <div class="row" style="justify-content:space-between;margin-top:14px">
+      <button class="btn" onclick="ms.step=${backStep};render()">← Back</button>
+      <button class="btn btn-primary" onclick="ms.step=${nextStep};render()">Next: Summary →</button>
+    </div>
+  </div>`;
+}
+
 function renderS10Summary(){
   const fam=ms.info.family||'Superpave';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
