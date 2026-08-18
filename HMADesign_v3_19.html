@@ -7069,126 +7069,71 @@ function renderS11AggDensity(){
       </table></div>
     </div>
 
-    <!-- ── A: Specific Gravity & Absorption — matches Excel "Volumetric Calc. - Design" table layout ── -->
-    <div style="margin-bottom:22px">
+    <!-- ── SECTION 3: Summary Table ── -->
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;border-bottom:2px solid #e8edf5;padding-bottom:5px">
+        Section 3 — Summary
+      </div>
       <div style="overflow-x:auto">
-      <table style="border-collapse:collapse;font-size:11px;width:100%;min-width:680px">
-        <thead>
-          <tr>
-            <th colspan="9" style="${thT};font-size:12px;text-align:center;letter-spacing:0.03em">
-              Specific Gravity &amp; Absorption of Aggregate</th>
-          </tr>
-          <tr>
-            <th colspan="2" style="${thTL}">Aggregate Blend</th>
-            <th rowspan="2" style="${thT}">%</th>
-            <th colspan="2" style="${thT}">Gsb</th>
-            <th colspan="2" style="${thT}">Gsa</th>
-            <th colspan="2" style="${thT}">% Absorption</th>
-          </tr>
-          <tr>
-            <th style="${thTL}">Aggregate</th>
-            <th style="${thTL}">Material</th>
-            <th style="${thT}">1</th>
-            <th style="${thT};font-size:9px;background:#2d4a7a">2 *</th>
-            <th style="${thT}">1</th>
-            <th style="${thT};font-size:9px;background:#2d4a7a">2 *</th>
-            <th style="${thT}">1</th>
-            <th style="${thT};font-size:9px;background:#2d4a7a">2 *</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${bodyRows}
-          <!-- Total % row -->
-          <tr>
-            <td colspan="2" style="${td0};font-weight:700;background:#f0f4fb;text-align:right">Total</td>
-            <td style="${td0};font-weight:700;background:#f0f4fb;color:${Math.abs(totalPct-100)<0.5?'#1a6b1a':'#c0392b'}">${totalPct.toFixed(3)}</td>
-            <td colspan="6" style="${tdN}"></td>
-          </tr>
-          <!-- Combined blended row -->
-          <tr>
-            <td colspan="3" style="${tdBotL}">* COMBINED BLENDED RELATIVE DENSITY</td>
-            <td colspan="2" style="${tdBot};font-size:13px">${physGsb!==null?physGsb.toFixed(3):'—'}</td>
-            <td colspan="2" style="${tdBot};font-size:13px">${physGsa!==null?physGsa.toFixed(3):'—'}</td>
-            <td colspan="2" style="${tdBot};font-size:13px">${physWA!==null?physWA.toFixed(2):'—'}</td>
-          </tr>
-          <tr>
-            <td colspan="9" style="padding:4px 8px;font-size:10px;color:#888;font-style:italic;background:#fafafa;border:1px solid #e0e4ec">
-              * Col 2 = calculated combined (fine virgin × T31 + RAP × T32) — mirrors formula Q43 in Excel reference. T29 = ${T29.toFixed(1)}% passing 4.75mm &nbsp;|&nbsp; T31 = ${T31.toFixed(3)} (virgin fraction) &nbsp;|&nbsp; T32 = ${T32.toFixed(3)} (RAP fraction)<br>
-              <strong>Yellow cells</strong> = enter physical test results. Coarse = retained 4.75mm, Fine = virgin passing 4.75mm, RAP = all RAP combined.
-            </td>
-          </tr>
-        </tbody>
-      </table></div>
-    </div>
-
-    <!-- ── B: Consensus Properties ── -->
-    <div>
-      <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em">B — Consensus Properties</div>
-      <div style="font-size:11px;color:#666;margin-bottom:12px">Enter final test results. Criteria per OPSS.MUNI 1151. Traffic Category: <strong>${tc}</strong>.</div>
-      <div style="overflow-x:auto">
-      <table style="border-collapse:collapse;width:100%;min-width:620px">
+      <table style="border-collapse:collapse;font-size:11px;min-width:480px">
         <thead><tr>
-          <th style="${thConsensus};text-align:left">Property</th>
-          <th style="${thConsensus}">Test Result</th>
-          <th style="${thConsensus}">Criteria</th>
-          <th style="${thConsensus}">Pass / Fail</th>
+          <th style="${thTL};font-size:10px">Description</th>
+          <th style="${thT};font-size:10px;width:75px">% (JMF)</th>
+          <th style="${thT};font-size:10px;width:110px">Bulk Relative Density (Gsb)</th>
+          <th style="${thT};font-size:10px;width:110px">Apparent Density (Gsa)</th>
+          <th style="${thT};font-size:10px;width:100px">Absorption (%)</th>
         </tr></thead>
         <tbody>
           <tr style="background:#fff">
-            <td style="${td2};text-align:left;font-weight:600">Sand Equivalent (%)</td>
-            <td style="${td2}">${inpCons('sandEq',at.sandEq,'0.1',80,'e.g. 65')}</td>
-            <td style="${td2};color:#666">≥ 45 %</td>
-            <td style="${td2}">${pf(at.sandEq,[45,null])}</td>
+            <td style="${tdL}">Retain on 4.75</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
+            <td style="${tdC};font-size:11px">${effCoarseGsb!=null?effCoarseGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effCoarseGsa!=null?effCoarseGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effCoarseWa!=null?effCoarseWa.toFixed(2):'—'}</td>
           </tr>
-          <tr style="background:#f8fbff">
-            <td style="${td2};text-align:left;font-weight:600">Uncompacted Void Content (%)</td>
-            <td style="${td2}">${inpCons('uvContent',at.uvContent,'0.1',80,'e.g. 47')}</td>
-            <td style="${td2};color:#666">≥ 45 % (≤100mm depth)<br><span style="font-size:10px;color:#888">43% acceptable per Note 1</span></td>
-            <td style="${td2}">${pf(at.uvContent,[43,null])}</td>
+          ${cMode!=='simple'?`
+          <tr style="background:#f0f4fb">
+            <td style="${tdL}">Retain on 2.36</td>
+            <td style="${tdC}">${cP236v!==null?cR236Pct.toFixed(1):'—'}</td>
+            <td style="${tdC};font-size:11px">${effR236Gsb!=null?effR236Gsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effR236Gsa!=null?effR236Gsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effR236Wa!=null?effR236Wa.toFixed(2):'—'}</td>
           </tr>
-          <tr style="background:#fff">
-            <td style="${td2};text-align:left;font-weight:600">Flat &amp; Elongated Particles (%)</td>
-            <td style="${td2}">${inpCons('fe',at.fe,'0.1',80,'e.g. 4')}</td>
-            <td style="${td2};color:#666">≤ 10 %</td>
-            <td style="${td2}">${pf(at.fe,[null,10])}</td>
-          </tr>
-          <tr style="background:#f8fbff">
-            <td style="${td2};text-align:left;font-weight:600">Fractured Particles — 1-face ≤100mm (%)</td>
-            <td style="${td2}">${inpCons('fpSh1',at.fpSh1,'0.1',80,'e.g. 97')}</td>
-            <td style="${td2};color:#666">≥ 95 %</td>
-            <td style="${td2}">${pf(at.fpSh1,[95,null])}</td>
-          </tr>
-          <tr style="background:#fff">
-            <td style="${td2};text-align:left;font-weight:600">Fractured Particles — 2-face ≤100mm (%)</td>
-            <td style="${td2}">${inpCons('fpSh2',at.fpSh2,'0.1',80,'e.g. 92')}</td>
-            <td style="${td2};color:#666">≥ 90 %</td>
-            <td style="${td2}">${pf(at.fpSh2,[90,null])}</td>
-          </tr>
-          <tr style="background:#f8fbff">
-            <td style="${td2};text-align:left;font-weight:600">Fractured Particles — 1-face >100mm (%)</td>
-            <td style="${td2}">${inpCons('fpDp1',at.fpDp1,'0.1',80,'e.g. 82')}</td>
-            <td style="${td2};color:#666">≥ 80 %</td>
-            <td style="${td2}">${pf(at.fpDp1,[80,null])}</td>
-          </tr>
-          <tr style="background:#fff">
-            <td style="${td2};text-align:left;font-weight:600">Fractured Particles — 2-face >100mm (%)</td>
-            <td style="${td2}">${inpCons('fpDp2',at.fpDp2,'0.1',80,'e.g. 78')}</td>
-            <td style="${td2};color:#666">≥ 75 %</td>
-            <td style="${td2}">${pf(at.fpDp2,[75,null])}</td>
+          <tr style="background:#e8f0fe">
+            <td style="${tdL}">Passing 2.36</td>
+            <td style="${tdC}">${cP236v!==null?cF236Pct.toFixed(1):'—'}</td>
+            <td style="${tdC};font-size:11px">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
+          </tr>`:`
+          <tr style="background:#f0f4fb">
+            <td style="${tdL}">Passing 4.75</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${T29.toFixed(1)}</td>
+            <td style="${tdC};font-size:11px">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
+          </tr>`}
+          ${cMode==='split-rap'?`
+          <tr style="background:#f0f4f0">
+            <td style="${tdL}">RAP Fine</td>
+            <td style="${td0};background:#eef3ee;font-weight:700">${cRapFinePct.toFixed(1)}</td>
+            <td style="${tdC};font-size:11px">${effRapGsb!=null?effRapGsb.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effRapGsa!=null?effRapGsa.toFixed(3):'—'}</td>
+            <td style="${tdC};font-size:11px">${effRapWa!=null?effRapWa.toFixed(2):'—'}</td>
+          </tr>`:''}
+          <tr>
+            <td colspan="2" style="${tdBotL}">Aggregate Blend Results</td>
+            <td style="${tdBot};font-size:15px">${eCombGsb!=null?eCombGsb.toFixed(3):'—'}</td>
+            <td style="${tdBot};font-size:15px">${eCombGsa!=null?eCombGsa.toFixed(3):'—'}</td>
+            <td style="${tdBot};font-size:15px">${eCombWa!=null?eCombWa.toFixed(2):'—'}</td>
           </tr>
         </tbody>
       </table></div>
-
-      <div class="fg" style="margin-top:10px;max-width:400px">
-        <label>Notes</label>
-        <textarea style="width:100%;height:50px;padding:6px;border:1px solid #d0d5dd;border-radius:4px;font-size:11px;resize:vertical"
-          onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting.notes=this.value;saveDB()">${at.notes||''}</textarea>
-      </div>
     </div>
 
     <div class="row" style="justify-content:space-between;margin-top:14px">
       <button class="btn" onclick="ms.step=${fam==='SMA'?9:10};render()">← Back</button>
-      <button class="btn btn-primary" onclick="ms.step=${fam==='SMA'?11:12};render()">Next: Summary →</button>
+      <button class="btn btn-primary" onclick="ms.step=${fam==='SMA'?11:12};render()">Next: Consensus →</button>
     </div>
   </div>`;
 }
