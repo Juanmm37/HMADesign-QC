@@ -7016,14 +7016,23 @@ function renderS11AggDensity(){
           </tr>
         </thead>
         <tbody>
-          <!-- Retain on 4.75 (Coarse) -->
+          <!-- Retain on 4.75 (Virgin Coarse) -->
           <tr style="background:#fff">
-            <td style="${tdL}">Retain on 4.75 *</td>
-            <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
+            <td style="${tdL}">Retain on 4.75 — Virgin *</td>
+            <td style="${td0};background:#f5f8ff;font-weight:700">${cVirginCoarsePct.toFixed(1)}</td>
             <td style="${tdY}">${cinp('c_coarseGsb',at.c_coarseGsb,3)}</td>
             <td style="${tdY}">${cinp('c_coarseGsa',at.c_coarseGsa,3)}</td>
             <td style="${tdY}">${cinp('c_coarseWa',at.c_coarseWa,2)}</td>
           </tr>
+          ${cMode==='split-rap'&&cRapCoarsePct>0?`
+          <!-- RAP Coarse — annual value, entered directly -->
+          <tr style="background:#f0f4f0">
+            <td style="${tdL}">Retain on 4.75 — RAP **</td>
+            <td style="${td0};background:#eef3ee;font-weight:700">${cRapCoarsePct.toFixed(1)}</td>
+            <td style="${tdY}">${cinp('c_rapCoarseGsb',at.c_rapCoarseGsb,3)}</td>
+            <td style="${tdY}">${cinp('c_rapCoarseGsa',at.c_rapCoarseGsa,3)}</td>
+            <td style="${tdY}">${cinp('c_rapCoarseWa',at.c_rapCoarseWa,2)}</td>
+          </tr>`:''}
           ${cMode!=='simple'?`
           <!-- Retain on 2.36 -->
           <tr style="background:#f0f4fb">
