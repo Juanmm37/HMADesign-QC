@@ -6643,14 +6643,21 @@ function renderS11AggDensity(){
   const cRapCoarsePct=hasRAP?Math.max(0,totalRapPct-cRapFinePct):0;
   const cVirginCoarsePct=cCoarsePct-cRapCoarsePct;  // virgin coarse only (LS 604 fraction)
 
-  // 2.36 split fractions of the fine fraction
-  const cP475v=at.c_pct475!==null?at.c_pct475:100;
-  const cP236v=at.c_pct236;
-  let cR2Frac=0,cF2Frac=1;
-  if(cP236v!==null&&cP475v>0){cR2Frac=(cP475v-cP236v)/cP475v;cF2Frac=cP236v/cP475v;}
-  const cSplitBase=cVirginPct; // 2.36 split always on virgin fine only (T30)
-  const cR236Pct=cSplitBase*cR2Frac;
-  const cF236Pct=cSplitBase*cF2Frac;
+  // Auto-compute virgin fine split at 2.36mm from JMF gradation (stockpile basis)
+  let T_236_virgin=0;
+  if(selTrial){
+    Object.keys(selTrial.blendPct||{}).forEach(s=>{
+      if(s.startsWith('RAP')||!slots[s])return;
+      const pct=_stockpilePcts[s]||0;
+      const agg=slots[s];
+      const g=(agg.gradation_mod||{})['2.36']!==undefined&&(agg.gradation_mod||{})['2.36']!==null
+        ?(agg.gradation_mod||{})['2.36']:(agg.gradation||{})['2.36'];
+      if(g===null||g===undefined)return;
+      T_236_virgin+=(pct/100)*(g/100)*100;
+    });
+  }
+  const cR236Pct=Math.max(0,cVirginPct-T_236_virgin); // virgin retain 2.36mm
+  const cF236Pct=Math.min(cVirginPct,T_236_virgin);   // virgin pass 2.36mm
 
   // Harmonic mean (Gsb/Gsa), weighted avg (WA)
   function cComb(fracs,vals){
