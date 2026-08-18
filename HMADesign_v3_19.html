@@ -7085,7 +7085,7 @@ function printAggDensity(){
   const selTrial=ms.selectedTrialIdx!==null?ms.trials?.[ms.selectedTrialIdx]:null;
   const _sp=selTrial?calcStockpilePercentages(selTrial):{};
   const getName=s=>slots[s]?(slots[s].material||s):s;
-  const fN=(v,d=3)=>(v===null||v===undefined||isNaN(v))?'—':Number(v).toFixed(d);
+  const fN=(v,d=3)=>(v===null||v===undefined||isNaN(Number(v)))?'—':Number(v).toFixed(d);
 
   // T29 / T30
   let T29=0,T30=0;
