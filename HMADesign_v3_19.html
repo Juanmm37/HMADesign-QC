@@ -6635,6 +6635,11 @@ function renderS11AggDensity(){
   const cCoarsePct=100-T29;
   const cVirginPct=T30;                  // % of total blend that is virgin fine
   const cRapFinePct=T29-T30;             // % of total blend that is RAP fine
+  // RAP coarse = total RAP blend% minus the RAP fraction that passes 4.75mm
+  let totalRapPct=0;
+  if(selTrial){Object.keys(selTrial.blendPct||{}).forEach(s=>{if(s.startsWith('RAP'))totalRapPct+=(selTrial.blendPct[s]||0);});}
+  const cRapCoarsePct=hasRAP?Math.max(0,totalRapPct-cRapFinePct):0;
+  const cVirginCoarsePct=cCoarsePct-cRapCoarsePct;  // virgin coarse only (LS 604 fraction)
 
   // 2.36 split fractions of the fine fraction
   const cP475v=at.c_pct475!==null?at.c_pct475:100;
