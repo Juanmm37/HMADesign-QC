@@ -2947,8 +2947,6 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
 // ── CMD Deviation Chart (SVG) ──
 function renderCMDChart(trial, blendGrad, info, forPrint=false){
   const mt=info.mixType||'';
-  const fam=info.family||'';
-  const isMarshall=fam==='Marshall';
   const NMAS_MAP={
     'SP 4.75':4.75,'HL2':4.75,
     'SP 9.5':9.5,'SMA 9.5':9.5,'DFC':9.5,
@@ -2964,19 +2962,18 @@ function renderCMDChart(trial, blendGrad, info, forPrint=false){
   const W=forPrint?1600:920, H=forPrint?900:400;
   const PL=forPrint?72:52, PR=forPrint?32:24, PT=forPrint?72:36, PB=forPrint?88:64;
   const cW=W-PL-PR, cH=H-PT-PB;
-  const chartSieves=['25','19','16','13.2','12.5','9.5','6.7','4.75','2.36','1.18','0.6','0.3','0.15','0.075'];
+  const ALL_SIEVES=['25','19','16','13.2','12.5','9.5','6.7','4.75','2.36','1.18','0.6','0.3','0.15','0.075'];
 
+  // Equal category spacing — only sieves with valid blend data, ordered coarser→finer
+  const validSieves=ALL_SIEVES.filter(s=>{const v=blendGrad[s];return v!==null&&v!==undefined;});
+  const n=validSieves.length;
+
+  // xOf: idx=0 (coarsest) → rightmost; idx=n-1 (finest) → leftmost
   function xOf(s){
-    const i=chartSieves.indexOf(s);if(i<0)return null;
-    const v=parseFloat(s);
-    if(isMarshall){
-      const logMin=Math.log10(parseFloat(chartSieves[chartSieves.length-1]));
-      const logMax=Math.log10(parseFloat(chartSieves[0]));
-      return PL+((Math.log10(v)-logMin)/(logMax-logMin))*cW;
-    }
-    const powMin=Math.pow(parseFloat(chartSieves[chartSieves.length-1]),0.45);
-    const powMax=Math.pow(parseFloat(chartSieves[0]),0.45);
-    return PL+((Math.pow(v,0.45)-powMin)/(powMax-powMin))*cW;
+    const idx=validSieves.indexOf(s);
+    if(idx<0)return null;
+    if(n<=1)return PL+cW/2;
+    return PL+((n-1-idx)/(n-1))*cW;
   }
 
   const devMin=-25, devMax=25;
@@ -2996,38 +2993,36 @@ function renderCMDChart(trial, blendGrad, info, forPrint=false){
     <text x="${PL-5}" y="${yOfDev(v)+fsAxis*0.4}" font-size="${fsAxis}" fill="${v===0?'#1f3864':'#555'}"
       font-weight="${v===0?'800':'600'}" text-anchor="end">${v>0?'+':''}${v}</text>`).join('');
 
-  // X grid + labels
-  const xGrid=chartSieves.map(s=>`<line x1="${xOf(s)}" y1="${PT}" x2="${xOf(s)}" y2="${PT+cH}" stroke="#e8edf5" stroke-width="0.8"/>`).join('');
+  // Vertical grid lines + rotated x labels at each valid sieve
   const SIEVE_LABELS={'25':'25.0','19':'19.0','16':'16.0','13.2':'13.2','12.5':'12.5',
     '9.5':'9.5','6.7':'6.7','4.75':'4.75','2.36':'2.36','1.18':'1.18',
     '0.6':'0.600','0.3':'0.300','0.15':'0.150','0.075':'0.075'};
-  const xLbls=chartSieves.map(s=>{
+  const xGrid=validSieves.map(s=>`<line x1="${xOf(s)}" y1="${PT}" x2="${xOf(s)}" y2="${PT+cH}" stroke="#e8edf5" stroke-width="0.8"/>`).join('');
+  const xLbls=validSieves.map(s=>{
     const x=xOf(s),y=PT+cH+8;
     return`<text x="${x}" y="${y}" font-size="${fsAxisX}" fill="#444" font-weight="600" text-anchor="end"
       transform="rotate(-90,${x},${y})">${SIEVE_LABELS[s]||s}</text>`;}).join('');
 
-  // ±5 band (subtle green zone)
+  // ±5 band
   const zeroBand=`<rect x="${PL}" y="${yOfDev(5)}" width="${cW}" height="${yOfDev(-5)-yOfDev(5)}" fill="#e8f5e9" opacity="0.5"/>`;
 
-  // NMAS vertical marker
-  const nmasStr=nmas%1===0?String(nmas):String(nmas);
-  // find the sieve key that matches NMAS
-  const nmasKey=chartSieves.find(s=>Math.abs(parseFloat(s)-nmas)<0.01)||null;
+  // NMAS marker (only if the NMAS sieve is in validSieves)
+  const nmasKey=validSieves.find(s=>Math.abs(parseFloat(s)-nmas)<0.01)||null;
   const nmasX=nmasKey?xOf(nmasKey):null;
   const nmasSvg=nmasX!==null?`
     <line x1="${nmasX}" y1="${PT}" x2="${nmasX}" y2="${PT+cH}" stroke="#e74c3c"
       stroke-width="${forPrint?2.5:1.5}" stroke-dasharray="${forPrint?'14,7':'7,3'}"/>
     <text x="${nmasX+6}" y="${PT+fsAxis+4}" font-size="${fsAxis}" fill="#e74c3c" font-weight="700">NMAS ${nmas}mm</text>`:'';
 
-  // Compute deviations and plot
+  // Compute CMD passing and deviations
   const pts=[];
-  chartSieves.forEach(s=>{
+  let totalDev=0;
+  validSieves.forEach(s=>{
     const d=parseFloat(s),blend=blendGrad[s];
-    if(blend===null||blend===undefined)return;
-    if(xOf(s)===null)return;
     const cmdP=Math.pow(d/nmas,0.45)*100;
     const dev=blend-cmdP;
-    pts.push({x:xOf(s),y:yOfDev(dev),dev});
+    totalDev+=Math.abs(dev);
+    pts.push({s,x:xOf(s),y:yOfDev(dev),dev,blend,cmdP});
   });
 
   let devSvg='';
@@ -3051,7 +3046,39 @@ function renderCMDChart(trial, blendGrad, info, forPrint=false){
     <line x1="${legX}" y1="${r2cy}" x2="${legX+legLW}" y2="${r2cy}" stroke="#e74c3c" stroke-width="${forPrint?2.5:1.5}" stroke-dasharray="${forPrint?'14,7':'7,3'}"/>
     <text x="${legX+legLW+6}" y="${r2cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">NMAS (${nmas}mm)</text>`;
 
-  return`<div style="margin-bottom:${forPrint?0:12}px">
+  // ── Stats: Total CMD Deviation + Fine Aggregate Ratio (EM-21) ──
+  const p600=blendGrad['0.6'], p300=blendGrad['0.3'], p150=blendGrad['0.15'];
+  const farDenom=(p300!==null&&p300!==undefined&&p150!==null&&p150!==undefined)?(p300-p150):null;
+  const far=(p600!==null&&p600!==undefined&&farDenom!==null&&farDenom>0)?((p600-p300)/farDenom):null;
+  const farOk=far===null||far>=3.0;
+
+  // Card style (inline so it works in both screen and print)
+  const crd=forPrint
+    ?`display:inline-flex;flex-direction:column;align-items:center;padding:14px 28px;border:2px solid #c5d3ef;border-radius:8px;background:#e8f0fe;min-width:220px`
+    :`display:inline-flex;flex-direction:column;align-items:center;padding:10px 20px;border:1.5px solid #c5d3ef;border-radius:7px;background:#e8f0fe;min-width:160px`;
+  const lbl=forPrint?`font-size:11px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px`
+    :`font-size:9px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px`;
+  const val=forPrint?`font-size:26px;font-weight:900;color:#1a1a2e`:`font-size:20px;font-weight:900;color:#1a1a2e`;
+  const sub=forPrint?`font-size:10px;color:#666;margin-top:3px`:`font-size:9px;color:#666;margin-top:2px`;
+
+  const farColor=farOk?'#1a1a2e':'#c0392b';
+  const farBg=farOk?'#e8f0fe':'#fff0f0';
+  const farBorder=farOk?'#c5d3ef':'#e74c3c';
+
+  const statsHtml=`<div style="display:flex;gap:${forPrint?'20px':'12px'};flex-wrap:wrap;margin-top:${forPrint?'20px':'10px'}">
+    <div style="${crd}">
+      <div style="${lbl}">Total CMD Deviation</div>
+      <div style="${val}">${totalDev.toFixed(1)}</div>
+      <div style="${sub}">Σ |blend − CMD| across all sieves</div>
+    </div>
+    <div style="${crd.replace('#e8f0fe',farBg).replace('#c5d3ef',farBorder)}">
+      <div style="${lbl}">Fine Aggregate Ratio <span style="font-weight:400;text-transform:none">(EM-21)</span></div>
+      <div style="${val.replace('#1a1a2e',farColor)}">${far!==null?far.toFixed(2):'—'}</div>
+      <div style="${sub}">(P<sub>0.600</sub>−P<sub>0.300</sub>) / (P<sub>0.300</sub>−P<sub>0.150</sub>) &nbsp;|&nbsp; Min: 3.0${!farOk?` &nbsp;<strong style="color:#c0392b">BELOW MIN</strong>`:''}</div>
+    </div>
+  </div>`;
+
+  return`<div style="margin-bottom:${forPrint?'16px':'12px'}">
     <svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:'Segoe UI',sans-serif;${forPrint?'':'max-width:'+W+'px'}">
       <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff" rx="2"/>
       ${zeroBand}
@@ -3070,6 +3097,7 @@ function renderCMDChart(trial, blendGrad, info, forPrint=false){
       <text x="${yLabelX}" y="${PT+cH/2}" font-size="${fsYLabel}" font-weight="700" fill="#555" text-anchor="middle" transform="rotate(-90,${yLabelX},${PT+cH/2})">DEVIATION FROM CMD (%)</text>
       <text x="${PL+cW/2}" y="${H-fsSub*0.3}" font-size="${fsSub}" fill="#777" text-anchor="middle">SIEVE SIZE (mm) &nbsp;|&nbsp; ← Finer &nbsp;&nbsp;&nbsp; Coarser →</text>
     </svg>
+    ${statsHtml}
   </div>`;
 }
 
