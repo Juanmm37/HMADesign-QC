@@ -137,6 +137,9 @@ input[readonly]{background:#f5f6f8;color:#444;font-weight:600}
     <div class="topbar-sub">Mix Design Management &mdash; Capital Paving Inc.</div>
   </div>
   <div style="margin-left:auto;display:flex;gap:8px;align-items:center" class="print-hide">
+    <span id="user-display" style="font-size:12px;color:#888;font-weight:600"></span>
+    <button onclick="signOut()" class="btn btn-sm" style="font-size:11px">Sign out</button>
+    <div style="width:1px;height:20px;background:#e0e4ec"></div>
     <button onclick="exportSession()" title="Download your current session as a JSON backup file" style="background:#e8f0fe;color:#1f3864;border:1px solid #c5d3ef;border-radius:5px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer">💾 Save Session</button>
     <button onclick="importSession()" title="Reload a previously saved session JSON file" style="background:#e8f0fe;color:#1f3864;border:1px solid #c5d3ef;border-radius:5px;padding:5px 11px;font-size:11px;font-weight:700;cursor:pointer">📂 Load Session</button>
   </div>
