@@ -7515,13 +7515,13 @@ function printConsensusCards(){
   const mixLabel=`${info.mixNo||'Mix Design'} — ${info.mixType||''}${info.hasRAP==='Yes'?' RAP':''}`;
 
   const thP='padding:5px 8px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,0.25)';
-  const tdP='padding:4px 8px;font-size:11px;border:1px solid #dde3ed;text-align:center';
+  const tdP='padding:4px 8px;font-size:11px;border:1px solid #dde3ed;text-align:center;vertical-align:middle';
   const tdPL=`${tdP};text-align:left;font-weight:600`;
 
   const blendTableRows=blendData.map((r,i)=>`
-    <tr style="background:${i%2?'#f8fafc':'#fff'}">
+    <tr style="background:${i%2?'#f8fafc':'#fff'};height:40px">
       <td style="${tdPL};color:#1f3864">${r.s}</td>
-      <td style="${tdP};text-align:left">${r.agg?`<span style="font-weight:600">${r.agg.material}</span><br><span style="font-size:9px;color:#888">${r.src}</span>`:'<span style="color:#bbb">N/A</span>'}</td>
+      <td style="${tdP};text-align:left">${r.agg?`<span style="font-weight:600">${r.agg.material}</span><br><span style="font-size:9px;color:#888">${r.src||'&nbsp;'}</span>`:`<span style="color:#bbb">N/A</span><br><span style="font-size:9px;color:transparent">&nbsp;</span>`}</td>
       <td style="${tdP};background:${r.agg?'#fffde7':'#f5f5f5'};font-weight:700">${r.agg?r.pct1dp.toFixed(1)+'%':'0.0%'}</td>
       <td style="${tdP};font-weight:700">${r.mass||0}</td>
     </tr>`).join('');
