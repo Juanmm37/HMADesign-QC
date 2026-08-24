@@ -7462,57 +7462,195 @@ table.main th.thl{text-align:left}
   win.document.close();win.focus();setTimeout(()=>win.print(),600);
 }
 
-function renderConsensusCards(selTrial, at){
+function _buildConsensusData(selTrial, at){
   const slots = ms.slots;
+  const spPcts = calcStockpilePercentages(selTrial);
+  const totalMass = typeof at.consensusTotalMass==='number' ? at.consensusTotalMass : 16000;
+  const DISPLAY_SLOTS = ['CA1','CA2','CA3','CA4','FA1','FA2','FA3','RAP1','RAP2','BHF'];
+  if(slots['MF'] && getAgg(slots['MF'])) DISPLAY_SLOTS.push('MF');
+  let totalPctSum=0, totalMassSum=0;
+  const blendData = DISPLAY_SLOTS.map(s=>{
+    const agg = slots[s] ? getAgg(slots[s]) : null;
+    const spPct = spPcts[s]||0;
+    const pct1dp = Math.round(spPct*10)/10;
+    const mass = agg ? Math.round(pct1dp/100*totalMass) : 0;
+    const src = agg ? ((slots[s]&&slots[s].source)||cleanSource(agg.supplier,agg.source)||agg.source||agg.supplier||'') : '';
+    totalPctSum += agg ? pct1dp : 0;
+    totalMassSum += mass;
+    return {s, agg, pct1dp, mass, src};
+  });
+  const UEXT_S=['25','19','16','13.2','12.5','9.5','6.7','4.75','2.36','pan'];
+  const rapData = ['RAP1','RAP2'].filter(s=>{
+    if(!slots[s])return false;
+    const agg=getAgg(slots[s]);
+    return agg&&agg.isRAP&&(agg.unextracted_m||agg.unextracted_mod);
+  }).map(s=>{
+    const agg=getAgg(slots[s]);
+    const bdRow=blendData.find(r=>r.s===s);
+    const extractedMass=bdRow?bdRow.mass:0;
+    const acPct=(agg.ACpct_adj!==null&&agg.ACpct_adj!==undefined)?agg.ACpct_adj:(agg.ACpct_m||0);
+    const unextractedNeeded=acPct>0?extractedMass/(1-acPct/100):extractedMass;
+    const rapTotalMass=Math.ceil(unextractedNeeded/100)*100;
+    const src=(slots[s]&&slots[s].source)||cleanSource(agg.supplier,agg.source)||agg.source||agg.supplier||'';
+    let cumMass=0,totalIndMass=0,totalPct=0;
+    const sieves=UEXT_S.map(sv=>{
+      const adjVal=(agg.unextracted_mod&&agg.unextracted_mod[sv]!==null&&agg.unextracted_mod[sv]!==undefined)?agg.unextracted_mod[sv]:0;
+      const indMass=Math.round(adjVal/100*rapTotalMass*10)/10;
+      cumMass=Math.round((cumMass+indMass)*10)/10;
+      totalIndMass=Math.round((totalIndMass+indMass)*10)/10;
+      totalPct=Math.round((totalPct+adjVal)*100)/100;
+      return {sv, adjVal, indMass, cumMass};
+    });
+    return {s, agg, src, extractedMass, acPct, rapTotalMass, sieves, totalPct, totalIndMass};
+  });
+  return {totalMass, blendData, totalPctSum, totalMassSum, rapData, UEXT_S};
+}
+
+function printConsensusCards(){
+  const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
+  if(!selTrial){alert('No trial blend selected.');return;}
+  const at=ms.aggTesting||{};
+  const info=ms.info;
+  const {totalMass,blendData,totalPctSum,totalMassSum,rapData,UEXT_S}=_buildConsensusData(selTrial,at);
+  const mixLabel=`${info.mixNo||'Mix Design'} — ${info.mixType||''}${info.hasRAP==='Yes'?' RAP':''}`;
+
+  const thP='padding:5px 8px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,0.25)';
+  const tdP='padding:4px 8px;font-size:11px;border:1px solid #dde3ed;text-align:center';
+  const tdPL=`${tdP};text-align:left;font-weight:600`;
+
+  const blendTableRows=blendData.map((r,i)=>`
+    <tr style="background:${i%2?'#f8fafc':'#fff'}">
+      <td style="${tdPL};color:#1f3864">${r.s}</td>
+      <td style="${tdP};text-align:left">${r.agg?`<span style="font-weight:600">${r.agg.material}</span><br><span style="font-size:9px;color:#888">${r.src}</span>`:'<span style="color:#bbb">N/A</span>'}</td>
+      <td style="${tdP};background:${r.agg?'#fffde7':'#f5f5f5'};font-weight:700">${r.agg?r.pct1dp.toFixed(1)+'%':'0.0%'}</td>
+      <td style="${tdP};font-weight:700">${r.mass||0}</td>
+    </tr>`).join('');
+
+  const reqRows=(title,bg,rows)=>`<div style="margin-bottom:6px">
+    <div style="background:${bg};color:#fff;font-size:9px;font-weight:700;padding:3px 7px">${title}</div>
+    <table style="border-collapse:collapse;width:100%">${rows.map(([t,m])=>`<tr>
+      <td style="padding:3px 6px;font-size:10px;font-weight:600;border:1px solid #dde3ed">${t}</td>
+      <td style="padding:3px 6px;font-size:10px;font-weight:700;color:${bg};border:1px solid #dde3ed;text-align:center">${m}</td>
+    </tr>`).join('')}</table></div>`;
+
+  const page1=`<div style="page-break-after:always">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #1f3864">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:68px">
+      <div>
+        <div style="font-size:14px;font-weight:900;color:#1f3864">AGGREGATE BLEND — CONSENSUS PROPERTIES &amp; COMBINED Gsb</div>
+        <div style="font-size:10px;color:#666;margin-top:2px">${mixLabel} &nbsp;|&nbsp; Total Mass: ${totalMass.toLocaleString()} g</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:18px;align-items:flex-start">
+      <table style="border-collapse:collapse;flex:1">
+        <thead><tr style="background:#1f3864;color:#fff">
+          <th style="${thP};text-align:left">Slot</th>
+          <th style="${thP};text-align:left">Material / Source</th>
+          <th style="${thP}">%</th>
+          <th style="${thP}">Mass (g)</th>
+        </tr></thead>
+        <tbody>
+          ${blendTableRows}
+          <tr style="background:#dce8ff">
+            <td colspan="2" style="${tdPL};color:#1f3864;background:#dce8ff">TOTAL</td>
+            <td style="${tdP};font-weight:700">${totalPctSum.toFixed(1)}%</td>
+            <td style="${tdP};font-weight:900;color:#1f3864;font-size:13px">${totalMass.toLocaleString()}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="min-width:210px">
+        <div style="font-size:10px;font-weight:800;color:#1f3864;margin-bottom:5px;text-align:center;text-transform:uppercase">Required Test Masses</div>
+        ${reqRows('Retained on 4.75mm — Virgin Agg. + RAP','#1f3864',[['CA Gsb (LS 605)','6 500 g *'],['F&amp;E (ASTM D4791)','See Manual *'],['FFCA (ASTM 5821)','See Manual *']])}
+        ${reqRows('Passing 4.75mm — Virgin Agg. + RAP','#1f3864',[['FAA (LS 629)','1 200 g']])}
+        ${reqRows('Passing 4.75mm — Virgin Agg. Only','#2e7d32',[['FA Gsb (LS 605)','2 × 1 200 g'],['SE (ASTM D2419)','1 200 g']])}
+        <div style="font-size:8px;color:#888;margin-top:4px">* Material can be reused after testing</div>
+      </div>
+    </div>
+  </div>`;
+
+  const thR='padding:5px 8px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(255,255,255,0.25)';
+  const tdR='padding:4px 8px;font-size:11px;border:1px solid #f0c8d8;text-align:center';
+  const tdRL=`${tdR};text-align:left;font-weight:600;color:#880e4f`;
+
+  const rapCardsPage=rapData.map(rd=>`
+    <div style="flex:1;min-width:280px">
+      <div style="font-size:12px;font-weight:800;color:#880e4f;margin-bottom:4px">${rd.s}: ${rd.agg.material}</div>
+      <div style="font-size:9px;color:#888;margin-bottom:6px">${rd.src} &nbsp;|&nbsp; AC%: ${rd.acPct.toFixed(2)}% &nbsp;|&nbsp; Extracted in blend: ${rd.extractedMass.toLocaleString()} g &nbsp;→&nbsp; <strong style="color:#880e4f">Unextracted total: ${rd.rapTotalMass.toLocaleString()} g</strong></div>
+      <table style="border-collapse:collapse;width:100%">
+        <thead><tr style="background:#880e4f;color:#fff">
+          <th style="${thR};text-align:left">Sieve</th>
+          <th style="${thR}">Ind. % Retained</th>
+          <th style="${thR}">Ind. Mass (g)</th>
+          <th style="${thR}">Cum. Mass (g)</th>
+        </tr></thead>
+        <tbody>
+          ${rd.sieves.map((sv,i)=>`<tr style="background:${i%2?'#fdf2f8':'#fff'}">
+            <td style="${tdRL}">${sv.sv==='pan'?'PAN':(SL[sv.sv]||sv.sv+'mm')}</td>
+            <td style="${tdR};background:#fffde7;font-weight:700">${sv.adjVal.toFixed(1)}%</td>
+            <td style="${tdR}">${sv.indMass.toFixed(1)}</td>
+            <td style="${tdR};font-weight:700">${sv.cumMass.toFixed(1)}</td>
+          </tr>`).join('')}
+          <tr style="background:#fce4ec">
+            <td style="${tdRL}">TOTAL</td>
+            <td style="${tdR};font-weight:700;color:#880e4f">${rd.totalPct.toFixed(1)}%</td>
+            <td style="${tdR};font-weight:800;color:#1f3864">${rd.totalIndMass.toFixed(1)}</td>
+            <td style="${tdR}"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>`).join('<div style="width:20px"></div>');
+
+  const page2=rapData.length?`<div>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #880e4f">
+      <img src="${LOGO_SRC}" alt="Capital Paving" style="height:68px">
+      <div>
+        <div style="font-size:14px;font-weight:900;color:#880e4f">UNEXTRACTED RAP WEIGHT CARD</div>
+        <div style="font-size:10px;color:#666;margin-top:2px">${mixLabel}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:0;align-items:flex-start;flex-wrap:wrap">${rapCardsPage}</div>
+  </div>`:'';
+
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Consensus Batching Cards — ${mixLabel}</title><meta charset="UTF-8">
+  <style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;color:#1a1a2e;background:#fff;padding:12px}@page{size:A4 landscape;margin:8mm}@media print{body{padding:0}}</style>
+  </head><body>${page1}${page2}</body></html>`);
+  win.document.close();win.focus();setTimeout(()=>win.print(),600);
+}
+
+function renderConsensusCards(selTrial, at){
   if(!selTrial) return `<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#795548">
     ⚠ No trial blend selected — return to Step 6 to select a trial before generating batching cards.
   </div>`;
 
-  const spPcts = calcStockpilePercentages(selTrial);
-  const totalMass = typeof at.consensusTotalMass==='number' ? at.consensusTotalMass : 16000;
+  const {totalMass,blendData,totalPctSum,totalMassSum,rapData,UEXT_S}=_buildConsensusData(selTrial,at);
 
   const thS='padding:6px 10px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(0,0,0,0.15)';
   const tdS='padding:5px 10px;font-size:12px;border:1px solid #e0e4ec;text-align:center';
   const tdL=`${tdS};text-align:left;font-weight:600`;
 
   // ── Card 1: Aggregate Blend ──
-  const activeSlots = SLOTS.filter(s => slots[s] && (spPcts[s]||0) > 0.0001);
-  const rawMasses = activeSlots.map(s => Math.round((spPcts[s]||0)/100*totalMass));
-  const sumFront = rawMasses.slice(0,-1).reduce((a,b)=>a+b,0);
-  if(rawMasses.length) rawMasses[rawMasses.length-1] = totalMass - sumFront;
-  let sumPct = 0;
-  const blendRows = activeSlots.map((s,i)=>{
-    const agg=getAgg(slots[s]); const pct=spPcts[s]||0; sumPct+=pct;
-    return `<tr style="background:${i%2?'#f8fafc':'#fff'}">
-      <td style="${tdL};color:#1f3864">${s}</td>
-      <td style="${tdS};text-align:left">${agg?agg.material:'—'}</td>
-      <td style="${tdS}">${pct.toFixed(1)}%</td>
-      <td style="${tdS};font-weight:700">${rawMasses[i].toLocaleString()}</td>
-    </tr>`;
-  });
+  const blendRows=blendData.map((r,i)=>`
+    <tr style="background:${i%2?'#f8fafc':'#fff'}">
+      <td style="${tdL};color:#1f3864">${r.s}</td>
+      <td style="${tdS};text-align:left">${r.agg?`<span style="font-weight:600">${r.agg.material}</span><br><span style="font-size:10px;color:#888">${r.src}</span>`:'<span style="color:#bbb">N/A</span>'}</td>
+      <td style="${tdS};background:${r.agg?'#fffde7':'#f5f5f5'};font-weight:700">${r.agg?r.pct1dp.toFixed(1)+'%':'0.0%'}</td>
+      <td style="${tdS};font-weight:700">${r.mass||0}</td>
+    </tr>`);
 
-  const reqTd='padding:4px 8px;font-size:11px;border:1px solid #e0e4ec;text-align:center';
-  const mkReqBlock=(title,bg,rows)=>`
-    <div style="margin-bottom:8px">
-      <div style="background:${bg};color:#fff;font-size:9px;font-weight:700;padding:4px 8px;border-radius:4px 4px 0 0">${title}</div>
-      <table style="border-collapse:collapse;width:100%">${rows.map(([t,m])=>`<tr>
-        <td style="${reqTd};text-align:left;font-weight:600;color:#333">${t}</td>
-        <td style="${reqTd};font-weight:700;color:${bg}">${m}</td>
-      </tr>`).join('')}</table>
-    </div>`;
+  const reqTd='padding:4px 8px;font-size:11px;border:1px solid #e0e4ec';
+  const mkReqBlock=(title,bg,rows)=>`<div style="margin-bottom:8px">
+    <div style="background:${bg};color:#fff;font-size:9px;font-weight:700;padding:4px 8px;border-radius:4px 4px 0 0">${title}</div>
+    <table style="border-collapse:collapse;width:100%">${rows.map(([t,m])=>`<tr>
+      <td style="${reqTd};text-align:left;font-weight:600;color:#333">${t}</td>
+      <td style="${reqTd};font-weight:700;color:${bg};text-align:center">${m}</td>
+    </tr>`).join('')}</table></div>`;
 
   const testReqHtml=`<div style="min-width:240px;max-width:280px">
     <div style="font-size:10px;font-weight:700;color:#1f3864;margin-bottom:6px;text-align:center;text-transform:uppercase;letter-spacing:0.5px">Required Test Masses</div>
-    ${mkReqBlock('Retained on 4.75mm — Virgin Agg. + RAP','#1f3864',[
-      ['CA Gsb (LS 605)','6 500 g *'],
-      ['F&E (ASTM D4791)','See Manual *'],
-      ['FFCA (ASTM 5821)','See Manual *']
-    ])}
+    ${mkReqBlock('Retained on 4.75mm — Virgin Agg. + RAP','#1f3864',[['CA Gsb (LS 605)','6 500 g *'],['F&amp;E (ASTM D4791)','See Manual *'],['FFCA (ASTM 5821)','See Manual *']])}
     ${mkReqBlock('Passing 4.75mm — Virgin Agg. + RAP','#1f3864',[['FAA (LS 629)','1 200 g']])}
-    ${mkReqBlock('Passing 4.75mm — Virgin Agg. Only','#2e7d32',[
-      ['FA Gsb (LS 605)','2 × 1 200 g'],
-      ['SE (ASTM D2419)','1 200 g']
-    ])}
+    ${mkReqBlock('Passing 4.75mm — Virgin Agg. Only','#2e7d32',[['FA Gsb (LS 605)','2 × 1 200 g'],['SE (ASTM D2419)','1 200 g']])}
     <div style="font-size:9px;color:#888;margin-top:4px">* Material can be reused after testing</div>
   </div>`;
 
@@ -7532,7 +7670,7 @@ function renderConsensusCards(selTrial, at){
         <table style="border-collapse:collapse;width:100%">
           <thead><tr style="background:#1f3864;color:#fff">
             <th style="${thS};text-align:left">Slot</th>
-            <th style="${thS};text-align:left">Material</th>
+            <th style="${thS};text-align:left">Material / Source</th>
             <th style="${thS}">Stockpile %</th>
             <th style="${thS}">Mass (g)</th>
           </tr></thead>
@@ -7540,7 +7678,7 @@ function renderConsensusCards(selTrial, at){
             ${blendRows.join('')}
             <tr style="background:#dce8ff">
               <td colspan="2" style="${tdL};color:#1f3864;background:#dce8ff">TOTAL</td>
-              <td style="${tdS};font-weight:700">${sumPct.toFixed(1)}%</td>
+              <td style="${tdS};font-weight:700">${totalPctSum.toFixed(1)}%</td>
               <td style="${tdS};font-weight:800;color:#1f3864;font-size:14px">${totalMass.toLocaleString()}</td>
             </tr>
           </tbody>
@@ -7551,41 +7689,16 @@ function renderConsensusCards(selTrial, at){
   </div>`;
 
   // ── Cards 2+: Unextracted RAP ──
-  const rapSlots=SLOTS.filter(s=>{
-    if(!slots[s])return false;
-    const agg=getAgg(slots[s]);
-    return agg&&agg.isRAP&&(agg.unextracted_m||agg.unextracted_mod);
-  });
-  const UEXT_S=['25','19','16','13.2','12.5','9.5','6.7','4.75','2.36','pan'];
-  const rapCardsHtml=rapSlots.map(s=>{
-    const agg=getAgg(slots[s]);
-    const rapMass=typeof at['rapBatchMass_'+s]==='number'?at['rapBatchMass_'+s]:2400;
-    let cumMass=0,totalIndMass=0,totalPct=0;
-    const sieveRows=UEXT_S.map((sv,i)=>{
-      const adjVal=(agg.unextracted_mod&&agg.unextracted_mod[sv]!==null&&agg.unextracted_mod[sv]!==undefined)?agg.unextracted_mod[sv]:0;
-      const indMass=Math.round(adjVal/100*rapMass*10)/10;
-      cumMass=Math.round((cumMass+indMass)*10)/10;
-      totalIndMass=Math.round((totalIndMass+indMass)*10)/10;
-      totalPct+=adjVal;
-      const lbl=sv==='pan'?'PAN':(SL[sv]||sv+'mm');
-      return `<tr style="background:${i%2?'#fdf2f8':'#fff'}">
-        <td style="${tdL};color:#880e4f">${lbl}</td>
-        <td style="${tdS};background:#fffde7;font-weight:700;color:#5d4037">${adjVal.toFixed(1)}%</td>
-        <td style="${tdS}">${indMass.toFixed(1)}</td>
-        <td style="${tdS};font-weight:700">${cumMass.toFixed(1)}</td>
-      </tr>`;
-    });
+  const rapCardsHtml=rapData.map(rd=>{
     return `<div style="margin-bottom:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:800;color:#880e4f;text-transform:uppercase;letter-spacing:0.5px">Unextracted RAP Weight Card — ${s}: ${agg.material}</div>
-        <div style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;color:#555;font-weight:600">Total Mass:</span>
-          <input type="number" value="${rapMass}" min="500" max="10000" step="100"
-            style="width:90px;padding:3px 6px;border:1px solid #e0b4c8;border-radius:4px;font-size:12px;text-align:center;font-weight:700"
-            onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['rapBatchMass_${s}']=Math.max(500,parseFloat(this.value)||2400);saveDB();render()">
-          <span style="font-size:11px;color:#555">g</span>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:6px">
+        <div style="font-size:12px;font-weight:800;color:#880e4f;text-transform:uppercase;letter-spacing:0.5px">Unextracted RAP Weight Card — ${rd.s}: ${rd.agg.material}</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:11px;color:#555">
+          <span>Extracted in blend: <strong>${rd.extractedMass.toLocaleString()} g</strong></span>
+          <span style="color:#880e4f;font-weight:700">→ Unextracted total: <strong style="font-size:13px">${rd.rapTotalMass.toLocaleString()} g</strong></span>
         </div>
       </div>
+      <div style="font-size:10px;color:#888;margin-bottom:6px">AC%: ${rd.acPct.toFixed(2)}% &nbsp;|&nbsp; Unextracted = ceil( ${rd.extractedMass} ÷ (1 − ${rd.acPct.toFixed(2)}/100) / 100 ) × 100</div>
       <div style="overflow-x:auto">
         <table style="border-collapse:collapse;min-width:440px">
           <thead><tr style="background:#880e4f;color:#fff">
@@ -7595,11 +7708,16 @@ function renderConsensusCards(selTrial, at){
             <th style="${thS}">Cumulative Mass (g)</th>
           </tr></thead>
           <tbody>
-            ${sieveRows.join('')}
+            ${rd.sieves.map((sv,i)=>`<tr style="background:${i%2?'#fdf2f8':'#fff'}">
+              <td style="${tdL};color:#880e4f">${sv.sv==='pan'?'PAN':(SL[sv.sv]||sv.sv+'mm')}</td>
+              <td style="${tdS};background:#fffde7;font-weight:700;color:#5d4037">${sv.adjVal.toFixed(1)}%</td>
+              <td style="${tdS}">${sv.indMass.toFixed(1)}</td>
+              <td style="${tdS};font-weight:700">${sv.cumMass.toFixed(1)}</td>
+            </tr>`).join('')}
             <tr style="background:#fce4ec">
               <td style="${tdL};color:#880e4f">TOTAL</td>
-              <td style="${tdS};font-weight:700;color:#880e4f">${totalPct.toFixed(1)}%</td>
-              <td style="${tdS};font-weight:800;color:#1f3864">${totalIndMass.toFixed(1)}</td>
+              <td style="${tdS};font-weight:700;color:#880e4f">${rd.totalPct.toFixed(1)}%</td>
+              <td style="${tdS};font-weight:800;color:#1f3864">${rd.totalIndMass.toFixed(1)}</td>
               <td style="${tdS}"></td>
             </tr>
           </tbody>
@@ -7609,9 +7727,12 @@ function renderConsensusCards(selTrial, at){
   }).join('');
 
   return `<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #e0e4ec">
-    <div style="font-size:13px;font-weight:900;color:#1f3864;margin-bottom:12px;display:flex;align-items:center;gap:10px">
-      ⚖ Batching Weight Cards
-      <span style="font-size:10px;font-weight:400;color:#888">Based on selected trial: ${selTrial.id||''}</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:13px;font-weight:900;color:#1f3864;display:flex;align-items:center;gap:10px">
+        ⚖ Batching Weight Cards
+        <span style="font-size:10px;font-weight:400;color:#888">Based on selected trial: ${selTrial.id||''}</span>
+      </div>
+      <button class="btn btn-primary" onclick="printConsensusCards()" style="font-size:11px;padding:5px 12px">🖨 Print Weight Cards</button>
     </div>
     ${aggCard}
     ${rapCardsHtml}
