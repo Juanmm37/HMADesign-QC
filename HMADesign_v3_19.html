@@ -7462,6 +7462,162 @@ table.main th.thl{text-align:left}
   win.document.close();win.focus();setTimeout(()=>win.print(),600);
 }
 
+function renderConsensusCards(selTrial, at){
+  const slots = ms.slots;
+  if(!selTrial) return `<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:6px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#795548">
+    ⚠ No trial blend selected — return to Step 6 to select a trial before generating batching cards.
+  </div>`;
+
+  const spPcts = calcStockpilePercentages(selTrial);
+  const totalMass = typeof at.consensusTotalMass==='number' ? at.consensusTotalMass : 16000;
+
+  const thS='padding:6px 10px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(0,0,0,0.15)';
+  const tdS='padding:5px 10px;font-size:12px;border:1px solid #e0e4ec;text-align:center';
+  const tdL=`${tdS};text-align:left;font-weight:600`;
+
+  // ── Card 1: Aggregate Blend ──
+  const activeSlots = SLOTS.filter(s => slots[s] && (spPcts[s]||0) > 0.0001);
+  const rawMasses = activeSlots.map(s => Math.round((spPcts[s]||0)/100*totalMass));
+  const sumFront = rawMasses.slice(0,-1).reduce((a,b)=>a+b,0);
+  if(rawMasses.length) rawMasses[rawMasses.length-1] = totalMass - sumFront;
+  let sumPct = 0;
+  const blendRows = activeSlots.map((s,i)=>{
+    const agg=getAgg(slots[s]); const pct=spPcts[s]||0; sumPct+=pct;
+    return `<tr style="background:${i%2?'#f8fafc':'#fff'}">
+      <td style="${tdL};color:#1f3864">${s}</td>
+      <td style="${tdS};text-align:left">${agg?agg.material:'—'}</td>
+      <td style="${tdS}">${pct.toFixed(1)}%</td>
+      <td style="${tdS};font-weight:700">${rawMasses[i].toLocaleString()}</td>
+    </tr>`;
+  });
+
+  const reqTd='padding:4px 8px;font-size:11px;border:1px solid #e0e4ec;text-align:center';
+  const mkReqBlock=(title,bg,rows)=>`
+    <div style="margin-bottom:8px">
+      <div style="background:${bg};color:#fff;font-size:9px;font-weight:700;padding:4px 8px;border-radius:4px 4px 0 0">${title}</div>
+      <table style="border-collapse:collapse;width:100%">${rows.map(([t,m])=>`<tr>
+        <td style="${reqTd};text-align:left;font-weight:600;color:#333">${t}</td>
+        <td style="${reqTd};font-weight:700;color:${bg}">${m}</td>
+      </tr>`).join('')}</table>
+    </div>`;
+
+  const testReqHtml=`<div style="min-width:240px;max-width:280px">
+    <div style="font-size:10px;font-weight:700;color:#1f3864;margin-bottom:6px;text-align:center;text-transform:uppercase;letter-spacing:0.5px">Required Test Masses</div>
+    ${mkReqBlock('Retained on 4.75mm — Virgin Agg. + RAP','#1f3864',[
+      ['CA Gsb (LS 605)','6 500 g *'],
+      ['F&E (ASTM D4791)','See Manual *'],
+      ['FFCA (ASTM 5821)','See Manual *']
+    ])}
+    ${mkReqBlock('Passing 4.75mm — Virgin Agg. + RAP','#1f3864',[['FAA (LS 629)','1 200 g']])}
+    ${mkReqBlock('Passing 4.75mm — Virgin Agg. Only','#2e7d32',[
+      ['FA Gsb (LS 605)','2 × 1 200 g'],
+      ['SE (ASTM D2419)','1 200 g']
+    ])}
+    <div style="font-size:9px;color:#888;margin-top:4px">* Material can be reused after testing</div>
+  </div>`;
+
+  const aggCard=`<div style="margin-bottom:20px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+      <div style="font-size:12px;font-weight:800;color:#1f3864;text-transform:uppercase;letter-spacing:0.5px">Aggregate Blend — Consensus Properties &amp; Combined Gsb</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:#555;font-weight:600">Total Mass:</span>
+        <input type="number" value="${totalMass}" min="1000" max="50000" step="100"
+          style="width:90px;padding:3px 6px;border:1px solid #c5cae9;border-radius:4px;font-size:12px;text-align:center;font-weight:700"
+          onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting.consensusTotalMass=Math.max(1000,parseFloat(this.value)||16000);saveDB();render()">
+        <span style="font-size:11px;color:#555">g</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap">
+      <div style="overflow-x:auto;flex:1;min-width:320px">
+        <table style="border-collapse:collapse;width:100%">
+          <thead><tr style="background:#1f3864;color:#fff">
+            <th style="${thS};text-align:left">Slot</th>
+            <th style="${thS};text-align:left">Material</th>
+            <th style="${thS}">Stockpile %</th>
+            <th style="${thS}">Mass (g)</th>
+          </tr></thead>
+          <tbody>
+            ${blendRows.join('')}
+            <tr style="background:#dce8ff">
+              <td colspan="2" style="${tdL};color:#1f3864;background:#dce8ff">TOTAL</td>
+              <td style="${tdS};font-weight:700">${sumPct.toFixed(1)}%</td>
+              <td style="${tdS};font-weight:800;color:#1f3864;font-size:14px">${totalMass.toLocaleString()}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      ${testReqHtml}
+    </div>
+  </div>`;
+
+  // ── Cards 2+: Unextracted RAP ──
+  const rapSlots=SLOTS.filter(s=>{
+    if(!slots[s])return false;
+    const agg=getAgg(slots[s]);
+    return agg&&agg.isRAP&&(agg.unextracted_m||agg.unextracted_mod);
+  });
+  const UEXT_S=['25','19','16','13.2','12.5','9.5','6.7','4.75','2.36','pan'];
+  const rapCardsHtml=rapSlots.map(s=>{
+    const agg=getAgg(slots[s]);
+    const rapMass=typeof at['rapBatchMass_'+s]==='number'?at['rapBatchMass_'+s]:2400;
+    let cumMass=0,totalIndMass=0,totalPct=0;
+    const sieveRows=UEXT_S.map((sv,i)=>{
+      const adjVal=(agg.unextracted_mod&&agg.unextracted_mod[sv]!==null&&agg.unextracted_mod[sv]!==undefined)?agg.unextracted_mod[sv]:0;
+      const indMass=Math.round(adjVal/100*rapMass*10)/10;
+      cumMass=Math.round((cumMass+indMass)*10)/10;
+      totalIndMass=Math.round((totalIndMass+indMass)*10)/10;
+      totalPct+=adjVal;
+      const lbl=sv==='pan'?'PAN':(SL[sv]||sv+'mm');
+      return `<tr style="background:${i%2?'#fdf2f8':'#fff'}">
+        <td style="${tdL};color:#880e4f">${lbl}</td>
+        <td style="${tdS};background:#fffde7;font-weight:700;color:#5d4037">${adjVal.toFixed(1)}%</td>
+        <td style="${tdS}">${indMass.toFixed(1)}</td>
+        <td style="${tdS};font-weight:700">${cumMass.toFixed(1)}</td>
+      </tr>`;
+    });
+    return `<div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:800;color:#880e4f;text-transform:uppercase;letter-spacing:0.5px">Unextracted RAP Weight Card — ${s}: ${agg.material}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:11px;color:#555;font-weight:600">Total Mass:</span>
+          <input type="number" value="${rapMass}" min="500" max="10000" step="100"
+            style="width:90px;padding:3px 6px;border:1px solid #e0b4c8;border-radius:4px;font-size:12px;text-align:center;font-weight:700"
+            onchange="if(!ms.aggTesting)ms.aggTesting={};ms.aggTesting['rapBatchMass_${s}']=Math.max(500,parseFloat(this.value)||2400);saveDB();render()">
+          <span style="font-size:11px;color:#555">g</span>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse;min-width:440px">
+          <thead><tr style="background:#880e4f;color:#fff">
+            <th style="${thS};text-align:left">Sieve Size</th>
+            <th style="${thS}">Individual % Retained</th>
+            <th style="${thS}">Individual Mass (g)</th>
+            <th style="${thS}">Cumulative Mass (g)</th>
+          </tr></thead>
+          <tbody>
+            ${sieveRows.join('')}
+            <tr style="background:#fce4ec">
+              <td style="${tdL};color:#880e4f">TOTAL</td>
+              <td style="${tdS};font-weight:700;color:#880e4f">${totalPct.toFixed(1)}%</td>
+              <td style="${tdS};font-weight:800;color:#1f3864">${totalIndMass.toFixed(1)}</td>
+              <td style="${tdS}"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div style="margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #e0e4ec">
+    <div style="font-size:13px;font-weight:900;color:#1f3864;margin-bottom:12px;display:flex;align-items:center;gap:10px">
+      ⚖ Batching Weight Cards
+      <span style="font-size:10px;font-weight:400;color:#888">Based on selected trial: ${selTrial.id||''}</span>
+    </div>
+    ${aggCard}
+    ${rapCardsHtml}
+  </div>`;
+}
+
 function renderS12Consensus(){
   const fam=ms.info.family||'Superpave';
   const fam2=fam;
@@ -7471,6 +7627,7 @@ function renderS12Consensus(){
   const stepNum=fam==='SMA'?11:12;
   const backStep=fam==='SMA'?10:11;
   const nextStep=fam==='SMA'?12:13;
+  const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
 
   const thC='padding:7px 10px;font-size:10px;font-weight:700;background:#1f3864;color:#fff;text-align:center;border:1px solid #1f3864';
   const thCL=`${thC};text-align:left`;
