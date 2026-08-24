@@ -7652,6 +7652,8 @@ function renderS12Consensus(){
 
   return`<div class="card card-blue">
     <div class="st">Step ${stepNum} — Consensus Properties</div>
+    ${renderConsensusCards(selTrial, at)}
+    <div style="font-size:12px;font-weight:700;color:#1f3864;margin-bottom:6px">Test Results</div>
     <div style="font-size:11px;color:#666;margin-bottom:12px">Enter final test results. Criteria per OPSS.MUNI 1151. Traffic Category: <strong>${tc}</strong>.</div>
     <div style="overflow-x:auto">
     <table style="border-collapse:collapse;width:100%;min-width:620px">
