@@ -1095,22 +1095,18 @@ function renderLibEditForm(year){
           <th style="padding:6px 10px;text-align:left">Sieve</th>
           <th style="padding:6px 10px;text-align:center;min-width:100px">Measured %</th>
           <th style="padding:6px 10px;text-align:center;min-width:100px">⚡ Adjusted %</th>
-          <th style="padding:6px 10px;text-align:center;min-width:80px;background:#6a0a35">Used</th>
         </tr>
       </thead>
       <tbody>
         ${UNEXT_SIEVES.map((sv,i)=>{
           const meas = ea.unextracted_m ? ea.unextracted_m[sv] : null;
           const mod  = ea.unextracted_mod ? ea.unextracted_mod[sv] : null;
-          const used = (mod!==null&&mod!==undefined)?mod:meas;
-          const isModActive = mod!==null&&mod!==undefined;
           const bg = i%2===0?'#ffffff':'#fdf2f8';
           const label = sv==='pan'?'Pan (< 2.36mm)':(SL[sv]||sv+'mm');
           return `<tr style="background:${bg}">
             <td style="padding:4px 10px;font-weight:600;color:#880e4f">${label}</td>
             <td style="padding:3px 8px">${numInp('um_'+sv, meas, 'unextracted_m', sv)}</td>
             <td style="padding:3px 8px;background:#fdf2f8">${numInp('umod_'+sv, mod, 'unextracted_mod', sv)}</td>
-            <td style="padding:4px 8px;text-align:center;font-weight:700;color:${isModActive?'#e65100':'#880e4f'};background:${isModActive?'#fff8e8':'#fdf2f8'}">${used!==null&&used!==undefined?Number(used).toFixed(1)+'%':'—'}${isModActive?' ⚡':''}</td>
           </tr>`;
         }).join('')}
       </tbody>
