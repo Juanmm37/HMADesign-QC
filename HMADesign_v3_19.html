@@ -7626,12 +7626,12 @@ function renderConsensusCards(selTrial, at){
   const {totalMass,blendData,totalPctSum,totalMassSum,rapData,UEXT_S}=_buildConsensusData(selTrial,at);
 
   const thS='padding:6px 10px;font-size:10px;font-weight:700;text-align:center;border:1px solid rgba(0,0,0,0.15)';
-  const tdS='padding:5px 10px;font-size:12px;border:1px solid #e0e4ec;text-align:center';
+  const tdS='padding:5px 10px;font-size:12px;border:1px solid #e0e4ec;text-align:center;vertical-align:middle';
   const tdL=`${tdS};text-align:left;font-weight:600`;
 
   // ── Card 1: Aggregate Blend ──
   const blendRows=blendData.map((r,i)=>`
-    <tr style="background:${i%2?'#f8fafc':'#fff'}">
+    <tr style="background:${i%2?'#f8fafc':'#fff'};height:44px">
       <td style="${tdL};color:#1f3864">${r.s}</td>
       <td style="${tdS};text-align:left">${r.agg?`<span style="font-weight:600">${r.agg.material}</span><br><span style="font-size:10px;color:#888">${r.src}</span>`:'<span style="color:#bbb">N/A</span>'}</td>
       <td style="${tdS};background:${r.agg?'#fffde7':'#f5f5f5'};font-weight:700">${r.agg?r.pct1dp.toFixed(1)+'%':'0.0%'}</td>
