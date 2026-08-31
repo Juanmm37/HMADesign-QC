@@ -5790,8 +5790,9 @@ function calcDesignPb(){
     }
   } else if(regType==='poly'){
     // For polynomial, use numerical method (binary search) to find where predict(Pb) = 4.0
+    // Extend range ±3% beyond data to handle cases where 4.0% Va is outside the data range
     const pbVals=pc.pts.map(p=>p.Pb);
-    const minPb=Math.min(...pbVals), maxPb=Math.max(...pbVals);
+    const minPb=Math.min(...pbVals)-3, maxPb=Math.max(...pbVals)+3;
     const minVal=reg.predict(minPb);
     const maxVal=reg.predict(maxPb);
 
@@ -5799,7 +5800,7 @@ function calcDesignPb(){
     if((minVal<=4.0&&4.0<=maxVal)||(maxVal<=4.0&&4.0<=minVal)){
       // Binary search
       let left=minPb, right=maxPb;
-      for(let i=0;i<50;i++){
+      for(let i=0;i<80;i++){
         const mid=(left+right)/2;
         const val=reg.predict(mid);
         if(Math.abs(val-4.0)<0.0001)break;
