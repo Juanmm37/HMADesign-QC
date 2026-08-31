@@ -2852,22 +2852,6 @@ function renderS3(){
             onchange="setBrdProp(${trialIdx},'brdManual',this.value)">
         </div>`:''}
       </div>
-      <div style="margin-top:12px;border-top:1px solid #c8d8ef;padding-top:10px">
-        <div style="font-size:10px;font-weight:700;color:#555;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em">Nmax Correction (optional)</div>
-        <div style="display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end">
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#555;margin-bottom:3px">Gmb @ N<sub>des</sub></div>
-            <input type="number" step="0.001" value="${trial.brdGmbNdes??''}" placeholder="e.g. 2.412"
-              style="width:100px;padding:4px 6px;border:1.5px solid #b8c8e8;border-radius:4px;font-size:12px;font-weight:700;color:#1f3864"
-              onchange="setBrdProp(${trialIdx},'brdGmbNdes',this.value)">
-          </div>
-          ${brdCalc.massNmax!=null?`
-          <div>
-            <div style="font-size:10px;font-weight:700;color:#1a6b1a;margin-bottom:3px">Corrected BRD Mass @ N<sub>max</sub></div>
-            <div style="font-size:16px;font-weight:900;color:#1a6b1a;padding:2px 0">${brdCalc.massNmax} g</div>
-          </div>`:`<div style="font-size:11px;color:#aaa;align-self:center">Enter Gmb @ N<sub>des</sub> to calculate corrected mass</div>`}
-        </div>
-      </div>
     </div>`;
     return `
     ${brdSettingsPanel}
