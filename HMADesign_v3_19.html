@@ -259,7 +259,19 @@ document.addEventListener('keydown',e=>{
   }
   if(best){
     e.preventDefault();
-    // Tell render() which field to re-focus after a debounced re-render
+    // Block render() while navigating so DOM rebuild doesn't kill focus.
+    // Each arrow press resets the 200ms timer; when it fires, navigation is
+    // considered done and any pending render is released.
+    window._isNavigating=true;
+    if(window._navEndTimer)clearTimeout(window._navEndTimer);
+    window._navEndTimer=setTimeout(()=>{
+      window._navEndTimer=null;
+      window._isNavigating=false;
+      if(window._navRenderPending){
+        window._navRenderPending=false;
+        render();
+      }
+    },200);
     if(best.dataset.volfield)window._volFocusAfterRender=best.dataset.volfield;
     if(best.dataset.nmaxfield)window._nmaxFocusAfterRender=best.dataset.nmaxfield;
     best.focus();
