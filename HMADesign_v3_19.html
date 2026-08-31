@@ -5962,7 +5962,7 @@ function renderS7PropCurves(){
   const charts=chartDefs.map(d=>makeChart(d.label,d.prop,d.min,d.max,d.color,true)).filter(c=>c).join('');
   const resultsRows=pts.map(p=>`<tr>
     <td style="width:11%;font-weight:700">${p.Pb.toFixed(1)}%</td>
-    <td style="width:13%;color:${p.Va>=3.5&&p.Va<=4.5?'#1a6b1a':'#c0392b'};font-weight:700">${p.Va.toFixed(1)}</td>
+    <td style="width:13%;font-weight:700">${p.Va.toFixed(1)}</td>
     <td style="width:13%">${p.VMA.toFixed(1)}</td><td style="width:13%">${p.VFA?p.VFA.toFixed(1):'—'}</td>
     <td style="width:13%">${p.avgGmb.toFixed(3)}</td>
     <td style="width:13%">${p.pGmmNini?p.pGmmNini.toFixed(1):'—'}</td>
