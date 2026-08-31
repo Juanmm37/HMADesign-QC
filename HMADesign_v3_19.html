@@ -2516,7 +2516,6 @@ function renderTBAChart(trialGrads, bands, info){
 function createTrialsFromTrials(){
   if(!ms.tbaTrials)return;
 
-  // Filter for valid and selected trials
   const validTrials=ms.tbaTrials.filter(t=>{
     const total=Object.values(t.pcts).reduce((sum,v)=>sum+(v||0),0);
     return t.selected && Math.abs(total-100)<0.01;
@@ -2524,20 +2523,21 @@ function createTrialsFromTrials(){
 
   if(!validTrials.length){alert('Select at least one trial that totals 100%');return;}
 
-  // Create workflow trials from valid selected trials
-  ms.trials=[];
-  validTrials.forEach((t,idx)=>{
-    const trial={
-      id:idx+1,
-      Pb:t.Pb,
-      notes:t.name,
-      blendPct:Object.assign({},t.pcts),
-      vol:{}
-    };
-    ms.trials.push(trial);
+  if(!ms.trials)ms.trials=[];
+  let nextId=ms.trials.length>0?Math.max(...ms.trials.map(t=>t.id))+1:1;
+
+  validTrials.forEach(t=>{
+    // Skip if an identical blend already exists in ms.trials
+    const dup=ms.trials.some(mt=>{
+      const slots=[...new Set([...Object.keys(mt.blendPct),...Object.keys(t.pcts)])];
+      return slots.every(s=>Math.abs((mt.blendPct[s]||0)-(t.pcts[s]||0))<0.001);
+    });
+    if(!dup){
+      ms.trials.push({id:nextId++,Pb:t.Pb,notes:t.name,blendPct:Object.assign({},t.pcts),vol:{},brdGb:1.030,brdVa:4.0,brdMode:'auto',brdManual:null});
+    }
   });
 
-  ms.selectedTrialIdx=0;
+  ms.selectedTrialIdx=ms.trials.length-1;
   saveDB();
   ms.step=4;
   render();
