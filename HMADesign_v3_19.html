@@ -5000,7 +5000,13 @@ function printSelected(){
   // PAGE 1: Trial summary with pass/fail coloring
   function pfTd(val,range,dec=1){
     if(val===null||val===undefined)return`<td style="text-align:center;color:#ccc">—</td>`;
-    const ok=range?val>=range[0]&&val<=range[1]:true;
+    let ok=true;
+    if(range){
+      const minV=range[0],maxV=range[1];
+      if(minV!==null&&maxV!==null)ok=(val>=minV&&val<=maxV);
+      else if(minV!==null)ok=(val>=minV);
+      else if(maxV!==null)ok=(val<=maxV);
+    }
     const col=range?(ok?'#1a6b1a':'#9c0006'):'#333';
     const bg=range?(ok?'#c6efce':'#ffc7ce'):'';
     return`<td style="text-align:center;font-weight:700;color:${col};background:${bg};padding:4px 8px">${val.toFixed(dec)}</td>`;
