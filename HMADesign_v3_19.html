@@ -259,21 +259,15 @@ document.addEventListener('keydown',e=>{
   }
   if(best){
     e.preventDefault();
-    // Block render() while navigating so DOM rebuild doesn't kill focus.
-    // Each arrow press resets the 200ms timer; when it fires, navigation is
-    // considered done and any pending render is released.
-    window._isNavigating=true;
-    if(window._navEndTimer)clearTimeout(window._navEndTimer);
-    window._navEndTimer=setTimeout(()=>{
-      window._navEndTimer=null;
-      window._isNavigating=false;
-      if(window._navRenderPending){
-        window._navRenderPending=false;
-        render();
-      }
-    },200);
-    if(best.dataset.volfield)window._volFocusAfterRender=best.dataset.volfield;
-    if(best.dataset.nmaxfield)window._nmaxFocusAfterRender=best.dataset.nmaxfield;
+    // Track where to restore focus after the scheduled DOM rebuild (same mechanism as Tab)
+    if(best.dataset.volfield) window._volFocusAfterRender=best.dataset.volfield;
+    else if(best.dataset.nmaxfield) window._nmaxFocusAfterRender=best.dataset.nmaxfield;
+    else if(best.dataset.tsrcol) window._tsrFocusAfterRender=best.dataset.tsrcol+'_'+best.dataset.tsrrow;
+    else if(best.dataset.acfield) window._acFocusAfterRender=best.dataset.acfield;
+    else if(best.hasAttribute('data-consfield')){
+      const cons=Array.from(document.querySelectorAll('[data-consfield]'));
+      window._consFocusAfterRender=cons.indexOf(best);
+    }
     best.focus();
     setTimeout(()=>{try{best.select();}catch(_){}},0);
   }
