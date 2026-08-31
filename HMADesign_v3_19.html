@@ -5385,12 +5385,7 @@ function renderS6VolSelected(){
   function pfCell(val,lo,hi,dec=1,goodHi=true){
     if(val==null||isNaN(val))return`<td style="text-align:center;color:#aaa">—</td>`;
     const s=val.toFixed(dec);
-    let pass=true;
-    if(lo!=null&&val<lo)pass=false;
-    if(hi!=null&&val>hi)pass=false;
-    if(!goodHi&&hi!=null&&val>hi)pass=false;
-    const col=pass?'#1a6b1a':'#c0392b';
-    return`<td style="text-align:center;font-weight:700;color:${col}">${s}</td>`;
+    return`<td style="text-align:center;font-weight:700">${s}</td>`;
   }
 
   return`<div class="card card-blue">
