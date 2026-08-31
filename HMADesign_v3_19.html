@@ -514,7 +514,8 @@ function setBrdProp(trialIdx, key, val){
 
 let _renderTimer = null;
 function scheduleRender(){
-  // Debounce: render 400ms after last blur, so tabbing through fields doesn't interrupt focus
+  // While arrow-key navigation is active, defer instead of scheduling a new timer
+  if(window._isNavigating){window._navRenderPending=true;return;}
   if(_renderTimer) clearTimeout(_renderTimer);
   _renderTimer = setTimeout(()=>{ _renderTimer=null; render(); }, 400);
 }
