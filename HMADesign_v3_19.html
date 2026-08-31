@@ -1457,7 +1457,7 @@ function renderS1(){
       </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
-      <div class="fg"><label>Municipality / Owner</label><input id="s1_mu" value="${i.muni||''}" placeholder="e.g. MTO Central"></div>
+      <div class="fg"><label>Municipality / Owner</label><input id="s1_mu" value="${i.muni||''}" placeholder="e.g. MTO Central" onblur="ms.info.muni=this.value" onchange="ms.info.muni=this.value"></div>
       <div class="fg"><label>Mixing Temp (°C)</label><input id="s1_tm" type="number" value="${i.tMix||165}"></div>
       <div class="fg"><label>Compaction Temp (°C)</label><input id="s1_tc2" type="number" value="${i.tComp||150}"></div>
       <div class="fg"><label>Within 100mm Surface?</label>
