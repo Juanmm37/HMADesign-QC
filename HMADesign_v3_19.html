@@ -162,24 +162,41 @@ const USERS=[
   {name:'Juan',   email:'jmunoz@capitalpaving.on.ca',  password:'Capital1', role:'admin'},
 ];
 let currentUser=null;
+function _applyLogin(user){
+  currentUser=user;
+  document.getElementById('login-overlay').style.display='none';
+  const ud=document.getElementById('user-display');
+  if(ud)ud.textContent=currentUser.name;
+}
 function signIn(){
   const email=document.getElementById('login-email').value.trim().toLowerCase();
   const password=document.getElementById('login-password').value;
   const errEl=document.getElementById('login-error');
   const user=USERS.find(u=>u.email===email&&u.password===password);
   if(!user){errEl.style.display='block';errEl.textContent='Invalid email or password.';return;}
-  currentUser=user;
-  document.getElementById('login-overlay').style.display='none';
-  const ud=document.getElementById('user-display');
-  if(ud)ud.textContent=currentUser.name;
+  try{localStorage.setItem('hmadesign_session',JSON.stringify({email:user.email}));}catch(_){}
+  _applyLogin(user);
 }
 function signOut(){
   currentUser=null;
+  try{localStorage.removeItem('hmadesign_session');}catch(_){}
   document.getElementById('login-overlay').style.display='flex';
   const ud=document.getElementById('user-display');
   if(ud)ud.textContent='';
 }
-(function(){const ll=document.getElementById('login-logo');if(ll)ll.src=LOGO_SRC;})();
+(function(){
+  const ll=document.getElementById('login-logo');
+  if(ll)ll.src=LOGO_SRC;
+  // Restore login session from localStorage
+  try{
+    const saved=localStorage.getItem('hmadesign_session');
+    if(saved){
+      const{email}=JSON.parse(saved);
+      const match=USERS.find(u=>u.email===email);
+      if(match)_applyLogin(match);
+    }
+  }catch(_){}
+})();
 
 // Capture-phase: prevent ArrowUp/Down from spinning number inputs (must fire before browser handler)
 document.addEventListener('keydown',e=>{
