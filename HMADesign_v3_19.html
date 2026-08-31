@@ -803,7 +803,7 @@ function renderDash(){
     <td>${m.pgac||'—'}</td><td>${m.muni||'—'}</td>
     <td style="text-align:center">${(m.trials||[]).length}</td>
     <td><span class="${m.status==='Complete'?'pass':m.status==='In Progress'?'pend':''}">${m.status}</span></td>
-    <td><button class="btn btn-sm btn-primary" onclick="openMix('${m.id}')">Open</button></td>
+    <td><button class="btn btn-sm btn-primary" onclick="openMix('${m.id}')">${m.status==='In Progress'?'Resume':'Open'}</button></td>
   </tr>`).join('')}</tbody></table></div>`
   :`<div style="text-align:center;padding:40px;color:#aaa;font-size:13px">No mix designs yet. <a href="#" onclick="startNewMix();return false">Create your first one.</a></div>`}`;
 }
