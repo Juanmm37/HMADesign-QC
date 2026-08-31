@@ -1416,7 +1416,7 @@ function renderS1(){
   return `<div class="card card-blue">
     <div class="st">Step 1 — Project Information</div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
-      <div class="fg"><label>Mix Number</label><input id="s1_mn" value="${i.mixNo||''}" placeholder="e.g. SP-26-05.1"></div>
+      <div class="fg"><label>Mix Number</label><input id="s1_mn" value="${i.mixNo||''}" placeholder="e.g. SP-26-05.1" onblur="ms.info.mixNo=this.value" onchange="ms.info.mixNo=this.value"></div>
       <div class="fg"><label>Mix Design Type</label>
         <select id="s1_fam" onchange="ms.info.family=this.value;ms.info.mixType='';ms.info.spec='';render()">
           <option value="">Select...</option>
