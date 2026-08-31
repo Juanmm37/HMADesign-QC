@@ -3786,12 +3786,38 @@ function saveMix(status){
   const mix={id,status,...ms.info,slots:ms.slots,trials:ms.trials,notes:ms.notes,
     selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,designPb:ms.designPb,
     propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch,nmaxBatch:ms.nmaxBatch,aggTesting:ms.aggTesting||null,
+    tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
     createdAt:ms.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
   const idx=db.mixes.findIndex(m=>m.id===id);
   if(idx>=0)db.mixes[idx]=mix;else db.mixes.push(mix);
   saveDB();alert('Saved!');
   ms={step:1,info:{},slots:{},trials:[],notes:'',innerTab:'workflow'};
   showView('records');
+}
+function saveAndExit(){
+  const id=ms.id||('mix_'+Date.now());
+  ms.id=id;
+  const mix={
+    id,status:'In Progress',step:ms.step,
+    ...ms.info,
+    slots:ms.slots,trials:ms.trials,notes:ms.notes,
+    selectedTrialIdx:ms.selectedTrialIdx,
+    acPoints:ms.acPoints,designPb:ms.designPb,
+    propertyCurves:ms.propertyCurves,
+    tsrBatch:ms.tsrBatch,nmaxBatch:ms.nmaxBatch,
+    aggTesting:ms.aggTesting||null,
+    tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
+    createdAt:ms.createdAt||new Date().toISOString(),
+    updatedAt:new Date().toISOString()
+  };
+  const idx=db.mixes.findIndex(m=>m.id===id);
+  if(idx>=0)db.mixes[idx]=mix;else db.mixes.push(mix);
+  ms={step:1,info:{},slots:{},trials:[],notes:'',innerTab:'workflow',
+    selectedTrialIdx:null,acPoints:[],designPb:null,propertyCurves:{},
+    tsrBatch:null,nmaxBatch:null,aggTesting:null};
+  try{localStorage.removeItem('capmix_session');}catch(_){}
+  saveDB();
+  showView('dashboard');
 }
 
 // ── RECORDS ──
