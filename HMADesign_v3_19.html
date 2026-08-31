@@ -3530,7 +3530,7 @@ function renderS4(){
       style="width:${w}px;padding:3px 5px;border:1px solid #d0d5dd;border-radius:4px;font-size:11px;text-align:center;font-family:inherit"
       oninput="updateVolField(${ti},'${key}',this.value)"
       onchange="updateVolField(${ti},'${key}',this.value);render()"
-      onblur="updateVolField(${ti},'${key}',this.value);render()"
+      onblur="updateVolField(${ti},'${key}',this.value);scheduleRender()"
       onkeydown="if(event.key==='Tab'){event.preventDefault();const inputs=Array.from(document.querySelectorAll('input[data-volfield]'));const idx=inputs.indexOf(this);if(idx>=0){const next=inputs[(idx+1)%inputs.length];window._volFocusAfterRender=next.dataset.volfield;next.focus()}}"
       placeholder="${ph}">`;
   }
