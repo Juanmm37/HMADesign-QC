@@ -469,12 +469,11 @@ function setBlend(trialIdx, slot, val){
 function setBrdProp(trialIdx, key, val){
   const t=ms.trials[trialIdx];
   if(!t)return;
-  if(key==='brdMode'){t.brdMode=val;}
+  if(key==='brdMode'){t.brdMode=val; if(val==='auto') t.brdManual=null;}
   else if(key==='brdManual'){t.brdManual=val===''?null:parseFloat(val)||null;}
-  else if(key==='brdGmbNdes'){t.brdGmbNdes=val===''?null:parseFloat(val)||null;}
   else if(key==='brdGb'){t.brdGb=val===''?null:parseFloat(val)||null;}
   else if(key==='brdVa'){t.brdVa=val===''?null:parseFloat(val)||null;}
-  render();
+  saveDB();render();
 }
 
 let _renderTimer = null;
