@@ -1450,8 +1450,8 @@ function renderS1(){
           ${getLibYears().map(y=>`<option value="${y}" ${(i.mixYear||CURRENT_YEAR)===y?'selected':''}>${y}${y===CURRENT_YEAR?' (current)':''}</option>`).join('')}
         </select>
       </div>
-      <div class="fg"><label>PGAC</label><input id="s1_pg" value="${i.pgac||''}" placeholder="e.g. 70-28X"></div>
-      <div class="fg"><label>PGAC Supplier</label><input id="s1_pgs" value="${i.pgacSup||''}" placeholder="e.g. McAsphalt"></div>
+      <div class="fg"><label>PGAC</label><input id="s1_pg" value="${i.pgac||''}" placeholder="e.g. 70-28X" onblur="ms.info.pgac=this.value" onchange="ms.info.pgac=this.value"></div>
+      <div class="fg"><label>PGAC Supplier</label><input id="s1_pgs" value="${i.pgacSup||''}" placeholder="e.g. McAsphalt" onblur="ms.info.pgacSup=this.value" onchange="ms.info.pgacSup=this.value"></div>
       <div class="fg"><label>Specification</label>
         <select id="s1_sp">${specOpts}</select>
       </div>
