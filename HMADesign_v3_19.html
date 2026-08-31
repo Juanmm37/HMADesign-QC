@@ -1387,7 +1387,7 @@ function renderNewMix(){
         <div style="font-size:10px;color:${n===ms.step?'#1f3864':'#aaa'};font-weight:${n===ms.step?'700':'500'};text-align:center;max-width:80px;line-height:1.2;text-decoration:${n===ms.step?'none':'underline dotted'}">${st}</div>
       </div>`;
   }).join('')}</div>`;
-  return bar+(
+  const stepContent=
     ms.step===1?renderS1():ms.step===2?renderS2():ms.step===3?renderS3TrialBlendAnalysis():
     ms.step===4?renderS3():ms.step===5?renderS4():ms.step===6?renderS5Select():
     ms.step===7?renderS6VolSelected():ms.step===8?renderS7PropCurves():
@@ -1395,7 +1395,13 @@ function renderNewMix(){
     ms.step===10?(fam2==='Marshall'?renderS10Summary():fam2==='SMA'?renderS11AggDensity():renderS9Nmax()):
     ms.step===11?(fam2==='Superpave'?renderS11AggDensity():fam2==='SMA'?renderS12Consensus():renderS10Summary()):
     ms.step===12?(fam2==='Superpave'?renderS12Consensus():renderS10Summary()):
-    renderS10Summary());
+    renderS10Summary();
+  const saveExitBtn=`<div class="print-hide" style="margin-top:18px;padding:0 2px;display:flex;justify-content:flex-end">
+    <button onclick="saveAndExit()" style="display:flex;align-items:center;gap:8px;padding:10px 22px;background:#fff;border:1.5px solid #1f3864;border-radius:7px;color:#1f3864;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
+      <span style="font-size:16px">💾</span> Save &amp; Exit to Dashboard
+    </button>
+  </div>`;
+  return bar+stepContent+saveExitBtn;
 }
 
 // ── STEP 1 ──
