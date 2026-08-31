@@ -740,7 +740,15 @@ function render(){
   if(view==='dashboard')el.innerHTML=renderDash();
   else if(view==='library')el.innerHTML=renderLib();
   else if(view==='newmix'){
-    el.innerHTML=renderNewMix();
+    try{el.innerHTML=renderNewMix();}catch(e){
+      // Property curves (step 8) loses its predict() functions when loaded from localStorage.
+      // Fall back one step so the user can re-enter via the Next button which recomputes curves.
+      console.warn('renderNewMix error on step',ms.step,e);
+      if(ms.step===8){ms.step=7;}else if(ms.step>1){ms.step--;}
+      try{el.innerHTML=renderNewMix();}catch(e2){
+        el.innerHTML='<div class="card" style="color:#c0392b;padding:20px">Error rendering step '+ms.step+'. Try navigating back.</div>';
+      }
+    }
     // Removing focused elements during DOM rebuild triggers their onblur synchronously,
     // which re-schedules a render. Cancel it immediately so the focus restoration below wins.
     if(_renderTimer){clearTimeout(_renderTimer);_renderTimer=null;}
