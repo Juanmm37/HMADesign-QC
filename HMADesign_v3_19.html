@@ -508,8 +508,6 @@ function setBrdProp(trialIdx, key, val){
 
 let _renderTimer = null;
 function scheduleRender(){
-  // While arrow-key navigation is active, defer instead of scheduling a new timer
-  if(window._isNavigating){window._navRenderPending=true;return;}
   if(_renderTimer) clearTimeout(_renderTimer);
   _renderTimer = setTimeout(()=>{ _renderTimer=null; render(); }, 400);
 }
