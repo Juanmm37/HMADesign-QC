@@ -8051,7 +8051,7 @@ function renderS10Summary(){
     </table>`:''}
     ${pts.length?`<div class="st" style="margin-bottom:8px">AC Point Results</div>
     <table class="agg-table"><thead><tr><th>Pb%</th><th>Va%</th><th>VMA%</th><th>VFA%</th><th>Gmb @Ndes</th><th>Gse</th>${fam!=='Marshall'?'<th>%Gmm Nini</th><th>%Gmm Ndes</th>':''}</tr></thead>
-    <tbody>${pts.map(p=>`<tr><td style="font-weight:700">${p.Pb.toFixed(1)}%</td><td style="color:${p.Va>=3.5&&p.Va<=4.5?'#1a6b1a':'#c0392b'};font-weight:700">${p.Va.toFixed(1)}</td><td>${p.VMA.toFixed(1)}</td><td>${p.VFA?p.VFA.toFixed(1):'—'}</td><td>${p.avgGmb.toFixed(3)}</td><td>${p.Gse?p.Gse.toFixed(3):'—'}</td>${fam!=='Marshall'?`<td>${p.pGmmNini?p.pGmmNini.toFixed(1):'—'}</td><td>${p.pGmmNdes?p.pGmmNdes.toFixed(1):'—'}</td>`:''}</tr>`).join('')}</tbody></table>`:''}
+    <tbody>${pts.map(p=>`<tr><td style="font-weight:700">${p.Pb.toFixed(1)}%</td><td style="font-weight:700">${p.Va.toFixed(1)}</td><td>${p.VMA.toFixed(1)}</td><td>${p.VFA?p.VFA.toFixed(1):'—'}</td><td>${p.avgGmb.toFixed(3)}</td><td>${p.Gse?p.Gse.toFixed(3):'—'}</td>${fam!=='Marshall'?`<td>${p.pGmmNini?p.pGmmNini.toFixed(1):'—'}</td><td>${p.pGmmNdes?p.pGmmNdes.toFixed(1):'—'}</td>`:''}</tr>`).join('')}</tbody></table>`:''}
     <div class="fg" style="margin:14px 0">
       <label>Overall Notes</label>
       <textarea class="notes-area" onchange="ms.notes=this.value" onblur="ms.notes=this.value" placeholder="Key decisions, selected design point...">${ms.notes||''}</textarea>
