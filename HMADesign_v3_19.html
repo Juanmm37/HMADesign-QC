@@ -742,6 +742,9 @@ function render(){
   else if(view==='library')el.innerHTML=renderLib();
   else if(view==='newmix'){
     el.innerHTML=renderNewMix();
+    // Removing focused elements during DOM rebuild triggers their onblur synchronously,
+    // which re-schedules a render. Cancel it immediately so the focus restoration below wins.
+    if(_renderTimer){clearTimeout(_renderTimer);_renderTimer=null;}
     // Restore focus for inputs after DOM rebuild
     setTimeout(()=>{
       if(window._nmaxFocusAfterRender){
