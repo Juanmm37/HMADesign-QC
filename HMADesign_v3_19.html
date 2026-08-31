@@ -2581,6 +2581,12 @@ function createTrialsFromTrials(){
   if(!validTrials.length){alert('Select at least one trial that totals 100%');return;}
 
   if(!ms.trials)ms.trials=[];
+  // Remove default empty trial created by initTrials() — it has no real blend data or measurements
+  ms.trials=ms.trials.filter(t=>{
+    const hasBlend=Object.values(t.blendPct||{}).some(v=>v>0);
+    const hasVol=t.vol&&Object.keys(t.vol).length>0&&Object.values(t.vol).some(v=>v!==null&&v!==undefined);
+    return hasBlend||hasVol;
+  });
   let nextId=ms.trials.length>0?Math.max(...ms.trials.map(t=>t.id))+1:1;
 
   validTrials.forEach(t=>{
