@@ -2253,8 +2253,8 @@ function renderS3TrialBlendAnalysis(){
             {label:'Blend %',key:'totalPct',fmt:(v)=>v.toFixed(1)+'%'},
             {label:'Gsb',key:'Gsb',fmt:(v)=>v.toFixed(3)},
             {label:'Gsa',key:'Gsa',fmt:(v)=>v.toFixed(3)},
-            {label:'Air Voids %',key:'Va',fmt:(v)=>v.toFixed(2)+'%'},
-            {label:'VMA %',key:'VMA',fmt:(v)=>v.toFixed(2)+'%'},
+            {label:'Air Voids %',key:'Va',fmt:(v)=>v.toFixed(1)+'%'},
+            {label:'VMA %',key:'VMA',fmt:(v)=>v.toFixed(1)+'%'},
             {label:'% Binder Replacement',key:'BR',fmt:(v)=>v.toFixed(1)+'%'}
           ].map(prop=>{
             return`<tr style="background:${prop.key==='totalPct'?'#e8f0fe':prop.key==='BR'?'#fff8e1':'#fff'}">
