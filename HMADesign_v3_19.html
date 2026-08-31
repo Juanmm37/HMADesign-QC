@@ -5930,9 +5930,10 @@ function renderS7PropCurves(){
       const offsetY=isGoingUp?14:-10;
       const textAnchor='start';
 
-      // Format based on property: 3 decimals for density (avgGmb) and MRD (Gmm), 1 decimal for others
+      // Format based on property: 3 decimals for density, always "4.0" for Va (design target), 1 decimal for others
       const decimals=(prop==='avgGmb'||prop==='Gmm')?3:1;
-      designValueText=`<text x="${designX+offsetX}" y="${designY+offsetY}" font-size="12" font-weight="700" fill="${color}" text-anchor="${textAnchor}">${designValue.toFixed(decimals)}</text>`;
+      const displayVal=(prop==='Va')?'4.0':designValue.toFixed(decimals);
+      designValueText=`<text x="${designX+offsetX}" y="${designY+offsetY}" font-size="12" font-weight="700" fill="${color}" text-anchor="${textAnchor}">${displayVal}</text>`;
     }
     return`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
       <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff"/>
