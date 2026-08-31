@@ -725,10 +725,6 @@ function updateGradationDisplay(){
 }
 
 function render(){
-  // Suppress DOM rebuild while arrow-key navigation is moving focus between cells.
-  // The handler sets _isNavigating=true and clears it 200ms after the last arrow press,
-  // then fires the pending render so computed values still update.
-  if(window._isNavigating){window._navRenderPending=true;return;}
   const el=document.getElementById('mc');
   if(view==='dashboard')el.innerHTML=renderDash();
   else if(view==='library')el.innerHTML=renderLib();
