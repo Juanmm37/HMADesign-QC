@@ -235,7 +235,18 @@ document.addEventListener('keydown',e=>{
   if(key==='ArrowLeft'||key==='ArrowRight'){
     e.preventDefault();
     const next=key==='ArrowRight'?all[idx+1]:all[idx-1];
-    if(next){next.focus();setTimeout(()=>{try{next.select();}catch(_){}},0);}
+    if(next){
+      if(next.dataset.volfield) window._volFocusAfterRender=next.dataset.volfield;
+      else if(next.dataset.nmaxfield) window._nmaxFocusAfterRender=next.dataset.nmaxfield;
+      else if(next.dataset.tsrcol) window._tsrFocusAfterRender=next.dataset.tsrcol+'_'+next.dataset.tsrrow;
+      else if(next.dataset.acfield) window._acFocusAfterRender=next.dataset.acfield;
+      else if(next.hasAttribute('data-consfield')){
+        const cons=Array.from(document.querySelectorAll('[data-consfield]'));
+        window._consFocusAfterRender=cons.indexOf(next);
+      }
+      next.focus();
+      setTimeout(()=>{try{next.select();}catch(_){}},0);
+    }
     return;
   }
 
