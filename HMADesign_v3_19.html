@@ -3851,7 +3851,7 @@ function openMix(id){
   console.log('openMix called with id:', id);
   const mix=db.mixes.find(m=>m.id===id);if(!mix){console.log('Mix not found');return;}
   console.log('Found mix, initializing ms object');
-  ms={step:5,id:mix.id,createdAt:mix.createdAt,innerTab:'workflow',
+  ms={step:mix.step||5,id:mix.id,createdAt:mix.createdAt,innerTab:'workflow',
     info:{mixNo:mix.mixNo,family:mix.family,mixType:mix.mixType,hasRAP:mix.hasRAP,traffic:mix.traffic,
       pgac:mix.pgac,pgacSup:mix.pgacSup,tMix:mix.tMix,tComp:mix.tComp,
       muni:mix.muni,spec:mix.spec,specType:mix.specType,surface:mix.surface,Gb:mix.Gb,
@@ -3860,7 +3860,8 @@ function openMix(id){
       dateCollected:mix.dateCollected||'',dateCompleted:mix.dateCompleted||''},
     slots:mix.slots||{},trials:mix.trials||[],notes:mix.notes||'',
     selectedTrialIdx:mix.selectedTrialIdx??null,acPoints:mix.acPoints||[],designPb:mix.designPb||null,
-    propertyCurves:mix.propertyCurves||{},tsrBatch:mix.tsrBatch||null,nmaxBatch:mix.nmaxBatch||null,aggTesting:mix.aggTesting||null};
+    propertyCurves:mix.propertyCurves||{},tsrBatch:mix.tsrBatch||null,nmaxBatch:mix.nmaxBatch||null,
+    aggTesting:mix.aggTesting||null,tbaTrials:mix.tbaTrials||null,tbaTargets:mix.tbaTargets||null};
   console.log('Calling showView');
   showView('newmix');
   console.log('openMix completed');
