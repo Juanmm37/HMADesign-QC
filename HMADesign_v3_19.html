@@ -447,13 +447,13 @@ async function uploadAllToCloud(){
   alert(fail===0?`All ${ok} mix design${ok>1?'s':''} uploaded! Andres and Mark can now see them.`:`${ok} uploaded, ${fail} failed.\n\nError: ${lastErr}`);
 }
 
-function showSyncBadge(msg){
+function showSyncBadge(msg,fade){
   let el=document.getElementById('sync-badge');
   if(!el)return;
   el.textContent=msg;
   el.style.opacity='1';
   clearTimeout(el._t);
-  el._t=setTimeout(()=>{el.style.opacity='0';},3000);
+  if(fade)el._t=setTimeout(()=>{el.style.opacity='0';},3000);
 }
 
 function saveDB(){
