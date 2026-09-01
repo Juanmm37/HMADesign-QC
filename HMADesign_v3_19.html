@@ -419,6 +419,27 @@ function initRealtime(){
     .subscribe();
 }
 
+async function uploadAllToCloud(){
+  if(!_sbClient){alert('Cloud not connected.');return;}
+  if(!db.mixes.length){alert('No mix designs to upload.');return;}
+  const btn=event.target;
+  btn.disabled=true;btn.textContent='Uploading…';
+  let ok=0,fail=0;
+  for(const mix of db.mixes){
+    try{
+      await _sbClient.from('mix_designs').upsert({
+        id:mix.id,data:mix,
+        updated_at:mix.updatedAt||new Date().toISOString(),
+        updated_by:currentUser?.email||'unknown'
+      },{onConflict:'id'});
+      ok++;
+    }catch(e){fail++;console.warn('Failed to upload mix',mix.id,e);}
+  }
+  btn.disabled=false;btn.textContent='☁ Upload All to Cloud';
+  alert(fail===0?`All ${ok} mix design${ok>1?'s':''} uploaded successfully! Andres and Mark can now see them.`:`${ok} uploaded, ${fail} failed. Check console for details.`);
+  render();
+}
+
 function showSyncBadge(msg){
   let el=document.getElementById('sync-badge');
   if(!el)return;
