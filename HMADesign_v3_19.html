@@ -5862,7 +5862,7 @@ function renderS7PropCurves(){
 
     // Calculate predicted value at design Pb
     let designValue=null;
-    if(designPb&&curve){
+    if(designPb&&curve&&typeof curve.predict==='function'){
       designValue=curve.predict(designPb);
     }
 
