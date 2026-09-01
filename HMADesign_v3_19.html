@@ -910,6 +910,7 @@ function renderDash(){
       <button class="btn btn-primary" onclick="startNewMix()">+ New Mix Design</button>
       <button class="btn" onclick="showView('library')">Aggregate Library</button>
       <button class="btn" onclick="showView('records')">All Records</button>
+      ${db.mixes.length?`<button class="btn" style="background:#1a7a1a;color:#fff;border:none" onclick="uploadAllToCloud()">☁ Upload All to Cloud</button>`:''}
     </div>
   </div>
   ${recent.length?`<div class="card"><div class="st">Recent Mix Designs</div>
