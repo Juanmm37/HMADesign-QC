@@ -8036,7 +8036,7 @@ function renderS10Summary(){
           const regType=ms.propCurvesRegType||'linear';
           const predAt=(prop,pb)=>{
             const m=pc[prop]&&(pc[prop][regType]||pc[prop].linear);
-            return m?m.predict(pb):null;
+            return (m&&typeof m.predict==='function')?m.predict(pb):null;
           };
           const Va=predAt('Va',designPb),VMA=predAt('VMA',designPb),VFA=predAt('VFA',designPb);
           return`<div class="mc"><div class="ml">Design Pb</div><div class="mv" style="font-size:24px;color:#f0b429">${designPb.toFixed(1)}%</div></div>
