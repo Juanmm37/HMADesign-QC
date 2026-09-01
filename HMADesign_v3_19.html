@@ -2596,7 +2596,7 @@ function createTrialsFromTrials(){
       return slots.every(s=>Math.abs((mt.blendPct[s]||0)-(t.pcts[s]||0))<0.001);
     });
     if(!dup){
-      ms.trials.push({id:nextId++,Pb:t.Pb,notes:t.name,blendPct:Object.assign({},t.pcts),vol:{},brdGb:1.030,brdVa:4.0,brdMode:'auto',brdManual:null});
+      ms.trials.push({id:nextId++,Pb:t.Pb,notes:'',blendPct:Object.assign({},t.pcts),vol:{},brdGb:1.030,brdVa:4.0,brdMode:'auto',brdManual:null});
     }
   });
 
