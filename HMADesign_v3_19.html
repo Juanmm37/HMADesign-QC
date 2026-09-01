@@ -377,7 +377,7 @@ let _autoSyncTimer=null;
 async function cloudSaveMix(mix){
   if(!mix||!mix.id)return;
   try{
-    const res=await fetch(SB_URL+'/rest/v1/mix_designs',{
+    const res=await fetch(SB_URL+'/rest/v1/hma_design_mixes',{
       method:'POST',headers:SB_HEADERS,
       body:JSON.stringify({id:mix.id,data:mix,updated_at:new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
     });
@@ -388,7 +388,7 @@ async function cloudSaveMix(mix){
 
 async function cloudLoadMixes(){
   try{
-    const res=await fetch(SB_URL+'/rest/v1/mix_designs?select=*',{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    const res=await fetch(SB_URL+'/rest/v1/hma_design_mixes?select=*',{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
     if(!res.ok)return;
     const rows=await res.json();
     if(!Array.isArray(rows))return;
@@ -438,7 +438,7 @@ async function uploadAllToCloud(){
   let ok=0,fail=0,lastErr='';
   for(const mix of db.mixes){
     try{
-      const res=await fetch(SB_URL+'/rest/v1/mix_designs',{
+      const res=await fetch(SB_URL+'/rest/v1/hma_design_mixes',{
         method:'POST',headers:SB_HEADERS,
         body:JSON.stringify({id:mix.id,data:mix,updated_at:mix.updatedAt||new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
       });
