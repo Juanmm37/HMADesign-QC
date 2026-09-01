@@ -1404,12 +1404,19 @@ function renderNewMix(){
     ms.step===11?(fam2==='Superpave'?renderS11AggDensity():fam2==='SMA'?renderS12Consensus():renderS10Summary()):
     ms.step===12?(fam2==='Superpave'?renderS12Consensus():renderS10Summary()):
     renderS10Summary();
+  const i=ms.info;
+  const mixInfoBar=(i.mixNo||i.mixType||i.pgac||i.traffic)?`<div class="print-hide" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 12px;background:#f0f4fb;border:1px solid #dde3ef;border-radius:6px;margin-bottom:8px;font-size:11px;color:#1f3864">
+    ${i.mixNo?`<span style="font-weight:800">${i.mixNo}</span><span style="color:#c5d3ef">|</span>`:''}
+    ${i.mixType?`<span>${i.mixType}${i.hasRAP==='Yes'?' + RAP':''}</span><span style="color:#c5d3ef">|</span>`:''}
+    ${i.traffic?`<span>Cat. ${i.traffic}</span><span style="color:#c5d3ef">|</span>`:''}
+    ${i.pgac?`<span>PGAC: <strong>${i.pgac}</strong></span>`:''}
+  </div>`:'';
   const saveExitBtn=`<div class="print-hide" style="margin-top:18px;padding:0 2px;display:flex;justify-content:flex-end">
     <button onclick="saveAndExit()" style="display:flex;align-items:center;gap:8px;padding:10px 22px;background:#fff;border:1.5px solid #1f3864;border-radius:7px;color:#1f3864;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
       <span style="font-size:16px">💾</span> Save &amp; Exit to Dashboard
     </button>
   </div>`;
-  return bar+stepContent+saveExitBtn;
+  return bar+mixInfoBar+stepContent+saveExitBtn;
 }
 
 // ── STEP 1 ──
