@@ -6946,12 +6946,11 @@ function renderS11AggDensity(){
   if(at.rapGsb===null&&at.rap1Gsb!=null)at.rapGsb=at.rap1Gsb;
 
   // ── Compute T29 (% passing 4.75mm, all) and T30 (% passing 4.75mm, virgin only) ──
-  // Use stockpile % (dry aggregate basis) — matches Step 6 Stockpile row and Excel row 18
-  const _stockpilePcts=selTrial?calcStockpilePercentages(selTrial):{};
+  // Use blendPct directly — matches calcBlendProps / blend gradation table shown in Step 6
   let T29=0,T30=0;
   if(selTrial){
     Object.keys(selTrial.blendPct||{}).forEach(s=>{
-      const pct=_stockpilePcts[s]||0; if(!pct||!slots[s])return;
+      const pct=parseFloat(selTrial.blendPct[s])||0; if(!pct||!slots[s])return;
       const agg=slots[s];
       const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null
         ?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
