@@ -733,6 +733,52 @@ function updateGradationDisplay(){
     const innerEnd=newChart.lastIndexOf('</div>');
     chartEl.innerHTML=newChart.substring(innerStart,innerEnd);
   }
+
+  // Update Trial Properties table dynamically
+  const propsEl=document.querySelector('#s3_trialProps tbody');
+  if(propsEl){
+    const propDefs=[
+      {label:'Blend %',key:'totalPct'},
+      {label:'Gsb',key:'Gsb'},
+      {label:'Gsa',key:'Gsa'},
+      {label:'Air Voids %',key:'Va'},
+      {label:'VMA %',key:'VMA'},
+      {label:'% Binder Replacement',key:'BR'}
+    ];
+    let html='';
+    propDefs.forEach(prop=>{
+      const bg=prop.key==='totalPct'?'#e8f0fe':prop.key==='BR'?'#fff8e1':'#fff';
+      html+=`<tr style="background:${bg}"><td style="padding:6px 8px;font-weight:600;color:#1f3864">${prop.label}</td>`;
+      trialGrads.forEach((tg,bi)=>{
+        let val=null,color='#1f3864';
+        if(prop.key==='totalPct'){
+          val=tg.totalPct;
+        } else if(prop.key==='Gsb'){
+          let wSum=0,pSum=0;
+          aggs.forEach(s=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const g=eff(a,'Gsb');if(g!==null&&pct>0){wSum+=g*pct;pSum+=pct;}});
+          val=pSum>0?wSum/pSum:null;
+        } else if(prop.key==='Gsa'){
+          let wSum=0,pSum=0;
+          aggs.forEach(s=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const g=eff(a,'Gsa');if(g!==null&&pct>0){wSum+=g*pct;pSum+=pct;}});
+          val=pSum>0?wSum/pSum:null;
+        } else if(prop.key==='Va'||prop.key==='VMA'){
+          const wt=ms.trials&&ms.trials[bi];
+          if(wt&&wt.vol){const{blendGsb}=calcBlendProps(wt);const r=calcVol(wt,ms.info,blendGsb);val=r?r[prop.key]:null;}
+        } else if(prop.key==='BR'){
+          val=calcBinderReplacement(ms.tbaTrials[bi].pcts,ms.tbaTrials[bi].Pb);
+          if(val!==null&&val>15)color='#c0392b';
+        }
+        let disp='—';
+        if(val!==null&&!isNaN(val)){
+          if(prop.key==='totalPct'||prop.key==='Va'||prop.key==='VMA'||prop.key==='BR') disp=val.toFixed(1)+'%';
+          else disp=val.toFixed(3);
+        }
+        html+=`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${color}">${disp}</td>`;
+      });
+      html+='</tr>';
+    });
+    propsEl.innerHTML=html;
+  }
 }
 
 function render(){
