@@ -1525,7 +1525,7 @@ function renderAggDetail(a, showEdit=false){
   </div>`;
 }
 
-function startNewMix(){ms={step:1,info:{},slots:{},trials:[],notes:'',innerTab:'workflow',selectedTrialIdx:null,acPoints:[],designPb:null,propertyCurves:{},tsrBatch:null,nmaxBatch:null,aggTesting:null};_showCardsIdx=null;targetGrad={};targetName='Target';showView('newmix');}
+function startNewMix(){ms={step:1,id:'mix_'+Date.now(),createdAt:new Date().toISOString(),info:{},slots:{},trials:[],notes:'',innerTab:'workflow',selectedTrialIdx:null,acPoints:[],designPb:null,propertyCurves:{},tsrBatch:null,nmaxBatch:null,aggTesting:null};_showCardsIdx=null;targetGrad={};targetName='Target';showView('newmix');}
 function renderNewMix(){
   console.log('renderNewMix called, step:', ms.step);
   const fam2=ms.info.family||'Superpave';
