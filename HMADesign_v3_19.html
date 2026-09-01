@@ -168,6 +168,8 @@ function _applyLogin(user){
   document.getElementById('login-overlay').style.display='none';
   const ud=document.getElementById('user-display');
   if(ud)ud.textContent=currentUser.name;
+  cloudLoadMixes();
+  initRealtime();
 }
 function signIn(){
   const email=document.getElementById('login-email').value.trim().toLowerCase();
