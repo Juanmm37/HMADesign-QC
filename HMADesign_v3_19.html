@@ -718,6 +718,7 @@ function updateBlendDisplay(){
 function updateVolField(ti, key, val){
   if(!ms.trials[ti].vol)ms.trials[ti].vol={};
   ms.trials[ti].vol[key]=val?parseFloat(val):null;
+  saveDB();
 }
 
 function showView(v){
