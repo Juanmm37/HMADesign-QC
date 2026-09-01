@@ -1409,7 +1409,8 @@ function renderNewMix(){
     ${i.mixNo?`<span style="font-weight:800">${i.mixNo}</span><span style="color:#c5d3ef">|</span>`:''}
     ${i.mixType?`<span>${i.mixType}${i.hasRAP==='Yes'?' + RAP':''}</span><span style="color:#c5d3ef">|</span>`:''}
     ${i.traffic?`<span>Cat. ${i.traffic}</span><span style="color:#c5d3ef">|</span>`:''}
-    ${i.pgac?`<span>PGAC: <strong>${i.pgac}</strong></span>`:''}
+    ${i.pgac?`<span>PGAC: <strong>${i.pgac}</strong></span><span style="color:#c5d3ef">|</span>`:''}
+    ${i.spec?`<span>${i.spec}</span>`:''}
   </div>`:'';
   const saveExitBtn=`<div class="print-hide" style="margin-top:18px;padding:0 2px;display:flex;justify-content:flex-end">
     <button onclick="saveAndExit()" style="display:flex;align-items:center;gap:8px;padding:10px 22px;background:#fff;border:1.5px solid #1f3864;border-radius:7px;color:#1f3864;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
