@@ -452,6 +452,7 @@ function showSyncBadge(msg,fade){
   if(!el)return;
   el.textContent=msg;
   el.style.opacity='1';
+  el.style.color=msg.startsWith('✓')?'#1a7a1a':msg.startsWith('⚠')?'#c0392b':'#888';
   clearTimeout(el._t);
   if(fade)el._t=setTimeout(()=>{el.style.opacity='0';},3000);
 }
