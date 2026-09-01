@@ -365,6 +365,66 @@ let _showCardsIdx=null; // persists across renders
 let targetGrad={},targetName='Target';
 const CHART_COLORS=['#1f3864','#e65100','#1a7a1a','#6b1a9a','#b36000','#0277bd','#880e4f'];
 
+// ── SUPABASE SYNC ──
+const SB_URL='https://gndkcdfvntmixdvpgbah.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZGtjZGZ2bnRtaXhkdnBnYmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyNTc0NjksImV4cCI6MjA5OTgzMzQ2OX0.DhF77avZvZCB1Y0yr-oF9w4nmoOQ1k9orzxYSS5gjVw';
+const _sbClient=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
+let _sbChannel=null;
+
+async function cloudSaveMix(mix){
+  if(!_sbClient)return;
+  try{
+    await _sbClient.from('mix_designs').upsert({
+      id:mix.id,
+      data:mix,
+      updated_at:new Date().toISOString(),
+      updated_by:currentUser?.email||'unknown'
+    },{onConflict:'id'});
+    showSyncBadge('✓ Synced');
+  }catch(e){console.warn('Cloud save failed:',e);showSyncBadge('⚠ Offline');}
+}
+
+async function cloudLoadMixes(){
+  if(!_sbClient)return;
+  try{
+    const{data,error}=await _sbClient.from('mix_designs').select('*');
+    if(error||!data)return;
+    data.forEach(row=>{
+      const mix=row.data;
+      if(!mix||!mix.id)return;
+      const idx=db.mixes.findIndex(m=>m.id===mix.id);
+      if(idx>=0){
+        const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
+        const cloudTs=new Date(row.updated_at||0).getTime();
+        if(cloudTs>localTs)db.mixes[idx]=mix;
+      }else{
+        db.mixes.push(mix);
+      }
+    });
+    localStorage.setItem('capmix_v4',JSON.stringify(db));
+    render();
+  }catch(e){console.warn('Cloud load failed:',e);}
+}
+
+function initRealtime(){
+  if(!_sbClient||_sbChannel)return;
+  _sbChannel=_sbClient.channel('mix_designs_changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:'mix_designs'},payload=>{
+      if(payload.new&&payload.new.updated_by===currentUser?.email)return;
+      cloudLoadMixes();
+    })
+    .subscribe();
+}
+
+function showSyncBadge(msg){
+  let el=document.getElementById('sync-badge');
+  if(!el)return;
+  el.textContent=msg;
+  el.style.opacity='1';
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.style.opacity='0';},3000);
+}
+
 function saveDB(){
   localStorage.setItem('capmix_v4',JSON.stringify(db));
   try{localStorage.setItem('capmix_session',JSON.stringify({ms,view}));}catch(e){}
