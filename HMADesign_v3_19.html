@@ -442,7 +442,7 @@ async function uploadAllToCloud(){
         method:'POST',headers:SB_HEADERS,
         body:JSON.stringify({id:mix.id,data:mix,updated_at:mix.updatedAt||new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
       });
-      if(res.ok)ok++;else{fail++;const t=await res.text();console.warn('Upload failed:',res.status,t);}
+      if(res.ok){ok++;}else{fail++;const t=await res.text();console.warn('Upload failed ['+res.status+']:',t);lastErr=res.status+': '+t.substring(0,120);}
     }catch(e){fail++;console.warn('Upload error:',e);}
   }
   btn.disabled=false;btn.textContent='☁ Upload All to Cloud';
