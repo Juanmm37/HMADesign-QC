@@ -435,18 +435,18 @@ async function uploadAllToCloud(){
   if(!db.mixes.length){alert('No mix designs to upload.');return;}
   const btn=event.target;
   btn.disabled=true;btn.textContent='Uploading…';
-  let ok=0,fail=0;
+  let ok=0,fail=0,lastErr='';
   for(const mix of db.mixes){
     try{
       const res=await fetch(SB_URL+'/rest/v1/mix_designs',{
         method:'POST',headers:SB_HEADERS,
         body:JSON.stringify({id:mix.id,data:mix,updated_at:mix.updatedAt||new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
       });
-      if(res.ok){ok++;}else{fail++;const t=await res.text();console.warn('Upload failed ['+res.status+']:',t);lastErr=res.status+': '+t.substring(0,120);}
-    }catch(e){fail++;console.warn('Upload error:',e);}
+      if(res.ok){ok++;}else{fail++;const t=await res.text();console.warn('Upload failed ['+res.status+']:',t);lastErr=res.status+': '+t.substring(0,200);}
+    }catch(e){fail++;lastErr=String(e);console.warn('Upload error:',e);}
   }
   btn.disabled=false;btn.textContent='☁ Upload All to Cloud';
-  alert(fail===0?`All ${ok} mix design${ok>1?'s':''} uploaded! Andres and Mark can now see them.`:`${ok} uploaded, ${fail} failed — check browser console.`);
+  alert(fail===0?`All ${ok} mix design${ok>1?'s':''} uploaded! Andres and Mark can now see them.`:`${ok} uploaded, ${fail} failed.\n\nError: ${lastErr}`);
 }
 
 function showSyncBadge(msg){
