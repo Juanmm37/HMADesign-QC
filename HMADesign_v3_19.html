@@ -2326,9 +2326,11 @@ function renderS3TrialBlendAnalysis(){
                 if(prop.key==='totalPct'){
                   val=tg.totalPct;
                 } else if(prop.key==='Gsb'){
-                  val=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const gsb=eff(a,'Gsb');return sum+(gsb!==null?gsb*pct:0);},0);
+                  let wS=0,pS=0;aggs.forEach(s=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const g=eff(a,'Gsb');if(g!==null&&pct>0){wS+=g*pct;pS+=pct;}});
+                  val=pS>0?wS/pS:null;
                 } else if(prop.key==='Gsa'){
-                  val=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const gsa=eff(a,'Gsa');return sum+(gsa!==null?gsa*pct:0);},0);
+                  let wS=0,pS=0;aggs.forEach(s=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const g=eff(a,'Gsa');if(g!==null&&pct>0){wS+=g*pct;pS+=pct;}});
+                  val=pS>0?wS/pS:null;
                 } else if(prop.key==='Va'||prop.key==='VMA'){
                   const workflowTrial=ms.trials&&ms.trials[bi];
                   if(workflowTrial&&workflowTrial.vol){
