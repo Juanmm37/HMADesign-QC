@@ -3916,7 +3916,7 @@ function saveMix(status){
     createdAt:ms.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
   const idx=db.mixes.findIndex(m=>m.id===id);
   if(idx>=0)db.mixes[idx]=mix;else db.mixes.push(mix);
-  saveDB();alert('Saved!');
+  saveDB();cloudSaveMix(mix);alert('Saved!');
   ms={step:1,info:{},slots:{},trials:[],notes:'',innerTab:'workflow'};
   showView('records');
 }
