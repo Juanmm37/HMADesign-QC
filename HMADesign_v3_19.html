@@ -462,6 +462,7 @@ function saveDB(){
   // Auto-sync active mix to cloud (debounced 15s) while working
   if(view==='newmix'&&ms&&ms.id){
     if(_autoSyncTimer)clearTimeout(_autoSyncTimer);
+    showSyncBadge('⟳ Saving...');
     _autoSyncTimer=setTimeout(autoSyncActiveMix,15000);
   }
 }
