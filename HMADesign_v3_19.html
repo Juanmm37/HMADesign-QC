@@ -368,76 +368,86 @@ let _showCardsIdx=null; // persists across renders
 let targetGrad={},targetName='Target';
 const CHART_COLORS=['#1f3864','#e65100','#1a7a1a','#6b1a9a','#b36000','#0277bd','#880e4f'];
 
-// ── SUPABASE SYNC ──
+// ── SUPABASE SYNC (direct fetch — no SDK dependency) ──
 const SB_URL='https://gndkcdfvntmixdvpgbah.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZGtjZGZ2bnRtaXhkdnBnYmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyNTc0NjksImV4cCI6MjA5OTgzMzQ2OX0.DhF77avZvZCB1Y0yr-oF9w4nmoOQ1k9orzxYSS5gjVw';
-const _sbClient=window.supabase?window.supabase.createClient(SB_URL,SB_KEY):null;
-let _sbChannel=null;
+const SB_HEADERS={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
+let _pollTimer=null;
+let _autoSyncTimer=null;
 
 async function cloudSaveMix(mix){
-  if(!_sbClient)return;
+  if(!mix||!mix.id)return;
   try{
-    await _sbClient.from('mix_designs').upsert({
-      id:mix.id,
-      data:mix,
-      updated_at:new Date().toISOString(),
-      updated_by:currentUser?.email||'unknown'
-    },{onConflict:'id'});
+    const res=await fetch(SB_URL+'/rest/v1/mix_designs',{
+      method:'POST',headers:SB_HEADERS,
+      body:JSON.stringify({id:mix.id,data:mix,updated_at:new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
+    });
+    if(!res.ok){const t=await res.text();console.warn('Cloud save error:',res.status,t);showSyncBadge('⚠ Sync error');return;}
     showSyncBadge('✓ Synced');
   }catch(e){console.warn('Cloud save failed:',e);showSyncBadge('⚠ Offline');}
 }
 
 async function cloudLoadMixes(){
-  if(!_sbClient)return;
   try{
-    const{data,error}=await _sbClient.from('mix_designs').select('*');
-    if(error||!data)return;
-    data.forEach(row=>{
+    const res=await fetch(SB_URL+'/rest/v1/mix_designs?select=*',{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    if(!res.ok)return;
+    const rows=await res.json();
+    if(!Array.isArray(rows))return;
+    let changed=false;
+    rows.forEach(row=>{
       const mix=row.data;
       if(!mix||!mix.id)return;
       const idx=db.mixes.findIndex(m=>m.id===mix.id);
       if(idx>=0){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
         const cloudTs=new Date(row.updated_at||0).getTime();
-        if(cloudTs>localTs)db.mixes[idx]=mix;
-      }else{
-        db.mixes.push(mix);
-      }
+        if(cloudTs>localTs){db.mixes[idx]=mix;changed=true;}
+      }else{db.mixes.push(mix);changed=true;}
     });
-    localStorage.setItem('capmix_v4',JSON.stringify(db));
-    render();
+    if(changed){localStorage.setItem('capmix_v4',JSON.stringify(db));if(view==='dashboard'||view==='records')render();}
   }catch(e){console.warn('Cloud load failed:',e);}
 }
 
 function initRealtime(){
-  if(!_sbClient||_sbChannel)return;
-  _sbChannel=_sbClient.channel('mix_designs_changes')
-    .on('postgres_changes',{event:'*',schema:'public',table:'mix_designs'},payload=>{
-      if(payload.new&&payload.new.updated_by===currentUser?.email)return;
-      cloudLoadMixes();
-    })
-    .subscribe();
+  // Poll every 20 seconds for changes from other users
+  if(_pollTimer)clearInterval(_pollTimer);
+  _pollTimer=setInterval(cloudLoadMixes,20000);
+  cloudLoadMixes();
+}
+
+function autoSyncActiveMix(){
+  if(!ms||!ms.id||view!=='newmix')return;
+  const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
+    slots:ms.slots,trials:ms.trials,notes:ms.notes,
+    selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
+    designPb:ms.designPb,propertyCurves:ms.propertyCurves,
+    tsrBatch:ms.tsrBatch,nmaxBatch:ms.nmaxBatch,
+    aggTesting:ms.aggTesting||null,tbaTrials:ms.tbaTrials||null,
+    tbaTargets:ms.tbaTargets||null,
+    createdAt:ms.createdAt||new Date().toISOString(),
+    updatedAt:new Date().toISOString()};
+  db.mixes=db.mixes.filter(m=>m.id!==mix.id);
+  db.mixes.push(mix);
+  localStorage.setItem('capmix_v4',JSON.stringify(db));
+  cloudSaveMix(mix);
 }
 
 async function uploadAllToCloud(){
-  if(!_sbClient){alert('Cloud not connected.');return;}
   if(!db.mixes.length){alert('No mix designs to upload.');return;}
   const btn=event.target;
   btn.disabled=true;btn.textContent='Uploading…';
   let ok=0,fail=0;
   for(const mix of db.mixes){
     try{
-      await _sbClient.from('mix_designs').upsert({
-        id:mix.id,data:mix,
-        updated_at:mix.updatedAt||new Date().toISOString(),
-        updated_by:currentUser?.email||'unknown'
-      },{onConflict:'id'});
-      ok++;
-    }catch(e){fail++;console.warn('Failed to upload mix',mix.id,e);}
+      const res=await fetch(SB_URL+'/rest/v1/mix_designs',{
+        method:'POST',headers:SB_HEADERS,
+        body:JSON.stringify({id:mix.id,data:mix,updated_at:mix.updatedAt||new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
+      });
+      if(res.ok)ok++;else{fail++;const t=await res.text();console.warn('Upload failed:',res.status,t);}
+    }catch(e){fail++;console.warn('Upload error:',e);}
   }
   btn.disabled=false;btn.textContent='☁ Upload All to Cloud';
-  alert(fail===0?`All ${ok} mix design${ok>1?'s':''} uploaded successfully! Andres and Mark can now see them.`:`${ok} uploaded, ${fail} failed. Check console for details.`);
-  render();
+  alert(fail===0?`All ${ok} mix design${ok>1?'s':''} uploaded! Andres and Mark can now see them.`:`${ok} uploaded, ${fail} failed — check browser console.`);
 }
 
 function showSyncBadge(msg){
