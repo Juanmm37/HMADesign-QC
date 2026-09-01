@@ -3942,7 +3942,7 @@ function saveAndExit(){
     selectedTrialIdx:null,acPoints:[],designPb:null,propertyCurves:{},
     tsrBatch:null,nmaxBatch:null,aggTesting:null};
   try{localStorage.removeItem('capmix_session');}catch(_){}
-  saveDB();
+  saveDB();cloudSaveMix(mix);
   showView('dashboard');
 }
 
