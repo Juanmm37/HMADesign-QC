@@ -873,7 +873,7 @@ function updateGradationDisplay(){
         }
         let disp='—';
         if(val!==null&&!isNaN(val)){
-          if(prop.key==='totalPct'||prop.key==='Va'||prop.key==='VMA'||prop.key==='BR') disp=val.toFixed(1)+'%';
+          if(prop.key==='totalPct'||prop.key==='Va'||prop.key==='VMA'||prop.key==='BR'||prop.key==='Pb') disp=val.toFixed(1)+'%';
           else disp=val.toFixed(3);
         }
         html+=`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${color}">${disp}</td>`;
