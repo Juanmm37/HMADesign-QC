@@ -876,6 +876,7 @@ function updateGradationDisplay(){
         if(val!==null&&!isNaN(val)){
           if(prop.key==='totalPct'||prop.key==='Va'||prop.key==='VMA'||prop.key==='BR'||prop.key==='Pb') disp=val.toFixed(1)+'%';
           else disp=val.toFixed(3);
+          if(prop.key==='Pb'&&val>15) disp+=' ⚠';
         }
         html+=`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${color}">${disp}</td>`;
       });
