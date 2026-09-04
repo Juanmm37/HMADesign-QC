@@ -2190,7 +2190,7 @@ function renderS3TrialBlendAnalysis(){
   const info=ms.info,mt=info.mixType||'',fam=info.family||'Superpave',bands=getBands(info);
   const aggs=SLOTS.filter(s=>ms.slots[s]);
 
-  if(!aggs.length)return`<div class="card"><div style="text-align:center;padding:30px;color:#aaa">No aggregates selected. Go back to Step 2.</div></div>`;
+  if(!aggs.length)return`<div class="card card-blue"><div class="st">Step 3 — Trial Blend Analysis</div><div class="wbox">No aggregates selected. Go back to Step 2 to add aggregates.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=2;render()">← Back: Aggregates</button></div></div>`;
 
   // Initialize tbaTrials if needed (renamed from tbaBlends for consistency with workflow terminology)
   if(!ms.tbaTrials)ms.tbaTrials=[
