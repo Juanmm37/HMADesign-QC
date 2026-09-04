@@ -2784,9 +2784,10 @@ function addTrial(){
   const newTrialNum=ms.tbaTrials.length+1;
   const lastTrialPb=ms.tbaTrials.length>0?ms.tbaTrials[ms.tbaTrials.length-1].Pb:5.0;
 
+  const lastPcts=ms.tbaTrials.length>0?Object.assign({},ms.tbaTrials[ms.tbaTrials.length-1].pcts):{};
   ms.tbaTrials.push({
     name:`Trial ${newTrialNum}`,
-    pcts:{},
+    pcts:lastPcts,
     Pb:lastTrialPb,
     selected:true
   });
