@@ -856,6 +856,7 @@ function updateGradationDisplay(){
           val=tg.totalPct;
         } else if(prop.key==='Pb'){
           val=ms.tbaTrials[bi].Pb||5.0;
+          if(val>15)color='#c0392b';
         } else if(prop.key==='Gsb'){
           let wSum=0,pSum=0;
           aggs.forEach(s=>{const a=getAgg(ms.slots[s]);const pct=(ms.tbaTrials[bi].pcts[s]||0)/100;const g=eff(a,'Gsb');if(g!==null&&pct>0){wSum+=g*pct;pSum+=pct;}});
