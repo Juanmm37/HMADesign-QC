@@ -6424,7 +6424,7 @@ function renderS8TSR(){
   if(fam==='Marshall')return renderS10Summary();
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
   const designPb=ms.designPb;
-  if(!selTrial||!designPb)return`<div class="card"><div class="wbox">Set design Pb in Step 8 first.</div></div>`;
+  if(!selTrial||!designPb)return`<div class="card card-blue"><div class="st">Step 9 — TSR Batching</div><div class="wbox">Set design Pb in Step 8 (Property Curves) first, then come back here.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=8;render()">← Back</button><button class="btn btn-primary" onclick="ms.step=10;render()">Next: ${fam==='SMA'?'Agg Densities':'Nmax'} →</button></div></div>`;
 
   // Initialize tsrBatch if needed
   if(!ms.tsrBatch)ms.tsrBatch={mode:'automatic',offset:50};
