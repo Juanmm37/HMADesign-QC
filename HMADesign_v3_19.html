@@ -6000,7 +6000,7 @@ function renderS7PropCurves(){
   const fam=ms.info.family||'Superpave',pc=ms.propertyCurves||{},pts=pc.pts||[];
   const designPb=ms.designPb;
   const regType=ms.propCurvesRegType||'linear';
-  if(!pts.length)return`<div class="card"><div class="wbox">No volumetric data yet. Complete Step 7 first.</div></div>`;
+  if(!pts.length)return`<div class="card card-blue"><div class="st">Step 8 — Property Curves</div><div class="wbox">No volumetric data yet. Complete Step 7 (Selected Volumetrics) first, then click Next: Property Curves.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=7;render()">← Back: Selected Volumetrics</button><button class="btn btn-primary" onclick="ms.step=9;render()">Next: TSR Batching →</button></div></div>`;
   const W=360,H=240,PL=40,PR=12,PT=20,PB=36,cW=W-PL-PR,cH=H-PT-PB;
   const minPb=Math.min(...pts.map(p=>p.Pb))-0.3,maxPb=Math.max(...pts.map(p=>p.Pb))+0.3;
   const xOf=pb=>PL+(pb-minPb)/(maxPb-minPb)*cW;
