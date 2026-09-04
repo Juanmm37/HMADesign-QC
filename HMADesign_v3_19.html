@@ -2289,9 +2289,9 @@ function renderS3TrialBlendAnalysis(){
             ${ms.tbaTrials.map((b,bi)=>`<th style="padding:4px 8px;text-align:center">
               <input type="number" min="0" max="20" step="0.1" value="${(b.Pb||5.0).toFixed(1)}"
                 style="width:60px;padding:2px 3px;border:1px solid #fff;border-radius:2px;font-size:10px;text-align:center;background:#3a5a8c;color:#fff"
-                onchange="if(ms.tbaTrials)ms.tbaTrials[${bi}].Pb=parseFloat(this.value)||5.0;saveDB()"
+                onchange="if(ms.tbaTrials){let v=parseFloat(this.value);if(!v||v<0.1)v=5.0;if(v>15){alert('Pb cannot exceed 15%. Did you mean '+( v/10).toFixed(1)+'%?');this.value=(v/10).toFixed(1);v=v/10;}ms.tbaTrials[${bi}].Pb=Math.round(v*10)/10;saveDB();}"
                 onkeydown="if(event.key==='Tab'){event.preventDefault();}"
-                onblur="if(ms.tbaTrials)ms.tbaTrials[${bi}].Pb=parseFloat(this.value)||5.0;saveDB();">
+                onblur="if(ms.tbaTrials){let v=parseFloat(this.value);if(!v||v<0.1)v=5.0;if(v>15){alert('Pb cannot exceed 15%. Did you mean '+(v/10).toFixed(1)+'%?');this.value=(v/10).toFixed(1);v=v/10;}ms.tbaTrials[${bi}].Pb=Math.round(v*10)/10;saveDB();}">
             </th>`).join('')}
             <th style="padding:4px 8px;text-align:center"></th>
           </tr>
