@@ -5978,8 +5978,26 @@ function calcDesignPb(){
   }
 }
 
+function rehydratePropertyCurves(){
+  const pc=ms.propertyCurves;
+  if(!pc)return;
+  ['Va','VMA','VFA','pGmmNini','avgGmb','pGmmNdes','DP','Gmm'].forEach(prop=>{
+    const d=pc[prop];if(!d)return;
+    if(d.linear&&typeof d.linear.predict!=='function'&&d.linear.m!==undefined){
+      const{m,b}=d.linear;d.linear.predict=x=>m*x+b;
+    }
+    if(d.poly&&typeof d.poly.predict!=='function'&&Array.isArray(d.poly.coefs)){
+      const coefs=d.poly.coefs;
+      const pts2=(pc.pts||[]).map(p=>p.Pb);
+      const xMin=Math.min(...pts2),xMax=Math.max(...pts2),xRange=xMax-xMin||1;
+      d.poly.predict=x=>{const xn=(x-xMin)/xRange;return coefs.reduce((s,c,i)=>s+c*Math.pow(xn,i),0);};
+    }
+  });
+}
+
 function renderS7PropCurves(){
-  const fam=ms.info.family||'Superpave',pc=ms.propertyCurves,pts=pc.pts||[];
+  rehydratePropertyCurves();
+  const fam=ms.info.family||'Superpave',pc=ms.propertyCurves||{},pts=pc.pts||[];
   const designPb=ms.designPb;
   const regType=ms.propCurvesRegType||'linear';
   if(!pts.length)return`<div class="card"><div class="wbox">No volumetric data yet. Complete Step 7 first.</div></div>`;
