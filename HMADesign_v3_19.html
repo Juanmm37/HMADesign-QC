@@ -6435,12 +6435,12 @@ function renderS8TSR(){
   // Get Gmm at design Pb from property curves (interpolate if needed)
   const pc=ms.propertyCurves||{};
   const pts=pc.pts||[];
-  if(!pts.length)return`<div class="card"><div class="wbox">No volumetric data available. Complete Step 7 and Step 8 first.</div></div>`;
+  if(!pts.length)return`<div class="card card-blue"><div class="st">Step 9 — TSR Batching</div><div class="wbox">No volumetric data yet. Go back to Step 7 (Selected Volumetrics) and click Next: Property Curves to compute them.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=8;render()">← Back: Property Curves</button><button class="btn btn-primary" onclick="ms.step=10;render()">Next: ${fam==='SMA'?'Agg Densities':'Nmax'} →</button></div></div>`;
 
   // Find Gmm at design Pb by interpolation
   let Gmm=null;
   const ptsWithGmm=pts.filter(p=>p.Gmm!==null&&p.Gmm!==undefined).sort((a,b)=>a.Pb-b.Pb);
-  if(!ptsWithGmm.length)return`<div class="card"><div class="wbox">Gmm data not available. Complete Step 7 first.</div></div>`;
+  if(!ptsWithGmm.length)return`<div class="card card-blue"><div class="st">Step 9 — TSR Batching</div><div class="wbox">Gmm data not available. Go back to Step 7 and enter MRD readings.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=8;render()">← Back: Property Curves</button><button class="btn btn-primary" onclick="ms.step=10;render()">Next: ${fam==='SMA'?'Agg Densities':'Nmax'} →</button></div></div>`;
 
   if(designPb<=ptsWithGmm[0].Pb){
     Gmm=ptsWithGmm[0].Gmm;
