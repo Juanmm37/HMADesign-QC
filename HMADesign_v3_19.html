@@ -6861,7 +6861,7 @@ function renderS9Nmax(){
   if(fam!=='Superpave')return renderS10Summary();
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
   const designPb=ms.designPb;
-  if(!selTrial||!designPb)return`<div class="card"><div class="wbox">Set design Pb in Step 8 first.</div></div>`;
+  if(!selTrial||!designPb)return`<div class="card card-blue"><div class="st">Step 10 — Nmax</div><div class="wbox">Set design Pb in Step 8 (Property Curves) first, then come back here.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=9;render()">← Back</button><button class="btn btn-primary" onclick="ms.step=11;render()">Next: Agg Densities →</button></div></div>`;
   const mt=ms.info.mixType||'',brdTotal=BRD_TOTAL[mt]||4800;
   const Pb=designPb;
   const nmx=ms.nmaxBatch||{};
