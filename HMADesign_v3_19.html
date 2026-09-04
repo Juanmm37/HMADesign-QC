@@ -5517,7 +5517,7 @@ function renderS6VolSelected(){
   const isM=fam==='Marshall',isSMA=fam==='SMA',isSP=fam==='Superpave';
   const numSpec=isM?3:2;
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
-  if(!selTrial)return`<div class="card"><div class="wbox">No blend selected. Go back to Step 6.</div></div>`;
+  if(!selTrial)return`<div class="card card-blue"><div class="st">Step 7 — Selected Volumetrics</div><div class="wbox">No blend selected. Go back to Step 6 to select a blend.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=6;render()">← Back: Select Blend</button></div></div>`;
   if(!ms.acPoints.length)initACPoints();
   const {blendGsb,blendGsa,blendGrad}=calcBlendProps(selTrial);
   const Gsb=blendGsb||2.7;
