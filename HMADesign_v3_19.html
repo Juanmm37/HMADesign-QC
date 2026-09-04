@@ -4893,7 +4893,7 @@ function renderS5Select(){
   const bands=getBands(info);
   console.log('Getting volume targets...');
   const tgt=getVolTargets(info,mt);
-  if(!trials.length)return`<div class="card"><div class="ibox">No trials yet. Go back to Step 3.</div></div>`;
+  if(!trials.length)return`<div class="card card-blue"><div class="st">Step 6 — Select Blend</div><div class="wbox">No trials yet. Go back to Step 4 (Trial Blends) to create trials.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=4;render()">← Back: Trial Blends</button></div></div>`;
 
   console.log('Starting trial calculations...');
   const selTrial=ms.selectedTrialIdx!==null?trials[ms.selectedTrialIdx]:null;
