@@ -2851,7 +2851,7 @@ function selectTrialForWorkflow(idx){
 function renderS3(){
   const aggs=SLOTS.filter(s=>ms.slots[s]);
   const info=ms.info,mt=info.mixType||'';
-  if(!aggs.length)return`<div class="card"><div style="text-align:center;padding:30px;color:#aaa">No aggregates selected. Go back to Step 2.</div></div>`;
+  if(!aggs.length)return`<div class="card card-blue"><div class="st">Step 4 — Trial Blends</div><div class="wbox">No aggregates selected. Go back to Step 2 to add aggregates.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=2;render()">← Back: Aggregates</button></div></div>`;
   const bands=getBands(info);
   // Use selectedTrialIdx if set, otherwise use last trial
   const trialIdx=(ms.selectedTrialIdx!==null&&ms.selectedTrialIdx<ms.trials.length)?ms.selectedTrialIdx:ms.trials.length-1;
