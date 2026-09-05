@@ -7166,11 +7166,13 @@ function renderS11AggDensity(){
   SLOTS.forEach(s=>{
     const sp=_stockpilePcts[s]||0; if(!sp||!slots[s])return;
     const agg=slots[s];
-    const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null
-      ?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
-    if(g===null||g===undefined)return;
-    T29+=(sp/100)*(g/100)*100;
-    if(!s.startsWith('RAP'))T30+=(sp/100)*(g/100)*100;
+    const gmod=(agg.gradation_mod||{})['4.75'];
+    const graw=(agg.gradation||{})['4.75'];
+    const g=(gmod!==null&&gmod!==undefined)?gmod:graw;
+    // Default to 100 when sieve not explicitly stored (fine fillers like BHF/MF pass 100% at 4.75mm)
+    const gv=(g!==null&&g!==undefined)?g:100;
+    T29+=(sp/100)*(gv/100)*100;
+    if(!s.startsWith('RAP'))T30+=(sp/100)*(gv/100)*100;
   });
   const T31=T29>0?T30/T29:0;
   const T32=1-T31;
