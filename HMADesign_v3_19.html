@@ -2310,8 +2310,7 @@ function renderS3TrialBlendAnalysis(){
   });
 
 
-  // Gradation comparison table with export selection
-  const selectedTarget=ms.tbaTargets[ms.selectedTargetIdx]||{label:'',values:{}};
+  // Gradation comparison table with inline editable target columns
   const gradTable=`
   <div class="card" id="s3_gradTable">
     <div class="st">Gradation Comparison & Trial Selection</div>
@@ -2320,16 +2319,29 @@ function renderS3TrialBlendAnalysis(){
         <thead>
           <tr style="background:#1f3864;color:#fff">
             <th style="padding:6px 8px;text-align:left;min-width:70px">Sieve (mm)</th>
-            ${trialGrads.map((tg,i)=>`<th style="padding:6px 8px;text-align:center;min-width:100px">${tg.name}<br><input type="checkbox" ${tg.selected?'checked':''} onchange="ms.tbaTrials[${i}].selected=this.checked;saveDB()" style="margin-top:4px"></th>`).join('')}
-            <th style="padding:6px 8px;text-align:center;min-width:100px;background:#162d52">Target: ${selectedTarget.label||'—'}</th>
-            <th style="padding:6px 8px;text-align:center;min-width:80px;background:#162d52">Min</th>
-            <th style="padding:6px 8px;text-align:center;min-width:80px;background:#162d52">Max</th>
+            ${trialGrads.map((tg,i)=>`<th style="padding:6px 8px;text-align:center;min-width:100px">
+              <div style="font-weight:700">${tg.name}</div>
+              <input type="checkbox" ${tg.selected?'checked':''} onchange="ms.tbaTrials[${i}].selected=this.checked;saveDB()" style="margin-top:4px">
+            </th>`).join('')}
+            ${ms.tbaTargets.map((t,ti)=>`<th style="padding:4px 6px;text-align:center;min-width:110px;background:#162d52">
+              <input type="text" value="${t.label||''}" placeholder="Target name"
+                style="width:90px;padding:2px 4px;border:1px solid #4a6a9c;border-radius:3px;font-size:10px;font-weight:700;text-align:center;background:#1e3a6e;color:#fff;margin-bottom:3px"
+                onchange="if(ms.tbaTargets)ms.tbaTargets[${ti}].label=this.value;saveDB()"
+                onblur="if(ms.tbaTargets)ms.tbaTargets[${ti}].label=this.value;saveDB()">
+              <div style="margin-top:2px">
+                ${ms.tbaTargets.length>1?`<button onclick="deleteTarget(${ti});render()" style="background:none;border:none;color:#ff8888;font-size:11px;cursor:pointer;padding:0 3px" title="Delete target">×</button>`:''}
+              </div>
+            </th>`).join('')}
+            <th style="padding:6px 8px;text-align:center;min-width:50px;background:#0f2440">
+              ${ms.tbaTargets.length<5?`<button class="btn btn-sm" onclick="addTarget();render()" style="padding:3px 8px;font-size:11px;font-weight:700;background:#2a5298;color:#fff;border:1px solid #4a72b8">+</button>`:''}
+            </th>
+            <th style="padding:6px 8px;text-align:center;min-width:60px;background:#162d52;font-size:10px">Min</th>
+            <th style="padding:6px 8px;text-align:center;min-width:60px;background:#162d52;font-size:10px">Max</th>
           </tr>
         </thead>
         <tbody>
           ${SIEVES.map((sv,ri)=>{
             const band=bands[sv];
-            const targetVal=selectedTarget.values[sv];
             return`<tr style="background:${ri%2===0?'#fff':'#fafbfc'}">
               <td style="padding:6px 8px;font-weight:600;color:#1f3864">${SL[sv]||sv}</td>
               ${trialGrads.map((tg,bi)=>{
@@ -2339,7 +2351,15 @@ function renderS3TrialBlendAnalysis(){
                   ${v!==null?v.toFixed(1):'—'}
                 </td>`;
               }).join('')}
-              <td style="padding:6px 8px;text-align:center;font-weight:700;color:#1f3864;background:#f0f4ff">${targetVal!==null&&targetVal!==undefined?parseFloat(targetVal).toFixed(1):'—'}</td>
+              ${ms.tbaTargets.map((t,ti)=>`<td style="padding:3px 5px;text-align:center;background:#f0f4ff">
+                <input type="number" min="0" max="100" step="0.1" value="${t.values[sv]!==null&&t.values[sv]!==undefined?t.values[sv]:''}"
+                  style="width:70px;padding:3px 4px;border:1px solid #b8c8e8;border-radius:3px;font-size:11px;font-weight:700;text-align:center;color:#1f3864;background:#f8faff"
+                  data-s3-input="target_${ti}_${sv}"
+                  onchange="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();}"
+                  onkeydown="if(event.key==='Tab'){event.preventDefault();const td=this.closest('td');const tr=td.parentElement;const colIdx=Array.from(tr.children).indexOf(td);const nextTr=tr.nextElementSibling;if(nextTr){const nextTd=nextTr.children[colIdx];if(nextTd&&nextTd.querySelector('input'))nextTd.querySelector('input').focus();}}"
+                  onblur="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();}">
+              </td>`).join('')}
+              <td style="padding:4px 6px;text-align:center;background:#f0f4ff"></td>
               <td style="padding:6px 8px;text-align:center;font-size:10px;color:#666">${band?band[0].toFixed(1):'—'}</td>
               <td style="padding:6px 8px;text-align:center;font-size:10px;color:#666">${band?band[1].toFixed(1):'—'}</td>
             </tr>`;
