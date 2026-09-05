@@ -2329,7 +2329,7 @@ function renderS3TrialBlendAnalysis(){
                 onchange="if(ms.tbaTargets)ms.tbaTargets[${ti}].label=this.value;saveDB()"
                 onblur="if(ms.tbaTargets)ms.tbaTargets[${ti}].label=this.value;saveDB()">
               <div style="margin-top:2px">
-                ${ms.tbaTargets.length>1?`<button onclick="deleteTarget(${ti});render()" style="background:none;border:none;color:#ff8888;font-size:11px;cursor:pointer;padding:0 3px" title="Delete target">×</button>`:''}
+                ${ms.tbaTargets.length>1?`<button onclick="deleteTarget(${ti})" style="background:none;border:none;color:#ff8888;font-size:11px;cursor:pointer;padding:0 3px" title="Delete target">×</button>`:''}
               </div>
             </th>`).join('')}
             <th style="padding:6px 8px;text-align:center;min-width:50px;background:#0f2440">
