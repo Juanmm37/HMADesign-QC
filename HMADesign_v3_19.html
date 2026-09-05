@@ -4852,7 +4852,7 @@ function renderAnalytics(){
     <table class="agg-table">
       <thead><tr><th class="L">Property</th>${trialGrads.map(t=>`<th>Trial ${t.id}<br><span style="font-size:10px;font-weight:400">Pb ${t.Pb}%</span></th>`).join('')}<th>Target</th></tr></thead>
       <tbody>
-        ${volRow('Va (%)', 'Va', [3.5,4.5])}
+        ${volRow('Va (%)', 'Va', (fam==='Superpave'||fam==='SMA')?null:[3.5,4.5])}
         ${vmaMin?volRow('VMA (%)', 'VMA', [vmaMin,25]):''}
         ${fam==='Superpave'?volRow('VFA (%)', 'VFA', vfa):''}
         ${volRow('Gmb @Ndes', 'avgGmb', null, 3)}
