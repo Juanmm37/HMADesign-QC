@@ -2743,24 +2743,33 @@ function createTrialsFromTrials(){
   if(!validTrials.length){alert('Select at least one trial that totals 100%');return;}
 
   if(!ms.trials)ms.trials=[];
-  // Remove default empty trial created by initTrials() — it has no real blend data or measurements
+  // Remove default empty placeholder trial (no real blend data AND no measurements)
   ms.trials=ms.trials.filter(t=>{
     const hasBlend=Object.values(t.blendPct||{}).some(v=>v>0);
     const hasVol=t.vol&&Object.keys(t.vol).length>0&&Object.values(t.vol).some(v=>v!==null&&v!==undefined);
     return hasBlend||hasVol;
   });
-  let nextId=ms.trials.length>0?Math.max(...ms.trials.map(t=>t.id))+1:1;
 
-  validTrials.forEach(t=>{
-    // Skip if an identical blend already exists in ms.trials
-    const dup=ms.trials.some(mt=>{
-      const slots=[...new Set([...Object.keys(mt.blendPct),...Object.keys(t.pcts)])];
-      return slots.every(s=>Math.abs((mt.blendPct[s]||0)-(t.pcts[s]||0))<0.001);
-    });
-    if(!dup){
+  // Match by position: update existing trial if one already exists at that index,
+  // otherwise create a new one. This prevents duplicates when user goes back to Step 3
+  // and changes blend percentages before re-exporting.
+  let nextId=ms.trials.length>0?Math.max(...ms.trials.map(t=>t.id))+1:1;
+  validTrials.forEach((t,idx)=>{
+    if(idx<ms.trials.length){
+      // Update existing trial's blend — preserve vol measurements already entered
+      ms.trials[idx].blendPct=Object.assign({},t.pcts);
+      ms.trials[idx].Pb=t.Pb;
+    } else {
       ms.trials.push({id:nextId++,Pb:t.Pb,notes:'',blendPct:Object.assign({},t.pcts),vol:{},brdGb:1.030,brdVa:4.0,brdMode:'auto',brdManual:null});
     }
   });
+  // Remove stale extra trials beyond what Step 3 now exports, but only if they have no vol data
+  if(ms.trials.length>validTrials.length){
+    ms.trials=ms.trials.filter((t,idx)=>{
+      if(idx<validTrials.length)return true;
+      return t.vol&&Object.values(t.vol).some(v=>v!==null&&v!==undefined);
+    });
+  }
 
   ms.selectedTrialIdx=ms.trials.length-1;
   saveDB();
