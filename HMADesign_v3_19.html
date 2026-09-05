@@ -2387,9 +2387,9 @@ function renderS3TrialBlendAnalysis(){
                 <input type="number" min="0" max="100" step="0.1" value="${t.values[sv]!==null&&t.values[sv]!==undefined?t.values[sv]:''}"
                   style="width:70px;padding:3px 4px;border:1px solid #b8c8e8;border-radius:3px;font-size:11px;font-weight:700;text-align:center;color:#1f3864;background:#f8faff"
                   data-s3-input="target_${ti}_${sv}"
-                  onchange="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();}"
+                  onchange="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();updateS3Chart();}"
                   onkeydown="if(event.key==='Tab'){event.preventDefault();const td=this.closest('td');const tr=td.parentElement;const colIdx=Array.from(tr.children).indexOf(td);const nextTr=tr.nextElementSibling;if(nextTr){const nextTd=nextTr.children[colIdx];if(nextTd&&nextTd.querySelector('input'))nextTd.querySelector('input').focus();}}"
-                  onblur="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();}">
+                  onblur="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();updateS3Chart();}">
               </td>`).join('')}
               <td style="padding:4px 6px;text-align:center;background:#f0f4ff"></td>
               <td style="padding:6px 8px;text-align:center;font-size:10px;color:#666">${band?band[0].toFixed(1):'—'}</td>
