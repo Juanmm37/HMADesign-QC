@@ -2713,11 +2713,16 @@ function renderTBAChart(trialGrads, bands, info){
     <text x="${PL+cW/2}" y="${PT-14}" font-size="13" font-weight="700" fill="#1f3864" text-anchor="middle">Gradation Curves — ${mt||'(no mix)'}${info.hasRAP==='Yes'?' RAP':''}</text>
   </svg>`;
 
+  const targetLegend=(ms.tbaTargets||[]).filter(t=>t.values&&Object.values(t.values).some(v=>v!==null&&v!==undefined)).map(t=>`
+    <div style="display:flex;align-items:center;gap:6px">
+      <div style="width:20px;height:3px;background:#ff6b35;border-radius:2px;border-top:2px dashed #ff6b35;background:none"></div>
+      <span style="font-size:11px;color:#555">${t.label||'Target'}</span>
+    </div>`).join('');
   const legend=trialGrads.map((tg,i)=>`
     <div style="display:flex;align-items:center;gap:6px">
       <div style="width:20px;height:3px;background:${CHART_COLORS[i%CHART_COLORS.length]};border-radius:2px"></div>
       <span style="font-size:11px;color:#555">${tg.name}</span>
-    </div>`).join('');
+    </div>`).join('')+targetLegend;
 
   return`<div class="card card-blue" id="s3_gradChart">
     <div class="st">Trial Gradations Chart</div>
