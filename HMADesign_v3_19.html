@@ -7120,6 +7120,7 @@ function renderS11AggDensity(){
   const fam=ms.info.family||'Superpave';
   const tc=ms.info.traffic||'B';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
+  const _stockpilePcts=selTrial?.blendPct||{};
   const slots=ms.slots||{};
 
   // ── Init aggTesting model (extended) ──
