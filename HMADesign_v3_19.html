@@ -3778,7 +3778,7 @@ function renderS4(){
         <div style="font-weight:900;color:#1f3864;font-size:14px;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #e0e4ea">
           Trial ${trial.id} — Pb: ${trial.Pb}%
           ${res?`<span style="margin-left:16px;font-size:12px;font-weight:500;color:#666">
-            Va: <strong style="color:${res.Va>=3.5&&res.Va<=4.5?'#1a6b1a':'#c0392b'}">${res.Va.toFixed(1)}%</strong>
+            Va: <strong style="color:${tgt.Va?(res.Va>=tgt.Va[0]&&res.Va<=tgt.Va[1]?'#1a6b1a':'#c0392b'):'#1f3864'}">${res.Va.toFixed(1)}%</strong>
             &nbsp; VMA: <strong>${res.VMA.toFixed(1)}%</strong>
             ${res.VFA!==null?`&nbsp; VFA: <strong>${res.VFA.toFixed(1)}%</strong>`:''}
           </span>`:''}
