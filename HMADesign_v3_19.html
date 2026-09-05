@@ -1909,11 +1909,13 @@ function calcBinderReplacement(blendPct, Pb) {
     if (!agg || !agg.isRAP) return;
     const bp = parseFloat(blendPct[s]) || 0;
     if (!bp) return;
-    const acPct = (agg.ACpct_adj !== null && agg.ACpct_adj !== undefined) ? agg.ACpct_adj : (agg.ACpct_m || 0);
+    // OPSS BR formula uses measured binder content (ACpct_m), not adjusted
+    const acPct = agg.ACpct_m || 0;
     weightedSumRapAC += acPct * bp;
     totalRapBlendPct += bp;
   });
   if (!totalRapBlendPct) return null;
+  // Round weighted avg to 1 decimal before dividing by Pb (matches OPSS spreadsheet)
   const weightedAvgRapAC = Math.round(weightedSumRapAC / totalRapBlendPct * 10) / 10;
   return Math.round(weightedAvgRapAC * totalRapBlendPct / Pb * 10) / 10;
 }
