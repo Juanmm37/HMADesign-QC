@@ -2220,59 +2220,7 @@ function renderS3TrialBlendAnalysis(){
     });
   });
 
-  // Target Gradation Entry section - side-by-side columns like trials
-  const targetSection=`
-  <div class="card">
-    <div class="st">Target Gradations (Optional)</div>
-    <div class="ibox">Enter target gradations side-by-side for comparison.</div>
-
-    <div style="overflow-x:auto;margin-bottom:16px">
-      <table style="border-collapse:collapse;width:100%;font-size:11px;min-width:100%">
-        <thead>
-          <tr style="background:#1f3864;color:#fff">
-            <th style="padding:6px 8px;text-align:left;min-width:70px">Sieve (mm)</th>
-            ${ms.tbaTargets.map((t,i)=>`<th style="padding:6px 8px;text-align:center;min-width:100px">${t.label}</th>`).join('')}
-            <th style="padding:6px 8px;text-align:center;min-width:50px"></th>
-          </tr>
-          <tr style="background:#2a4a7c;color:#fff;font-size:10px">
-            <th style="padding:4px 8px;text-align:left">Target Label</th>
-            ${ms.tbaTargets.map((t,ti)=>`<th style="padding:4px 8px;text-align:center">
-              <input type="text" placeholder="Label" value="${t.label||''}"
-                style="width:90px;padding:2px 3px;border:1px solid #fff;border-radius:2px;font-size:9px;text-align:center;background:#3a5a8c;color:#fff"
-                onchange="if(ms.tbaTargets)ms.tbaTargets[${ti}].label=this.value;saveDB()"
-                onblur="if(ms.tbaTargets)ms.tbaTargets[${ti}].label=this.value;saveDB();">
-            </th>`).join('')}
-            <th style="padding:4px 8px;text-align:center"></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${SIEVES.map((sv,si)=>{
-            return`<tr style="background:${si%2===0?'#fff':'#fafbfc'}">
-              <td style="padding:6px 8px;font-weight:600;color:#1f3864">${SL[sv]||sv}</td>
-              ${ms.tbaTargets.map((t,ti)=>`<td style="padding:4px 6px;text-align:center">
-                <input type="number" min="0" max="100" step="0.1" value="${t.values[sv]||''}"
-                  style="width:70px;padding:3px 4px;border:1px solid #d0d5dd;border-radius:3px;font-size:11px;text-align:center"
-                  data-s3-input="target_${ti}_${sv}"
-                  onchange="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();updateS3Display();}"
-                  onkeydown="if(event.key==='Tab'){event.preventDefault();const td=this.closest('td');const tr=td.parentElement;const colIdx=Array.from(tr.children).indexOf(td);const nextTr=tr.nextElementSibling;if(nextTr){const nextTd=nextTr.children[colIdx];if(nextTd&&nextTd.querySelector('input'))nextTd.querySelector('input').focus();}}"
-                  onblur="if(ms.tbaTargets){const val=this.value!==''?parseFloat(this.value):null;ms.tbaTargets[${ti}].values['${sv}']=val;if(val!==null)this.value=val.toFixed(1);saveDB();}"
-              </td>`).join('')}
-              <td style="padding:4px 6px;text-align:center"></td>
-            </tr>`;
-          }).join('')}
-          <tr style="background:#1f3864;color:#fff;font-weight:700">
-            <td style="padding:6px 8px">Actions</td>
-            ${ms.tbaTargets.map((t,ti)=>{
-              return`<td style="padding:6px 8px;text-align:center"></td>`;
-            }).join('')}
-            <td style="padding:6px 8px;text-align:center">
-              ${ms.tbaTargets.length<5?`<button class="btn btn-sm" onclick="addTarget()" style="padding:3px 8px;font-size:10px;margin:0">+</button>`:''}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>`;
+  // targetSection removed — targets now live inline in the gradation comparison table
 
   // JMF Input section (renamed from Blend to Trial)
   const jmfInput=`
