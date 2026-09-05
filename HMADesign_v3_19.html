@@ -7120,8 +7120,32 @@ function renderS11AggDensity(){
   const fam=ms.info.family||'Superpave';
   const tc=ms.info.traffic||'B';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
-  const _stockpilePcts=selTrial?.blendPct||{};
   const slots=ms.slots||{};
+
+  // ── Stockpile % per OPSS spreadsheet (Selected-Aggregate Data row 18) ──
+  // RAP slots: stockpile = blend × (1 − ACpct_m/100)
+  // Virgin slots: blend + proportional share of the RAP binder removed
+  const _stockpilePcts=(()=>{
+    const bp=selTrial?.blendPct||{};
+    const sp={};
+    let totalVirginBlend=0,totalRAPBinder=0;
+    SLOTS.forEach(s=>{
+      const pct=parseFloat(bp[s])||0; if(!pct||!slots[s])return;
+      if(s.startsWith('RAP')){
+        const agg=getAgg(slots[s]);
+        const acPct=(agg&&agg.ACpct_m)||0;
+        sp[s]=pct*(1-acPct/100);
+        totalRAPBinder+=pct*(acPct/100);
+      } else {
+        totalVirginBlend+=pct;
+      }
+    });
+    SLOTS.forEach(s=>{
+      const pct=parseFloat(bp[s])||0; if(!pct||!slots[s]||s.startsWith('RAP'))return;
+      sp[s]=pct+(totalVirginBlend>0?(pct/totalVirginBlend)*totalRAPBinder:0);
+    });
+    return sp;
+  })();
 
   // ── Init aggTesting model (extended) ──
   if(!ms.aggTesting)ms.aggTesting={};
@@ -7133,22 +7157,23 @@ function renderS11AggDensity(){
   // Backward compat — old model used rap1Gsb
   if(at.rapGsb===null&&at.rap1Gsb!=null)at.rapGsb=at.rap1Gsb;
 
-  // ── Compute T29 (% passing 4.75mm, all) and T30 (% passing 4.75mm, virgin only) ──
-  // Use blendPct directly — matches calcBlendProps / blend gradation table shown in Step 6
+  // ── T29/T30/T31/T32 per OPSS spreadsheet (Selected-Aggregate Data, cells T29-T32) ──
+  // T29 = stockpile% passing 4.75mm (all agg incl RAP)
+  // T30 = stockpile% passing 4.75mm (virgin only, no RAP)
+  // T31 = T30/T29 — virgin fraction of the fine portion
+  // T32 = 1−T31  — RAP fraction of the fine portion
   let T29=0,T30=0;
-  if(selTrial){
-    Object.keys(selTrial.blendPct||{}).forEach(s=>{
-      const pct=parseFloat(selTrial.blendPct[s])||0; if(!pct||!slots[s])return;
-      const agg=slots[s];
-      const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null
-        ?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
-      if(g===null||g===undefined)return;
-      T29+=(pct/100)*(g/100)*100;
-      if(!s.startsWith('RAP'))T30+=(pct/100)*(g/100)*100;
-    });
-  }
-  const T31=T29>0?T30/T29:0;  // fraction of fine fraction that is virgin aggregate
-  const T32=1-T31;              // fraction of fine fraction that is RAP
+  SLOTS.forEach(s=>{
+    const sp=_stockpilePcts[s]||0; if(!sp||!slots[s])return;
+    const agg=slots[s];
+    const g=(agg.gradation_mod||{})['4.75']!==undefined&&(agg.gradation_mod||{})['4.75']!==null
+      ?(agg.gradation_mod||{})['4.75']:(agg.gradation||{})['4.75'];
+    if(g===null||g===undefined)return;
+    T29+=(sp/100)*(g/100)*100;
+    if(!s.startsWith('RAP'))T30+=(sp/100)*(g/100)*100;
+  });
+  const T31=T29>0?T30/T29:0;
+  const T32=1-T31;
 
   // ── Q43 equivalent — combined fine+RAP Gsb/Gsa/WA ──
   // Excel: Q43 = ROUND(P43*T31 + P48*T32, 3)
