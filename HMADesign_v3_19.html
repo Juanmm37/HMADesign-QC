@@ -886,6 +886,38 @@ function updateGradationDisplay(){
   }
 }
 
+// Lightweight chart-only update called when target values change (avoids rebuilding inputs)
+function updateS3Chart(){
+  clearTimeout(updateS3Chart._t);
+  updateS3Chart._t=setTimeout(()=>{
+    const chartEl=document.querySelector('#s3_gradChart');
+    if(!chartEl)return;
+    const info=ms.info,bands=getBands(info);
+    const aggs=SLOTS.filter(s=>ms.slots[s]);
+    const trialGrads=ms.tbaTrials.map(b=>{
+      const grad={};
+      const totalPct=aggs.reduce((sum,s)=>(b.pcts[s]||0)+sum,0);
+      SIEVES.forEach(sv=>{
+        let val=0;
+        aggs.forEach(s=>{
+          const a=getAgg(ms.slots[s]);
+          const pct=b.pcts[s]||0;
+          const gm=(a.gradation||{})[sv];
+          const gmod=(a.gradation_mod||{})[sv];
+          const aggGrad=(gmod!==null&&gmod!==undefined)?gmod:gm;
+          val+=(aggGrad!==null&&aggGrad!==undefined?aggGrad:100)*(pct/100);
+        });
+        grad[sv]=totalPct>0?val:null;
+      });
+      return{name:b.name,grad,totalPct,Pb:b.Pb,selected:b.selected};
+    });
+    const newChart=renderTBAChart(trialGrads,bands,info);
+    const innerStart=newChart.indexOf('>')+1;
+    const innerEnd=newChart.lastIndexOf('</div>');
+    chartEl.innerHTML=newChart.substring(innerStart,innerEnd);
+  },150);
+}
+
 function render(){
   const el=document.getElementById('mc');
   if(view==='dashboard')el.innerHTML=renderDash();
