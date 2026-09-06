@@ -4008,21 +4008,22 @@ function saveAndExit(){
 function renderRec(){
   if(!db.mixes.length)return`<div style="text-align:center;padding:50px;color:#aaa">No mix designs. <a href="#" onclick="startNewMix();return false">Create one.</a></div>`;
   return`<div class="row" style="margin-bottom:14px;justify-content:space-between">
-    <div class="st" style="margin:0">All Mix Designs (${db.mixes.length})</div>
+    <div class="st" style="margin:0">All Mix Design Records (${db.mixes.length})</div>
     <button class="btn btn-primary" onclick="startNewMix()">+ New Mix Design</button>
   </div>
   <table class="rec-table">
-    <thead><tr><th>Mix No.</th><th>Type</th><th>RAP?</th><th>PGAC</th><th>Municipality</th><th>Spec</th><th>Trials</th><th>Status</th><th>Design Pb</th><th>Date</th><th>Actions</th></tr></thead>
+    <thead><tr><th>Mix No.</th><th>Type</th><th>RAP?</th><th>PGAC</th><th>Spec</th><th>Trials</th><th>Status</th><th>Design Pb (%)</th><th>Date Started</th><th>Date Completed</th><th>Actions</th></tr></thead>
     <tbody>${db.mixes.map(m=>`<tr>
       <td><strong>${m.mixNo||'—'}</strong></td>
       <td><span class="badge ${mxB(m.mixType)}">${m.mixType||'—'}</span></td>
       <td>${m.hasRAP==='Yes'?'<span class="pend">RAP</span>':'—'}</td>
-      <td>${m.pgac||'—'}</td><td style="font-size:11px">${m.muni||'—'}</td>
+      <td>${m.pgac||'—'}</td>
       <td style="font-size:11px">${m.spec||'—'}</td>
       <td style="text-align:center">${(m.trials||[]).length}</td>
       <td><span class="${m.status==='Complete'?'pass':m.status==='In Progress'?'pend':''}">${m.status}</span></td>
-      <td style="font-size:11px;color:#888">${m.designPb?'Pb='+m.designPb.toFixed(1)+'%':'—'}</td>
+      <td style="text-align:center;font-weight:600">${m.designPb?m.designPb.toFixed(1):'—'}</td>
       <td style="font-size:11px">${m.createdAt?new Date(m.createdAt).toLocaleDateString('en-CA'):'—'}</td>
+      <td style="font-size:11px">${m.dateCompleted?new Date(m.dateCompleted+'T00:00:00').toLocaleDateString('en-CA'):'—'}</td>
       <td class="row" style="gap:4px">
         <button class="btn btn-sm btn-primary" onclick="openMix('${m.id}')">Open</button>
         ${m.status==='Complete'?`<button class="btn btn-sm btn-gold" onclick="produceReport('${m.id}')" title="Generate filled Excel report from this mix design">📄 Report</button>`:''}
