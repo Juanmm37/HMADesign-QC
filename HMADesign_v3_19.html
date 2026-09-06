@@ -1675,7 +1675,8 @@ function renderS1(){
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
       <div class="fg"><label>Location / Highway</label><input id="s1_location" value="${i.location||''}" placeholder="e.g. Hwy 401 @  km 320"></div>
       <div class="fg"><label>Item No.</label><input id="s1_itemNo" value="${i.itemNo||''}" placeholder="e.g. SP12.5 CAT D"></div>
-      <div class="fg"><label>Date Started</label><input id="s1_dateCollected" type="date" value="${i.dateCollected||''}"></div>
+      <div class="fg"><label>Date Started</label><input id="s1_dateStarted" type="date" value="${i.dateStarted||''}"></div>
+      <div class="fg"><label>Date Samples Collected</label><input id="s1_dateCollected" type="date" value="${i.dateCollected||''}"></div>
     </div></div>
     <div class="row" style="justify-content:flex-end;margin-top:8px">
       <button class="btn btn-primary" onclick="saveS1()">Next: Select Aggregates →</button>
