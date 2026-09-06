@@ -7594,7 +7594,7 @@ function renderS11AggDensity(){
           <th style="${thT};font-size:10px;width:100px">Absorption (%)</th>
         </tr></thead>
         <tbody>
-          <tr style="background:#fff">
+          <tr style="background:#fff;height:36px">
             <td style="${tdL}">Retain on 4.75</td>
             <td style="${td0};background:#f5f8ff;font-weight:700">${cCoarsePct.toFixed(1)}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effCoarseGsb!=null?effCoarseGsb.toFixed(3):'—'}</td>
@@ -7602,21 +7602,21 @@ function renderS11AggDensity(){
             <td style="${tdC};font-size:12px;font-weight:700">${effCoarseWa!=null?effCoarseWa.toFixed(2):'—'}</td>
           </tr>
           ${cMode!=='simple'?`
-          <tr style="background:#f0f4fb">
+          <tr style="background:#f0f4fb;height:36px">
             <td style="${tdL}">Retain on 2.36 (Virgin)</td>
             <td style="${td0};background:#f5f8ff;font-weight:700">${cR236Pct.toFixed(1)}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effR236Gsb!=null?effR236Gsb.toFixed(3):'—'}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effR236Gsa!=null?effR236Gsa.toFixed(3):'—'}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effR236Wa!=null?effR236Wa.toFixed(2):'—'}</td>
           </tr>
-          <tr style="background:#e8f0fe">
+          <tr style="background:#e8f0fe;height:36px">
             <td style="${tdL}">Passing 2.36 (Virgin)</td>
             <td style="${td0};background:#f5f8ff;font-weight:700">${cF236Pct.toFixed(1)}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effFineGsa!=null?effFineGsa.toFixed(3):'—'}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
           </tr>`:`
-          <tr style="background:#f0f4fb">
+          <tr style="background:#f0f4fb;height:36px">
             <td style="${tdL}">Passing 4.75 (Virgin)</td>
             <td style="${td0};background:#f5f8ff;font-weight:700">${cVirginPct.toFixed(1)}</td>
             <td style="${tdC};font-size:12px;font-weight:700">${effFineGsb!=null?effFineGsb.toFixed(3):'—'}</td>
@@ -7624,14 +7624,14 @@ function renderS11AggDensity(){
             <td style="${tdC};font-size:12px;font-weight:700">${effFineWa!=null?effFineWa.toFixed(2):'—'}</td>
           </tr>`}
           ${rapFineEntries.map(e=>`
-          <tr style="background:#eef3ee">
+          <tr style="background:#eef3ee;height:36px">
             <td style="${tdL}">${cMode==='simple'?'Passing 4.75':'RAP Fine'} — ${getName(e.slot)} <span style="font-size:9px;color:#888;font-weight:400">annual</span></td>
             <td style="${td0};background:#eef3ee;font-weight:700">${e.pct.toFixed(1)}</td>
             <td style="${tdY}">${cinp(e.gsbKey,at[e.gsbKey],3)}</td>
             <td style="${tdY}">${cinp(e.gsaKey,at[e.gsaKey],3)}</td>
             <td style="${tdY}">${cinp(e.waKey,at[e.waKey],2)}</td>
           </tr>`).join('')}
-          <tr>
+          <tr style="height:36px">
             <td colspan="2" style="${tdBotL}">Aggregate Blend Results</td>
             <td style="${tdBot};font-size:15px">${eCombGsb!=null?eCombGsb.toFixed(3):'—'}</td>
             <td style="${tdBot};font-size:15px">${eCombGsa!=null?eCombGsa.toFixed(3):'—'}</td>
