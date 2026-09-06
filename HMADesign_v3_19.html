@@ -3813,39 +3813,39 @@ function renderS4(){
             <tr style="background:#fff">
               <td style="padding:5px 10px;font-weight:700;color:#1f3864">Trial ${trial.id}</td>
               <!-- BRD A, B, (C for Marshall) -->
-              <td style="padding:3px 5px">${vi(ti,'GmbA',vol.GmbA)}</td>
-              <td style="padding:3px 5px">${vi(ti,'GmbB',vol.GmbB)}</td>
-              ${isM?`<td style="padding:3px 5px">${vi(ti,'GmbC',vol.GmbC)}</td>`:''}
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'GmbA',vol.GmbA)}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'GmbB',vol.GmbB)}</td>
+              ${isM?`<td style="padding:3px 5px;text-align:center">${vi(ti,'GmbC',vol.GmbC)}</td>`:''}
               <!-- Avg BRD -->
               <td style="text-align:center;font-weight:800;color:#1f3864;background:#e8f0fe;font-size:13px;padding:5px">
                 ${avgGmb?avgGmb.toFixed(3):'—'}
               </td>
               <!-- MRD A, B -->
-              <td style="padding:3px 5px">${vi(ti,'GmmA',vol.GmmA)}</td>
-              <td style="padding:3px 5px">${vi(ti,'GmmB',vol.GmmB)}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'GmmA',vol.GmmA)}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'GmmB',vol.GmmB)}</td>
               <!-- Avg MRD -->
               <td style="text-align:center;font-weight:800;color:#1f3864;background:#e8f0fe;font-size:13px;padding:5px">
                 ${avgGmm?avgGmm.toFixed(3):'—'}
               </td>
               ${isSP||isSMA?`
               <!-- h Nini A, B -->
-              <td style="padding:3px 5px">${vi(ti,'hNiniA',vol.hNiniA,74,'0.1','mm')}</td>
-              <td style="padding:3px 5px">${vi(ti,'hNiniB',vol.hNiniB,74,'0.1','mm')}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'hNiniA',vol.hNiniA,74,'0.1','mm')}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'hNiniB',vol.hNiniB,74,'0.1','mm')}</td>
               <!-- %Gmm @ Nini -->
               <td style="text-align:center;font-weight:800;color:#1f3864;background:#e8f0fe;font-size:12px;padding:5px">
                 ${res&&res.pGmmNini!==null?res.pGmmNini.toFixed(1):'—'}
               </td>
               <!-- h Ndes A, B -->
-              <td style="padding:3px 5px">${vi(ti,'hNdesA',vol.hNdesA,74,'0.1','mm')}</td>
-              <td style="padding:3px 5px">${vi(ti,'hNdesB',vol.hNdesB,74,'0.1','mm')}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'hNdesA',vol.hNdesA,74,'0.1','mm')}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'hNdesB',vol.hNdesB,74,'0.1','mm')}</td>
               <!-- %Gmm @ Ndes -->
               <td style="text-align:center;font-weight:800;color:#1f3864;background:#e8f0fe;font-size:12px;padding:5px">
                 ${res&&res.pGmmNdes!==null?res.pGmmNdes.toFixed(1):'—'}
               </td>
               `:''}
               ${isM?`
-              <td style="padding:3px 5px">${vi(ti,'Stab',vol.Stab,76,'1','N')}</td>
-              <td style="padding:3px 5px">${vi(ti,'Flow',vol.Flow,68,'0.1','')}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'Stab',vol.Stab,76,'1','N')}</td>
+              <td style="padding:3px 5px;text-align:center">${vi(ti,'Flow',vol.Flow,68,'0.1','')}</td>
               `:''}
             </tr>
           </tbody>
