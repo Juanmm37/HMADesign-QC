@@ -6246,7 +6246,7 @@ function renderS7PropCurves(){
     <div class="st">Step 8 — Property Curves</div>
     <div class="st" style="margin:12px 0 8px">Results Table</div>
     <table class="agg-table" style="margin-bottom:14px">
-      <thead><tr><th style="width:11%">Pb%</th><th style="width:13%">Va%</th><th style="width:13%">VMA%</th><th style="width:13%">VFA%</th><th style="width:13%">Gmb @Ndes</th><th style="width:13%">%Gmm Nini</th><th style="width:13%">DP</th><th style="width:11%">Gmm</th></tr></thead>
+      <thead><tr>${isM?`<th>Pb%</th><th>Gmb</th><th>Gmm</th><th>Va%</th><th>VMA%</th><th>VFA%</th><th>DP</th>`:`<th style="width:11%">Pb%</th><th style="width:13%">Va%</th><th style="width:13%">VMA%</th><th style="width:13%">VFA%</th><th style="width:13%">Gmb @Ndes</th><th style="width:13%">%Gmm Nini</th><th style="width:13%">DP</th><th style="width:11%">Gmm</th>`}</tr></thead>
       <tbody>${resultsRows}</tbody>
     </table>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;margin-bottom:16px">
