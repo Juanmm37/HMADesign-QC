@@ -3803,9 +3803,10 @@ function renderS4(){
   return`<div class="card card-blue">
     <div class="st">Step 5 — Trial Volumetrics</div>
     ${ms.trials.map((trial,ti)=>{
-      const{blendGsb}=calcBlendProps(trial);
+      const{blendGsb,blendGrad}=calcBlendProps(trial);
       const res=calcVol(trial,info,blendGsb);
       const tgt=getVolTargets(info,mt);
+      if(isM){const pct475=blendGrad?blendGrad['4.75']:null;const vmaMin=getMarshallVmaMin(mt,pct475);if(vmaMin!==null)tgt.VMA=[vmaMin,null];}
       const vol=trial.vol||{};
       // Computed averages for display
       const avgGmb=res?res.avgGmb:null;
