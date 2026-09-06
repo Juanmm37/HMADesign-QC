@@ -352,6 +352,41 @@ const MS_VOL={
   minFlow:{'default':8,'HL2':9,'HL3F':9,'HL4F':9},
   minStab:{'DFC':8900,'HL1':8900,'HL3':8900,'HL3HS':12000,'HDBC':12000,'MDBC':12000,'HL8':8000,'HL2':5800,'HL3F':5800,'HL4F':5800,'default':8000},
 };
+// OPSS 1150 Table 7 — minimum VMA for Marshall mixes
+// Rows: % passing 4.75mm breakpoints; columns: nominal max particle size (mm)
+const MARSHALL_VMA_T7={
+  rows:[40,45,50,55,60],
+  data:{
+    13.2:[13.5,14.0,14.5,15.0,15.5,16.0],
+    19.0:[12.5,13.0,13.5,14.0,14.5,15.0],
+    26.5:[11.5,12.0,12.5,13.0,13.5,14.0]
+  },
+  hl2:{4.75:18.0,9.5:16.0}
+};
+// NMPS to Table 7 column mapping for Marshall mix types
+const MARSHALL_NMPS={
+  'HL1':13.2,'HL3':13.2,'HL3HS':13.2,'HL3F':13.2,
+  'HL4':19.0,'HL4F':19.0,
+  'HL8':26.5,'MDBC':19.0,'HDBC':26.5
+};
+function getMarshallVmaMin(mt,pct475){
+  if(mt==='HL2'){const nmps=MARSHALL_VMA_T7.hl2;return nmps['9.5'];}
+  if(mt==='DFC'||mt==='HL1')return null;
+  const nmps=MARSHALL_NMPS[mt];
+  if(!nmps||pct475===null||pct475===undefined||isNaN(pct475))return null;
+  const rows=MARSHALL_VMA_T7.rows;
+  const col=MARSHALL_VMA_T7.data[nmps];
+  if(!col)return null;
+  if(pct475<=rows[0])return col[0];
+  if(pct475>rows[rows.length-1])return col[col.length]; // 60+ row (index 5)
+  for(let i=0;i<rows.length-1;i++){
+    if(pct475>rows[i]&&pct475<=rows[i+1]){
+      const frac=(pct475-rows[i])/(rows[i+1]-rows[i]);
+      return Math.round((col[i]+frac*(col[i+1]-col[i]))*10)/10;
+    }
+  }
+  return null;
+}
 const SMA_VOL={Va:4.0,VMA_min:17,minPb:[[2.40,6.8],[2.45,6.7],[2.50,6.6],[2.55,6.5],[2.60,6.3],[2.65,6.2],[2.70,6.1],[2.75,6.0],[2.80,5.9],[2.85,5.8],[2.90,5.7],[2.95,5.6],[3.00,5.5]]};
 function smaMinPb(gsb){const t=SMA_VOL.minPb;if(gsb<=t[0][0])return t[0][1];if(gsb>=t[t.length-1][0])return t[t.length-1][1];for(let i=0;i<t.length-1;i++){if(gsb>=t[i][0]&&gsb<=t[i+1][0]){const r=(gsb-t[i][0])/(t[i+1][0]-t[i][0]);return t[i][1]+r*(t[i+1][1]-t[i][1]);}}return null;}
 
