@@ -5318,6 +5318,7 @@ function printSelected(){
       <tbody>${bpRow}${gRows}${prRows}</tbody>
     </table>
     <div style="margin-top:8px;font-size:10px;color:#555">⚡ = Modified value used in calculations</div>
+    ${(()=>{if(!isM)return'';const pct475=blendGrad['4.75'];const vmaMin=getMarshallVmaMin(mt,pct475);return vmaMin!==null?`<div style="margin-top:6px;font-size:10px;color:#1f3864;font-weight:600">Min VMA (OPSS 1150 Table 7, ${pct475!=null?pct475.toFixed(1):'—'}% passing 4.75mm): <strong>≥${vmaMin.toFixed(1)}%</strong></div>`:'';})()}
   </div>`;
 
   // PAGE 3: Gradation chart — full page, no header wrapper to maximize space
