@@ -6250,6 +6250,7 @@ function renderS7PropCurves(){
           <input type="number" step="0.1" value="${designPb?designPb.toFixed(1):''}" placeholder="e.g. 4.8"
             onchange="ms.designPb=Math.round((parseFloat(this.value)||0)*10)/10||null;saveDB();render()"
             onblur="ms.designPb=Math.round((parseFloat(this.value)||0)*10)/10||null;saveDB();render()">
+          ${(()=>{if(fam!=='Marshall')return'';const isOverride=ms.designPbAuto!=null&&Math.abs(designPb-ms.designPbAuto)>0.005;if(!isOverride||!pc.Va)return'';const curve=pc.Va[regType];if(!curve||typeof curve.predict!=='function')return'';const va=curve.predict(designPb);return`<div style="font-size:11px;color:#c0392b;margin-top:4px;font-weight:600">Va @ ${designPb.toFixed(1)}% Pb = <strong>${va.toFixed(1)}%</strong> (auto: ${ms.designPbAuto.toFixed(1)}%)</div>`;})()}
         </div>
       </div>
     </div>
