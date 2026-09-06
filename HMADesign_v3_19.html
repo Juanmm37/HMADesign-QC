@@ -1020,14 +1020,15 @@ function renderDash(){
     </div>
   </div>
   ${recent.length?`<div class="card"><div class="st">Recent Mix Designs</div>
-  <table class="rec-table"><thead><tr><th>Mix No.</th><th>Type</th><th>RAP?</th><th>PGAC</th><th>Municipality</th><th>Trials</th><th>Status</th><th></th></tr></thead>
+  <table class="rec-table"><thead><tr><th>Mix No.</th><th>Type</th><th>PGAC</th><th>Municipality</th><th>Trials</th><th>Status</th><th style="text-align:center">Date Started</th><th style="text-align:center">Date Completed</th><th></th></tr></thead>
   <tbody>${recent.map(m=>`<tr>
     <td><strong>${m.mixNo||'—'}</strong></td>
-    <td><span class="badge ${mxB(m.mixType)}">${m.mixType||'—'}</span></td>
-    <td>${m.hasRAP?'<span class="pend">RAP</span>':'—'}</td>
+    <td><span class="badge ${mxB(m.mixType)}">${m.mixType||'—'}${m.hasRAP==='Yes'?' RAP':''}</span></td>
     <td>${m.pgac||'—'}</td><td>${m.muni||'—'}</td>
     <td style="text-align:center">${(m.trials||[]).length}</td>
     <td><span class="${m.status==='Complete'?'pass':m.status==='In Progress'?'pend':''}">${m.status}</span></td>
+    <td style="text-align:center;font-size:11px">${m.dateStarted?new Date(m.dateStarted+'T00:00:00').toLocaleDateString('en-CA'):m.createdAt?new Date(m.createdAt).toLocaleDateString('en-CA'):'—'}</td>
+    <td style="text-align:center;font-size:11px">${m.dateCompleted?new Date(m.dateCompleted+'T00:00:00').toLocaleDateString('en-CA'):'—'}</td>
     <td><button class="btn btn-sm btn-primary" onclick="openMix('${m.id}')">${m.status==='In Progress'?'Resume':'Open'}</button></td>
   </tr>`).join('')}</tbody></table></div>`
   :`<div style="text-align:center;padding:40px;color:#aaa;font-size:13px">No mix designs yet. <a href="#" onclick="startNewMix();return false">Create your first one.</a></div>`}`;
