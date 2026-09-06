@@ -5285,11 +5285,14 @@ function printSelected(){
       const v=gmod!=null?gmod:gm;
       const isMod=gmod!=null;
       const disp=v!=null?Number(v).toFixed(1):'100.0';
-      return`<td style="text-align:right;font-size:10px;color:${v==null?'#aaa':isMod?'#e65100':'#333'};font-weight:${isMod?'700':'600'};padding:3px 4px;border-right:1px solid #eee">${disp}${isMod?'⚡':''}</td>`;
+      const cellBg=sv==='4.75'?'background:#fff8e1;':ri%2?'background:#fafbfc;':'';
+      return`<td style="text-align:right;font-size:10px;color:${v==null?'#aaa':isMod?'#e65100':'#333'};font-weight:${isMod?'700':'600'};padding:3px 4px;border-right:1px solid #eee;${cellBg}">${disp}${isMod?'⚡':''}</td>`;
     }).join('');
     let bc='#1f3864',bb='';
     if(band&&bv!=null){if(bv>=band[0]&&bv<=band[1]){bc='#1a6b1a';bb='background:#c6efce33';}else{bc='#9c0006';bb='background:#ffc7ce55';}}
-    return`<tr style="${sv==='4.75'?'background:#fff8e1;border-left:3px solid #f9a825':ri%2?'background:#fafbfc':''}"><td style="font-size:10px;color:#333;padding:3px 6px;font-weight:${sv==='4.75'?'800':'600'};border-right:1px solid #dde">${SL[sv]}</td><td style="font-size:9px;color:#888;text-align:center;padding:3px 3px;border-right:1px solid #dde">${US[sv]||'—'}</td>${avs}<td style="text-align:right;font-weight:800;font-size:11px;color:${bc};${bb};padding:3px 6px;border-right:1px solid #cce">${bv!=null?Number(bv).toFixed(1):'—'}</td><td style="text-align:center;font-size:10px;color:#777;padding:3px 4px;border-right:1px solid #dde">${band?Number(band[0]).toFixed(1):''}</td><td style="text-align:center;font-size:10px;color:#777;padding:3px 4px">${band?Number(band[1]).toFixed(1):''}</td></tr>`;
+    const rowBg=sv==='4.75'?'background:#fff8e1;':ri%2?'background:#fafbfc;':'';
+    const hl=sv==='4.75'?'border-left:3px solid #f9a825;':'';
+    return`<tr style="${rowBg}${hl}"><td style="font-size:10px;color:#333;padding:3px 6px;font-weight:${sv==='4.75'?'800':'600'};${rowBg}border-right:1px solid #dde">${SL[sv]}</td><td style="font-size:9px;color:#888;text-align:center;padding:3px 3px;${rowBg}border-right:1px solid #dde">${US[sv]||'—'}</td>${avs}<td style="text-align:right;font-weight:800;font-size:11px;color:${bc};${bb};padding:3px 6px;border-right:1px solid #cce">${bv!=null?Number(bv).toFixed(1):'—'}</td><td style="text-align:center;font-size:10px;color:#777;padding:3px 4px;border-right:1px solid #dde">${band?Number(band[0]).toFixed(1):''}</td><td style="text-align:center;font-size:10px;color:#777;padding:3px 4px">${band?Number(band[1]).toFixed(1):''}</td></tr>`;
   }).join('');
   const _getACsp=s=>{const a=getAgg(ms.slots[s]);if(!a||!a.isRAP)return null;return(a.ACpct_adj!=null)?a.ACpct_adj:(a.ACpct_m!=null?a.ACpct_m:null);};
   let _rBTsp=0,_rASsp=0;aggs.forEach(s=>{const ac=_getACsp(s);if(ac===null)return;const bp=parseFloat(selTrial.blendPct[s])||0;if(!bp)return;_rASsp+=ac*bp;_rBTsp+=bp;});
