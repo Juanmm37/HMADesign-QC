@@ -1687,7 +1687,7 @@ function saveS1(){
   const sp=document.getElementById('s1_sp').value;
   ms.info={mixNo:document.getElementById('s1_mn').value,family:document.getElementById('s1_fam').value,
     mixType:document.getElementById('s1_mt').value,hasRAP:document.getElementById('s1_rap').value,
-    traffic:document.getElementById('s1_tc').value,
+    traffic:(document.getElementById('s1_tc')||{value:''}).value,
     mixYear:parseInt(document.getElementById('s1_mixYear').value)||CURRENT_YEAR,pgac:document.getElementById('s1_pg').value,
     pgacSup:document.getElementById('s1_pgs').value,tMix:parseFloat(document.getElementById('s1_tm').value)||165,
     tComp:parseFloat(document.getElementById('s1_tc2').value)||150,muni:document.getElementById('s1_mu').value,
