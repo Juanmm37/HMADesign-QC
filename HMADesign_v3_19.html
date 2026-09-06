@@ -8303,7 +8303,11 @@ function renderS10Summary(){
     <div class="st">Summary of Results</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div><div class="st" style="margin-bottom:8px">Project Info</div>
-        ${[['Mix Design No.',ms.info.mixNo],['Mix Type',ms.info.mixType+(ms.info.hasRAP==='Yes'?' RAP':'')],['Traffic',ms.info.traffic],['PGAC',ms.info.pgac],['Municipality',ms.info.muni],['Specification',ms.info.spec]].map(([l,v])=>`
+        ${[['Mix Design No.',ms.info.mixNo],['Mix Type',ms.info.mixType+(ms.info.hasRAP==='Yes'?' RAP':'')],
+          ...(fam!=='Marshall'?[['Traffic',ms.info.traffic]]:[] ),
+          ['PGAC',ms.info.pgac],
+          ...(fam!=='Marshall'?[['Municipality',ms.info.muni]]:[] ),
+          ['Specification',ms.info.spec]].map(([l,v])=>`
         <div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid #f0f0f0">
           <span style="font-size:11px;font-weight:700;color:#888;min-width:120px;text-transform:uppercase">${l}</span>
           <span style="font-size:13px">${v||'—'}</span>
