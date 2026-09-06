@@ -2649,14 +2649,16 @@ function renderTBAChart(trialGrads, bands, info){
   const mt=info.mixType||'',fam=info.family||'',isMarshall=fam==='Marshall';
   const W=920,H=400,PL=52,PR=24,PT=36,PB=64;
   const cW=W-PL-PR,cH=H-PT-PB;
+  const MARSHALL_MAX_SIEVE=26.5;
+  const activeSieves=isMarshall?SIEVES.filter(s=>parseFloat(s)<=MARSHALL_MAX_SIEVE):SIEVES;
 
   function xOf(s){
     const v=parseFloat(s);
     if(isNaN(v))return null;
     if(isMarshall){
-      // Marshall: 0.45 power scale
+      // Marshall: 0.45 power scale, max sieve = 26.5mm
       const powMin=Math.pow(parseFloat(PLOT_SIEVES[PLOT_SIEVES.length-1]),0.45);
-      const powMax=Math.pow(parseFloat(PLOT_SIEVES[0]),0.45);
+      const powMax=Math.pow(MARSHALL_MAX_SIEVE,0.45);
       const powV=Math.pow(v,0.45);
       const frac=(powV-powMin)/(powMax-powMin);
       return PL+frac*cW;
