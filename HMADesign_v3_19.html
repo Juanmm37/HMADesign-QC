@@ -6206,7 +6206,15 @@ function renderS7PropCurves(){
     </svg>`;
   }
 
-  const chartDefs=[
+  const isM=fam==='Marshall';
+  const chartDefs=isM?[
+    {label:'Air Voids (%)',prop:'Va',min:0,max:8,color:'#c0392b'},
+    {label:'Gmb',prop:'avgGmb',min:2.3,max:2.6,color:'#6b1a9a'},
+    {label:'Gmm (MRD)',prop:'Gmm',min:2.4,max:2.7,color:'#0277bd'},
+    {label:'VMA (%)',prop:'VMA',min:10,max:18,color:'#1f3864'},
+    {label:'VFA (%)',prop:'VFA',min:50,max:100,color:'#1a7a1a'},
+    {label:'DP (Dust Prop.)',prop:'DP',min:0,max:1,color:'#00796b'},
+  ]:[
     {label:'Air Voids (%)',prop:'Va',min:0,max:8,color:'#c0392b'},
     {label:'VMA (%)',prop:'VMA',min:10,max:18,color:'#1f3864'},
     {label:'VFA (%)',prop:'VFA',min:50,max:100,color:'#1a7a1a'},
@@ -6217,7 +6225,15 @@ function renderS7PropCurves(){
   ];
 
   const charts=chartDefs.map(d=>makeChart(d.label,d.prop,d.min,d.max,d.color,true)).filter(c=>c).join('');
-  const resultsRows=pts.map(p=>`<tr>
+  const resultsRows=pts.map(p=>isM?`<tr>
+    <td style="font-weight:700">${p.Pb.toFixed(1)}%</td>
+    <td>${p.avgGmb.toFixed(3)}</td>
+    <td>${p.Gmm?p.Gmm.toFixed(3):'—'}</td>
+    <td style="font-weight:700">${p.Va.toFixed(1)}</td>
+    <td>${p.VMA.toFixed(1)}</td>
+    <td>${p.VFA?p.VFA.toFixed(1):'—'}</td>
+    <td>${p.DP?p.DP.toFixed(2):'—'}</td>
+  </tr>`:`<tr>
     <td style="width:11%;font-weight:700">${p.Pb.toFixed(1)}%</td>
     <td style="width:13%;font-weight:700">${p.Va.toFixed(1)}</td>
     <td style="width:13%">${p.VMA.toFixed(1)}</td><td style="width:13%">${p.VFA?p.VFA.toFixed(1):'—'}</td>
