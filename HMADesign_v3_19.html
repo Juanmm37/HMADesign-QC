@@ -3965,11 +3965,16 @@ function renderS5(){
 }
 function saveMix(status){
   const id=ms.id||'mix_'+Date.now();
+  const now=new Date();
+  const todayISO=now.toISOString().slice(0,10);
+  const existingCompleted=(db.mixes.find(m=>m.id===id)||{}).dateCompleted||null;
+  const dateCompleted=status==='Complete'?(existingCompleted||todayISO):existingCompleted;
   const mix={id,status,...ms.info,slots:ms.slots,trials:ms.trials,notes:ms.notes,
     selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,designPb:ms.designPb,
     propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch,nmaxBatch:ms.nmaxBatch,aggTesting:ms.aggTesting||null,
     tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
-    createdAt:ms.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+    dateCompleted,
+    createdAt:ms.createdAt||now.toISOString(),updatedAt:now.toISOString()};
   const idx=db.mixes.findIndex(m=>m.id===id);
   if(idx>=0)db.mixes[idx]=mix;else db.mixes.push(mix);
   saveDB();cloudSaveMix(mix);alert('Saved!');
