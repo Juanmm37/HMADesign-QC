@@ -1624,7 +1624,7 @@ function renderNewMix(){
   const i=ms.info;
   const mixInfoBar=(i.mixNo||i.mixType||i.pgac||i.traffic)?`<div class="print-hide" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:5px 12px;background:#f0f4fb;border:1px solid #dde3ef;border-radius:6px;margin-bottom:8px;font-size:11px;color:#1f3864">
     ${i.mixNo?`<span style="font-weight:800">${i.mixNo}</span><span style="color:#c5d3ef">|</span>`:''}
-    ${i.mixType?`<span>${i.mixType}${i.hasRAP==='Yes'?' + RAP':''}</span><span style="color:#c5d3ef">|</span>`:''}
+    ${i.mixType?`<span>${i.mixType}${i.hasRAP==='Yes'?' RAP':''}</span><span style="color:#c5d3ef">|</span>`:''}
     ${i.traffic?`<span>Cat. ${i.traffic}</span><span style="color:#c5d3ef">|</span>`:''}
     ${i.pgac?`<span>PGAC: <strong>${i.pgac}</strong></span><span style="color:#c5d3ef">|</span>`:''}
     ${i.spec?`<span>${i.spec}</span>`:''}
