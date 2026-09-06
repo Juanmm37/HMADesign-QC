@@ -3520,18 +3520,19 @@ function printTrial(trialIdx){
       const isModified=(gmod!==null&&gmod!==undefined);
       const display=isNull?'100.0':Number(v).toFixed(1);
       const col=isNull?'#aaa':isModified?'#e65100':'#333';
-      return`<td style="text-align:right;font-size:10px;padding:3px 4px;border-right:1px solid #eee;color:${col};font-weight:${isModified?'700':'600'};${rowI%2?'background:#fafbfc':''}">${display}${isModified?'⚡':''}</td>`;
+      const cellBg=sv==='4.75'?'#fff8e1':rowI%2?'#fafbfc':'';
+      return`<td style="text-align:right;font-size:10px;padding:3px 4px;border-right:1px solid #eee;color:${col};font-weight:${isModified?'700':'600'};${cellBg?`background:${cellBg};`:''}">${display}${isModified?'⚡':''}</td>`;
     }).join('');
     let blendColor='#1f3864',blendBg='';
     if(band&&blendVal!==null&&blendVal!==undefined){
       if(blendVal>=band[0]&&blendVal<=band[1]){blendColor='#1a6b1a';blendBg='background:#c6efce33';}
       else{blendColor='#9c0006';blendBg='background:#ffc7ce55';}
     }
-    const bg=sv==='4.75'?'background:#fff8e1':rowI%2?'background:#fafbfc':'';
-    const hl475=sv==='4.75'?';border-left:3px solid #f9a825':'';
-    return`<tr style="${hl475}">
-      <td style="font-size:10px;color:#333;padding:3px 6px;font-weight:${sv==='4.75'?'800':'600'};white-space:nowrap;${bg};border-right:1px solid #dde">${SL[sv]}</td>
-      <td style="font-size:9px;color:#888;text-align:center;padding:3px 3px;${bg};border-right:1px solid #dde">${US[sv]||'—'}</td>
+    const rowBg=sv==='4.75'?'background:#fff8e1;':rowI%2?'background:#fafbfc;':'';
+    const hl475=sv==='4.75'?'border-left:3px solid #f9a825;':'';
+    return`<tr style="${rowBg}${hl475}">
+      <td style="font-size:10px;color:#333;padding:3px 6px;font-weight:${sv==='4.75'?'800':'600'};white-space:nowrap;${rowBg}border-right:1px solid #dde">${SL[sv]}</td>
+      <td style="font-size:9px;color:#888;text-align:center;padding:3px 3px;${rowBg}border-right:1px solid #dde">${US[sv]||'—'}</td>
       ${aggVals}
       <td style="text-align:right;font-weight:800;font-size:11px;color:${blendColor};${blendBg};padding:3px 6px;border-right:1px solid #cce">${blendVal!==null&&blendVal!==undefined?Number(blendVal).toFixed(1):'—'}</td>
       <td style="text-align:center;font-size:10px;color:#777;padding:3px 4px;border-right:1px solid #dde">${band?Number(band[0]).toFixed(1):''}</td>
