@@ -2958,6 +2958,7 @@ function renderS3(){
       <div class="mc"><div class="ml">Blend Gsa</div><div id="s3-blend-gsa" class="mv" style="font-size:18px">${fN(blendGsa)}</div></div>
     </div>
     <div id="s3-sma-minpb" class="ibox" style="margin-top:8px;font-size:11px;display:${info.family==='SMA'&&blendGsb?'':'none'}">SMA Min Pb @ Gsb <span id="s3-sma-gsb">${fN(blendGsb)}</span>: <strong id="s3-sma-minpb-val">${blendGsb?fN(smaMinPb(blendGsb),1):'—'}</strong>%</div>
+    ${(()=>{if(info.family!=='Marshall')return'';const pct475=blendGrad['4.75'];const vmaMin=getMarshallVmaMin(mt,pct475);if(vmaMin===null)return'';return`<div class="ibox" style="margin-top:8px;font-size:11px">Min VMA (OPSS T7, ${pct475!==null?pct475.toFixed(1):'—'}% passing 4.75mm): <strong>≥${vmaMin.toFixed(1)}%</strong></div>`;})()}
     <div style="margin-top:12px;display:flex;gap:6px;flex-wrap:wrap">
       <button class="btn btn-sm" onclick="addDesignTrial()">+ Add Trial</button>
       ${ms.trials.length>1?`<button class="btn btn-sm btn-danger" onclick="remTrial()">Remove Last</button>`:''}
