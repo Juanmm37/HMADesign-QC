@@ -1637,12 +1637,12 @@ function renderS1(){
       </div>
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
-      <div class="fg"><label>Traffic Category</label>
+      ${fam!=='Marshall'?`<div class="fg"><label>Traffic Category</label>
         <select id="s1_tc">
           <option value="">Select...</option>
           ${['A','B','C','D','E'].map(t=>`<option ${i.traffic===t?'selected':''} value="${t}">${t}</option>`).join('')}
         </select>
-      </div>
+      </div>`:'<div></div>'}
       <div class="fg"><label>Aggregate Year</label>
         <select id="s1_mixYear">
           ${getLibYears().map(y=>`<option value="${y}" ${(i.mixYear||CURRENT_YEAR)===y?'selected':''}>${y}${y===CURRENT_YEAR?' (current)':''}</option>`).join('')}
