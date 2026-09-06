@@ -2656,18 +2656,18 @@ function renderTBAChart(trialGrads, bands, info){
     const v=parseFloat(s);
     if(isNaN(v))return null;
     if(isMarshall){
-      // Marshall: 0.45 power scale, max sieve = 26.5mm
-      const powMin=Math.pow(parseFloat(PLOT_SIEVES[PLOT_SIEVES.length-1]),0.45);
-      const powMax=Math.pow(MARSHALL_MAX_SIEVE,0.45);
-      const powV=Math.pow(v,0.45);
-      const frac=(powV-powMin)/(powMax-powMin);
-      return PL+frac*cW;
-    } else {
-      // Superpave/SMA: Semi-log scale
+      // Marshall: semi-log scale, max sieve = 26.5mm
       const logMin=Math.log10(parseFloat(PLOT_SIEVES[PLOT_SIEVES.length-1]));
-      const logMax=Math.log10(parseFloat(PLOT_SIEVES[0]));
+      const logMax=Math.log10(MARSHALL_MAX_SIEVE);
       const logV=Math.log10(v);
       const frac=(logV-logMin)/(logMax-logMin);
+      return PL+frac*cW;
+    } else {
+      // Superpave/SMA: 0.45 power scale
+      const powMin=Math.pow(parseFloat(PLOT_SIEVES[PLOT_SIEVES.length-1]),0.45);
+      const powMax=Math.pow(parseFloat(PLOT_SIEVES[0]),0.45);
+      const powV=Math.pow(v,0.45);
+      const frac=(powV-powMin)/(powMax-powMin);
       return PL+frac*cW;
     }
   }
