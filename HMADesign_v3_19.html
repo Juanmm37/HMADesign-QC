@@ -378,7 +378,7 @@ function getMarshallVmaMin(mt,pct475){
   const col=MARSHALL_VMA_T7.data[nmps];
   if(!col)return null;
   if(pct475<=rows[0])return col[0];
-  if(pct475>rows[rows.length-1])return col[col.length]; // 60+ row (index 5)
+  if(pct475>rows[rows.length-1])return col[col.length-1]; // 60+ row (last entry)
   for(let i=0;i<rows.length-1;i++){
     if(pct475>rows[i]&&pct475<=rows[i+1]){
       const frac=(pct475-rows[i])/(rows[i+1]-rows[i]);
