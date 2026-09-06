@@ -2995,8 +2995,8 @@ function renderS3(){
     }
     const minVal=band?band[0].toFixed(1):'';
     const maxVal=band?band[1].toFixed(1):'';
-    return`<tr style="border-bottom:1px solid #eee">
-      <td style="font-size:11px;color:#333;white-space:nowrap;padding:3px 6px;font-weight:600">${SL[sv]}</td>
+    return`<tr style="border-bottom:1px solid #eee${sv==='4.75'?';background:#fff8e1;border-left:3px solid #f9a825':''}">
+      <td style="font-size:11px;color:#333;white-space:nowrap;padding:3px 6px;font-weight:${sv==='4.75'?'800':'600'}">${SL[sv]}</td>
       <td style="font-size:10px;color:#888;text-align:center;padding:3px 4px">${US[sv]||'—'}</td>
       ${aggVals}
       <td id="blend-sv-${sv}" style="text-align:right;font-weight:800;color:${blendColor};${blendBg};padding:3px 6px">${blendVal!==null&&blendVal!==undefined?Number(blendVal).toFixed(1):'—'}</td>
