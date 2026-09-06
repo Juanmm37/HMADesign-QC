@@ -7233,17 +7233,17 @@ function renderS11AggDensity(){
 
   // Auto-compute virgin fine split at 2.36mm from JMF gradation (stockpile basis)
   let T_236_virgin=0;
-  if(selTrial){
-    Object.keys(selTrial.blendPct||{}).forEach(s=>{
-      if(s.startsWith('RAP')||!slots[s])return;
-      const pct=_stockpilePcts[s]||0;
-      const agg=slots[s];
-      const g=(agg.gradation_mod||{})['2.36']!==undefined&&(agg.gradation_mod||{})['2.36']!==null
-        ?(agg.gradation_mod||{})['2.36']:(agg.gradation||{})['2.36'];
-      if(g===null||g===undefined)return;
-      T_236_virgin+=(pct/100)*(g/100)*100;
-    });
-  }
+  SLOTS.forEach(s=>{
+    if(s.startsWith('RAP')||!slots[s])return;
+    const pct=_stockpilePcts[s]||0; if(!pct)return;
+    const agg=slots[s];
+    const gmod=(agg.gradation_mod||{})['2.36'];
+    const graw=(agg.gradation||{})['2.36'];
+    const g=(gmod!==null&&gmod!==undefined)?gmod:graw;
+    // Default to 100 when sieve not explicitly stored (fine fillers like BHF/MF pass 100% at 2.36mm)
+    const gv=(g!==null&&g!==undefined)?g:100;
+    T_236_virgin+=(pct/100)*(gv/100)*100;
+  });
   const cR236Pct=Math.max(0,cVirginPct-T_236_virgin); // virgin retain 2.36mm
   const cF236Pct=Math.min(cVirginPct,T_236_virgin);   // virgin pass 2.36mm
 
