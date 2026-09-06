@@ -2409,8 +2409,8 @@ function renderS3TrialBlendAnalysis(){
         <tbody>
           ${SIEVES.map((sv,ri)=>{
             const band=bands[sv];
-            return`<tr style="background:${ri%2===0?'#fff':'#fafbfc'}">
-              <td style="padding:6px 8px;font-weight:600;color:#1f3864">${SL[sv]||sv}</td>
+            return`<tr style="background:${sv==='4.75'?'#fff8e1':ri%2===0?'#fff':'#fafbfc'}${sv==='4.75'?';border-left:3px solid #f9a825':''}">
+              <td style="padding:6px 8px;font-weight:${sv==='4.75'?'800':'600'};color:#1f3864">${SL[sv]||sv}</td>
               ${trialGrads.map((tg,bi)=>{
                 const v=tg.grad[sv];
                 const inBand=band&&v!==null?(v>=band[0]&&v<=band[1]):true;
