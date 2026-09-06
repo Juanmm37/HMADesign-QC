@@ -2458,9 +2458,10 @@ function renderS3TrialBlendAnalysis(){
             {label:'Gsa',key:'Gsa',fmt:(v)=>v.toFixed(3)},
             {label:'Air Voids %',key:'Va',fmt:(v)=>v.toFixed(1)+'%'},
             {label:'VMA %',key:'VMA',fmt:(v)=>v.toFixed(1)+'%'},
+            ...(fam==='Marshall'?[{label:'Min VMA % (T7)',key:'minVMA',fmt:(v)=>'≥'+v.toFixed(1)+'%'}]:[]),
             {label:'% Binder Replacement',key:'BR',fmt:(v)=>v.toFixed(1)+'%'}
           ].map(prop=>{
-            return`<tr style="background:${prop.key==='totalPct'?'#e8f0fe':prop.key==='BR'?'#fff8e1':'#fff'}">
+            return`<tr style="background:${prop.key==='totalPct'?'#e8f0fe':prop.key==='BR'?'#fff8e1':prop.key==='minVMA'?'#f0f4ff':'#fff'}">
               <td style="padding:6px 8px;font-weight:600;color:#1f3864">${prop.label}</td>
               ${trialGrads.map((tg,bi)=>{
                 let val=null;
@@ -2479,10 +2480,12 @@ function renderS3TrialBlendAnalysis(){
                     const res=calcVol(workflowTrial,ms.info,blendGsb);
                     val=res?res[prop.key]:null;
                   }
+                } else if(prop.key==='minVMA'){
+                  val=getMarshallVmaMin(mt,tg.grad['4.75']);
                 } else if(prop.key==='BR'){
                   val=calcBinderReplacement(ms.tbaTrials[bi].pcts,ms.tbaTrials[bi].Pb);
                 }
-                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':'#1f3864'}">${val!==null?prop.fmt(val):'—'}</td>`;
+                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':prop.key==='minVMA'?'#555':'#1f3864'}">${val!==null?prop.fmt(val):'—'}</td>`;
               }).join('')}
             </tr>`;
           }).join('')}
