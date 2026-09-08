@@ -2792,7 +2792,7 @@ function renderTBAChart(trialGrads, bands, info){
     <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff"/>
     ${yGrid}${bandSvg}<line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" stroke="#ccc" stroke-width="1.5"/>
     <line x1="${PL}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#ccc" stroke-width="1.5"/>
-    ${trialLines}${targetLines}${xLbls}
+    ${trialLines}${targetLines}${pcsSvg}${xLbls}
     <text x="${PL-30}" y="${PT+cH/2}" font-size="11" fill="#666" text-anchor="middle" transform="rotate(-90,${PL-30},${PT+cH/2})">% Passing</text>
     <text x="${PL+cW/2}" y="${PT-14}" font-size="13" font-weight="700" fill="#1f3864" text-anchor="middle">Gradation Curves — ${mt||'(no mix)'}${info.hasRAP==='Yes'?' RAP':''}</text>
     <text x="${PL+cW/2}" y="${PT-2}" font-size="9" fill="#999" text-anchor="middle">${isMarshall?'Semi-log scale':'0.45 Power scale'}</text>
