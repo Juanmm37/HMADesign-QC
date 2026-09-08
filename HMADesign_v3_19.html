@@ -3322,14 +3322,14 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
   const _pcsY=_pcsDat&&_pcsX!==null?yOf(_pcsDat.pct):null;
   let pcsSvg='';
   if(_pcsX!==null&&_pcsY!==null){
-    const r=forPrint?14:7;
-    const lw=forPrint?3:1.5;
+    const r=forPrint?14:5;
+    const lw=forPrint?3:1.2;
     const fs=forPrint?14:9;
-    pcsSvg=`<circle cx="${_pcsX.toFixed(1)}" cy="${_pcsY.toFixed(1)}" r="${r}" fill="none" stroke="#e84393" stroke-width="${(r*0.35).toFixed(1)}"/>
+    pcsSvg=`<circle cx="${_pcsX.toFixed(1)}" cy="${_pcsY.toFixed(1)}" r="${r}" fill="none" stroke="#e84393" stroke-width="${forPrint?(r*0.35).toFixed(1):'1.8'}"/>
     <line x1="${(_pcsX-r-4).toFixed(1)}" y1="${_pcsY.toFixed(1)}" x2="${(_pcsX+r+4).toFixed(1)}" y2="${_pcsY.toFixed(1)}" stroke="#e84393" stroke-width="${lw}"/>
     <line x1="${_pcsX.toFixed(1)}" y1="${(_pcsY-r-4).toFixed(1)}" x2="${_pcsX.toFixed(1)}" y2="${(_pcsY+r+4).toFixed(1)}" stroke="#e84393" stroke-width="${lw}"/>
-    <text x="${(_pcsX+r+6).toFixed(1)}" y="${(_pcsY-3).toFixed(1)}" font-size="${fs}" fill="#e84393" font-weight="700">PCS</text>
-    <text x="${(_pcsX+r+6).toFixed(1)}" y="${(_pcsY+fs).toFixed(1)}" font-size="${fs}" fill="#e84393">${_pcsDat.pct}%</text>`;
+    <text x="${(_pcsX+r+4).toFixed(1)}" y="${(_pcsY-3).toFixed(1)}" font-size="${fs}" fill="#e84393" font-weight="700">PCS</text>
+    <text x="${(_pcsX+r+4).toFixed(1)}" y="${(_pcsY+fs).toFixed(1)}" font-size="${fs}" fill="#e84393">${_pcsDat.pct}%</text>`;
   }
 
   const blendPts=chartSieves.map(s=>{
