@@ -3340,13 +3340,15 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     :`0.45 Power Aggregate Grading Chart — ${mt}${info.hasRAP==='Yes'?' RAP':''}`;
 
   // Legend — bottom-right corner; size scales with font
-  const hasPCS=(!isMarshall&&fam==='Superpave'&&SP_PCS[mt]!=null);
-  const legW=forPrint?230:150, legH=hasPCS?(forPrint?110:72):(forPrint?76:52);
+  const legW=forPrint?230:150, legH=(_pcsX!==null)?(forPrint?110:72):(forPrint?76:52);
   const legX=PL+cW-legW-10, legY=PT+cH-legH-10;
   const legLH=forPrint?32:22; // legend line height
   const legLW=forPrint?24:16; // legend line sample width
   const legSq=forPrint?12:8;  // legend square size
   const r1cy=legY+legLH/2, r2cy=legY+legLH*1.5;
+  // PCS legend row — built here because legY/legLH are now in scope
+  const pcsLegRow=_pcsX!==null?`<circle cx="${legX+legSq/2}" cy="${(legY+legLH*2.5).toFixed(1)}" r="${legSq/2}" fill="none" stroke="#e84393" stroke-width="2"/>
+    <text x="${legX+legLW+6}" y="${(legY+legLH*2.5+fsLeg*0.38).toFixed(1)}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">PCS (${_pcsDat?_pcsDat.pct:''}%)</text>`:'';
   const legendSvg=`
     <rect x="${legX-8}" y="${legY-8}" width="${legW+16}" height="${legH+12}" fill="rgba(255,255,255,0.94)" stroke="#bbb" stroke-width="${forPrint?2:1}" rx="4"/>
     <line x1="${legX}" y1="${r1cy}" x2="${legX+legLW}" y2="${r1cy}" stroke="#c0392b" stroke-width="${blendLw}"/>
