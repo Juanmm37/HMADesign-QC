@@ -3750,6 +3750,19 @@ function calcVol(trial,info,blendGsb){
   return{avgGmb,Va,VMA,VFA,Gse,pGmmNini,pGmmNdes,Stab:vol.Stab,Flow:vol.Flow,
     Gmm_val:Gmm,GmmA:Gmm1,GmmB:Gmm2,hNini,hNdes};
 }
+function specCite(info,what){
+  const fam=info.family||'',isM=fam==='Marshall',isMUNI=(info.specType||'PROV')==='MUNI';
+  if(isM){
+    const tMap={Grad:'Table 2',AC:'Table 3',Va:'Table 4',Flow:'Table 5',Stab:'Table 6',VMA:'Table 7'};
+    return`OPSS.MUNI 1150 ${tMap[what]||''}`.trim();
+  }
+  if(isMUNI){
+    const tMap={Traffic:'Table 1',Grad:'Table 2',VolProps:'Table 5',VMA:'Table 5',VFA:'Table 5',GmmNini:'Table 5',GmmNdes:'Table 5',Gyrations:'Table 7'};
+    return`OPSS.MUNI 1151 ${tMap[what]||''}`.trim();
+  }
+  const tMap={Grad:'Table 1',VolProps:'Table 3',VMA:'Table 3',VFA:'Table 3',GmmNini:'Table 3',GmmNdes:'Table 3',Gyrations:'Table 7'};
+  return`OPSS.PROV 1151 ${tMap[what]||''}`.trim();
+}
 function chkCell(val,rng,unit,dec=1,note=''){
   if(val===null||val===undefined)return`<div class="mc"><div class="ml">${unit}</div><div class="mv" style="font-size:18px">—</div></div>`;
   // Support [min,max], [min,null]=min only, [null,max]=max only
