@@ -3919,14 +3919,17 @@ function renderS4(){
           const{blendGrad}=calcBlendProps(trial);
           const ep=res?calcEstimatedProps(res,trial,info,blendGsb,blendGrad):null;
           return res?`
+          <div style="font-size:10px;color:#1f3864;font-weight:600;margin-bottom:6px;opacity:0.75;letter-spacing:0.03em">
+            Targets per ${specCite(info,’VolProps’)}
+          </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:8px;margin-bottom:10px">
-            ${chkCell(res.Va,tgt.Va,'Va (%)')}
-            ${chkCell(res.VMA,tgt.VMA,'VMA (%)')}
-            ${res.VFA!==null?chkCell(res.VFA,tgt.VFA,'VFA (%)'):'' }
-            ${res.pGmmNini!==null&&tgt.pGmmNini?chkCell(res.pGmmNini,tgt.pGmmNini,'%Gmm Nini',1,'* ≤89.5 permitted at Contractor’s option (OPSS Note 5)'):''}
-            ${res.pGmmNdes!==null&&tgt.pGmmNdes?chkCell(res.pGmmNdes,tgt.pGmmNdes,'%Gmm Ndes'):''}
-            ${res.Stab&&tgt.Stab?chkCell(res.Stab,tgt.Stab,'Stability (N)',0):''}
-            ${res.Flow&&tgt.Flow?chkCell(res.Flow,tgt.Flow,'Flow ×0.25mm'):''}
+            ${chkCell(res.Va,tgt.Va,’Va (%)’)}
+            ${chkCell(res.VMA,tgt.VMA,’VMA (%)’)}
+            ${res.VFA!==null?chkCell(res.VFA,tgt.VFA,’VFA (%)’):’’ }
+            ${res.pGmmNini!==null&&tgt.pGmmNini?chkCell(res.pGmmNini,tgt.pGmmNini,’%Gmm Nini’,1,’per ‘+specCite(info,’GmmNini’)):’’}
+            ${res.pGmmNdes!==null&&tgt.pGmmNdes?chkCell(res.pGmmNdes,tgt.pGmmNdes,’%Gmm Ndes’):’’}
+            ${res.Stab&&tgt.Stab?chkCell(res.Stab,tgt.Stab,’Stability (N)’,0,’per ‘+specCite(info,’Stab’)):’’}
+            ${res.Flow&&tgt.Flow?chkCell(res.Flow,tgt.Flow,’Flow ×0.25mm’,’’,’per ‘+specCite(info,’Flow’)):’’}
             <div class="mc"><div class="ml">Avg BRD</div><div class="mv" style="font-size:18px">${res.avgGmb.toFixed(3)}</div></div>
             <div class="mc"><div class="ml">Avg MRD</div><div class="mv" style="font-size:18px">${res.Gmm_val.toFixed(3)}</div></div>
             <div class="mc"><div class="ml">Gse</div><div class="mv" style="font-size:18px">${fN(res.Gse)}</div></div>
