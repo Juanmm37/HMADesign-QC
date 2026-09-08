@@ -7751,6 +7751,12 @@ function renderS11AggDensity(){
   const T31=T29>0?T30/T29:0;
   const T32=1-T31;
 
+  // ── Display fractions — use JMF blend grad (matches Step 6 table) ──
+  // T29 above uses stockpile% (required for Q43/P51 density formulas).
+  // For display we use the blend-based total so Retain + all fine fractions sum to 100%.
+  const _blendG4_75=selTrial?(calcBlendProps(selTrial).blendGrad['4.75']??T29):T29;
+  const dispCoarsePct=Math.round((100-_blendG4_75)*10)/10;  // = 39.3 when JMF shows 60.7
+
   // ── Q43 equivalent — combined fine+RAP Gsb/Gsa/WA ──
   // Excel: Q43 = ROUND(P43*T31 + P48*T32, 3)
   const hasRAP=!!(slots.RAP1||slots.RAP2);
