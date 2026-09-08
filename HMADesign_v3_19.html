@@ -8727,8 +8727,10 @@ function renderS10Summary(){
   const fam=ms.info.family||'Superpave';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
   const designPb=ms.designPb,pc=ms.propertyCurves,pts=pc.pts||[];
+  const info=ms.info,mt=info.mixType||'';
   return`<div class="card card-blue">
     <div class="st">Summary of Results</div>
+    <div style="font-size:10px;color:#1f3864;font-weight:600;margin-bottom:10px;opacity:0.7">Design per ${specCite(info,'VolProps')}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
       <div><div class="st" style="margin-bottom:8px">Project Info</div>
         ${[['Mix Design No.',ms.info.mixNo],['Mix Type',ms.info.mixType+(ms.info.hasRAP==='Yes'?' RAP':'')],
