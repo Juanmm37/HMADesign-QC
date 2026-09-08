@@ -6367,7 +6367,7 @@ function renderS6VolSelected(){
     <div class="row" style="justify-content:space-between;margin-top:16px">
       <button class="btn" onclick="ms.step=6;render()">← Back</button>
       <button class="btn btn-gold" onclick="printStep('Selected Volumetrics')">🖨 Print</button>
-      <button class="btn btn-primary" onclick="computePropertyCurves();ms.step=8;render()">Next: Property Curves →</button>
+      <button class="btn btn-primary" onclick="try{computePropertyCurves();}catch(e){console.error('computePropertyCurves error',e);alert('Error computing property curves: '+e.message);}ms.step=8;render()">Next: Property Curves →</button>
     </div>
   </div>`;
 }
