@@ -351,6 +351,25 @@ const SP_VOL={
 };
 // MUNI 1151 Table 5: Cat D %GmmNini max is 89.5 (vs 89.0 in PROV 1151 Table 3)
 const SP_GMMNINI_MUNI={'A':91.5,'B':90.5,'C':89.0,'D':89.5,'E':89.0};
+const SP_PCS={
+  'SP 4.75':null,
+  'SP 9.5':{sieve:'2.36',pct:47},
+  'SP 12.5':{sieve:'2.36',pct:39},'SP 12.5 FC1':{sieve:'2.36',pct:39},'SP 12.5 FC2':{sieve:'2.36',pct:39},
+  'SP 19.0':{sieve:'4.75',pct:47},
+  'SP 25.0':{sieve:'4.75',pct:40},
+  'SP 37.5':{sieve:'9.5',pct:47},
+};
+function getDPRange(info,blendGrad){
+  const mt=info.mixType||'',fam=info.family||'';
+  if(fam!=='Superpave')return{min:0.6,max:1.2};
+  if(mt==='SP 4.75')return{min:0.9,max:2.0};
+  const pcs=SP_PCS[mt];
+  if(pcs&&blendGrad){
+    const blendPct=blendGrad[pcs.sieve];
+    if(blendPct!==null&&blendPct!==undefined&&blendPct<pcs.pct)return{min:0.8,max:1.6};
+  }
+  return{min:0.6,max:1.2};
+}
 const MS_VOL={
   Va:{'default':[3.5,4.5],'HL2':[4.5,5.5],'DFC':[3.2,3.8]},
   minFlow:{'default':8,'HL2':9,'HL3F':9,'HL4F':9},
