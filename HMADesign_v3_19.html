@@ -983,10 +983,19 @@ function render(){
   else if(view==='newmix'){
     rehydratePropertyCurves();
     try{el.innerHTML=renderNewMix();}catch(e){
-      console.warn('renderNewMix error on step',ms.step,e);
+      console.error('renderNewMix error on step',ms.step,e);
+      const _failedStep=ms.step,_failedErr=String(e);
       if(ms.step===8){ms.step=7;}else if(ms.step>1){ms.step--;}
-      try{el.innerHTML=renderNewMix();}catch(e2){
-        el.innerHTML='<div class="card" style="color:#c0392b;padding:20px">Error rendering step '+ms.step+'. Try navigating back.</div>';
+      try{
+        el.innerHTML=renderNewMix();
+        const _b=document.createElement('div');
+        _b.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#c0392b;color:#fff;padding:12px 20px;border-radius:8px;font-size:12px;max-width:560px;z-index:9999;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.4)';
+        _b.innerHTML='<strong>Error on Step '+_failedStep+':</strong> '+_failedErr.replace(/</g,'&lt;')+'<br><small style="opacity:0.8">Click to dismiss</small>';
+        _b.onclick=()=>_b.remove();
+        document.body.appendChild(_b);
+        setTimeout(()=>_b.remove&&_b.remove(),60000);
+      }catch(e2){
+        el.innerHTML='<div class="card" style="color:#c0392b;padding:20px"><strong>Error on Step '+_failedStep+':</strong><br><code style="font-size:11px">'+_failedErr.replace(/</g,'&lt;')+'</code><br><button class="btn" onclick="ms.step--;render()" style="margin-top:12px">← Go Back</button></div>';
       }
     }
     // Removing focused elements during DOM rebuild triggers their onblur synchronously,
