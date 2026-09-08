@@ -5195,11 +5195,11 @@ function renderAnalytics(){
   });
   const W=820,H=340,PL=46,PR=20,PT=34,PB=60;
   const cW=W-PL-PR,cH=H-PT-PB;
-  // X axis: RIGHT-TO-LEFT — coarser on LEFT side of chart
-  // PLOT_SIEVES[0] = '25' (coarsest) => x = PL (left)
-  // PLOT_SIEVES[last] = '0.075' (finest) => x = PL+cW (right)
-  // But display label shows coarser on left
-  const xOf=(s)=>{const i=PLOT_SIEVES.indexOf(s);return i>=0?PL+(i/(PLOT_SIEVES.length-1))*cW:null;};
+  // X axis: coarser on LEFT, finer on RIGHT, clipped to mix-type max sieve
+  const MIX_MAX_SIEVE2={'SP 4.75':12.5,'SP 9.5':16.0,'SP 12.5':26.5,'SP 12.5 FC1':26.5,'SP 12.5 FC2':26.5,'SP 19.0':37.5,'SP 25.0':50,'SP 37.5':50,'SMA 9.5':16.0,'SMA 12.5':26.5,'SMA 19.0':37.5};
+  const maxSN2=(info.family||'')==='Marshall'?26.5:(MIX_MAX_SIEVE2[mt]||50);
+  const activePlotSieves=PLOT_SIEVES.filter(s=>parseFloat(s)<=maxSN2);
+  const xOf=(s)=>{const i=activePlotSieves.indexOf(s);return i>=0?PL+(i/(activePlotSieves.length-1))*cW:null;};
   const yOf=v=>PT+cH-(v/100)*cH;
 
   function line(grad,color,dash='',wt=2){
