@@ -3775,8 +3775,9 @@ function getVolTargets(info,mt){
     const vmaMin=SP_VOL.VMA[mt]||14;
     const vfaRow=SP_VOL.VFA_by_traffic[tc]||{};
     const vfa=vfaRow[mt]||vfaRow['default']||[65,78];
-    const pNiniMax=Math.max(SP_VOL['%GmmNini'][tc]||90.5,89.5);
-    return{Va:null,VMA:[vmaMin,null],VFA:vfa,pGmmNini:[null,pNiniMax],pGmmNdes:[95.5,96.5],Stab:null,Flow:null};
+    const gmmNiniTable=(info.specType||'PROV')==='MUNI'?SP_GMMNINI_MUNI:SP_VOL['%GmmNini'];
+    const pNiniMax=gmmNiniTable[tc]||null;
+    return{Va:null,VMA:[vmaMin,null],VFA:vfa,pGmmNini:pNiniMax?[null,pNiniMax]:null,pGmmNdes:[95.5,96.5],Stab:null,Flow:null};
   } else if(fam==='SMA'){
     return{Va:null,VMA:[17,null],VFA:null,pGmmNini:null,pGmmNdes:null,Stab:null,Flow:null};
   } else {
