@@ -4003,7 +4003,7 @@ function renderS4(){
                 <td style="padding:6px 8px;text-align:center;font-weight:700;font-size:13px;color:${tgt.VFA&&ep.VFA_est>=tgt.VFA[0]&&ep.VFA_est<=tgt.VFA[1]?'#1a6b1a':'#c0392b'}">${ep.VFA_est!==null?ep.VFA_est.toFixed(1):'—'}</td>
                 ${res.pGmmNini!==null&&res.pGmmNini!==undefined?`<td style="padding:6px 8px;text-align:center;font-weight:700;font-size:13px;color:${tgt.pGmmNini&&ep.pGmmNini_est<=tgt.pGmmNini[1]?'#1a6b1a':'#c0392b'}">${ep.pGmmNini_est!==null?ep.pGmmNini_est.toFixed(1):'—'}</td>`:''}
                 <td style="padding:6px 8px;text-align:center;font-weight:700;font-size:13px;color:#1f3864">${ep.Pbe_est!==null?ep.Pbe_est.toFixed(1):'—'}</td>
-                <td style="padding:6px 8px;text-align:center;font-weight:700;font-size:13px;color:${ep.DP_est!==null&&ep.DP_est>=0.6&&ep.DP_est<=1.2?'#1a6b1a':'#c0392b'}">${ep.DP_est!==null?ep.DP_est.toFixed(1):'—'}</td>
+                <td style="padding:6px 8px;text-align:center;font-weight:700;font-size:13px;color:${ep.DP_est!==null&&ep.DP_est>=dr.min&&ep.DP_est<=dr.max?'#1a6b1a':'#c0392b'}">${ep.DP_est!==null?ep.DP_est.toFixed(1):'—'}</td>
               </tr>
             </tbody>
           </table>`:''}
