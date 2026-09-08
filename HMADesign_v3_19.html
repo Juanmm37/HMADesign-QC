@@ -4059,6 +4059,260 @@ function saveAndExit(){
 }
 
 // ── RECORDS ──
+// ══════════════════════════════════════════════════════
+// SPEC REFERENCE — OPSS.MUNI 1151 & OPSS.PROV 1151
+// ══════════════════════════════════════════════════════
+let _specTab='muni1151';
+function renderSpecRef(){
+  const th=(t,s='')=>`<th style="background:#1f3864;color:#fff;padding:6px 8px;font-size:11px;font-weight:700;text-align:center;border:1px solid #3a5a8a${s?';'+s:''}">${t}</th>`;
+  const td=(t,s='')=>`<td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde${s?';'+s:''}">${t||'—'}</td>`;
+  const tdl=(t,s='')=>`<td style="padding:5px 8px;font-size:11px;text-align:left;border:1px solid #dde;font-weight:600${s?';'+s:''}">${t}</td>`;
+  const tbl=(head,rows,note='')=>`<div style="overflow-x:auto;margin-bottom:4px"><table style="border-collapse:collapse;width:100%;min-width:400px">${head}${rows}</table></div>${note?`<div style="font-size:10px;color:#555;margin-bottom:12px;padding:4px 6px;background:#f8f9fc;border-radius:4px;border-left:3px solid #c5d3ef">${note}</div>`:''}`;
+
+  // ── MUNI 1151 ───────────────────────────────────────
+  const muni1151=()=>{
+    // Table 1 — Traffic Categories
+    const t1=tbl(
+      `<thead><tr>${th('Ontario Traffic<br>Category')}${th('20-Year Design ESALs')}${th('Typical Applications')}</tr></thead>`,
+      `<tbody>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">A</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">Less than 0.3 million</td><td style="padding:5px 8px;font-size:11px;border:1px solid #dde">Low volume roads, parking lots, driveways, and residential roads</td></tr>
+        <tr style="background:#f8f9fc"><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">B</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">0.3 to 3 million</td><td style="padding:5px 8px;font-size:11px;border:1px solid #dde">Minor collector roads</td></tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">C</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">3 to 10 million</td><td style="padding:5px 8px;font-size:11px;border:1px solid #dde">Major collector and minor arterial roads</td></tr>
+        <tr style="background:#f8f9fc"><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">D</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">10 to 30 million</td><td style="padding:5px 8px;font-size:11px;border:1px solid #dde">Major arterial roads and transit routes</td></tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">E</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">Greater than 30 million</td><td style="padding:5px 8px;font-size:11px;border:1px solid #dde">Freeways, major arterial roads with heavy truck traffic, and special applications</td></tr>
+      </tbody>`,
+      'Note 1: ESAL = Equivalent Single Axle Load for the projected traffic level in the design lane over a 20-year period.'
+    );
+
+    // Table 2 — Superpave Aggregate Gradation Control Points
+    const spGradRows=[
+      ['Superpave 4.75','—','—','—','—','100','95–100','90–100','—','30–60','6–12'],
+      ['Superpave 9.5','—','—','—','—','100','90–100','32–90','32–67','—','2–10'],
+      ['Superpave 12.5','—','—','—','100','90–100','28–90','—','28–58','—','2–10'],
+      ['Superpave 12.5 FC1 & FC2','—','—','—','100','90–100','45–90','45–60','28–58','—','2–10'],
+      ['Superpave 19.0','—','—','100','90–100','23–90','—','—','23–49','—','2–8'],
+      ['Superpave 25.0','—','100','90–100','19–90','—','—','—','19–45','—','1–7'],
+      ['Superpave 37.5','100','90–100','15–90','—','—','—','—','15–41','—','0–6'],
+    ];
+    const t2=tbl(
+      `<thead><tr>${th('HMA Type','text-align:left')}${['50.0','37.5','25.0','19.0','12.5','9.5','4.75','2.36','1.18','0.075'].map(s=>th(s)).join('')}</tr></thead>`,
+      `<tbody>${spGradRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${r.slice(1).map(v=>td(v)).join('')}</tr>`).join('')}</tbody>`,
+      'Percentage passing by dry mass. Control points define acceptable gradation zone.'
+    );
+
+    // Table 3 — SMA Aggregate Gradation Control Points
+    const smaGradRows=[
+      ['SMA 9.5','—','—','—','100','70–95','30–50','20–30','8–12'],
+      ['SMA 12.5','—','—','100','90–100','50–80','20–35','16–24','8–11'],
+      ['SMA 19.0','—','100','90–100','50–88','25–60','20–28','16–24','8–11'],
+    ];
+    const t3=tbl(
+      `<thead><tr>${th('HMA Type','text-align:left')}${['37.5','25.0','19.0','12.5','9.5','4.75','2.36','0.075'].map(s=>th(s)).join('')}</tr></thead>`,
+      `<tbody>${smaGradRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${r.slice(1).map(v=>td(v)).join('')}</tr>`).join('')}</tbody>`,
+      'Note A: For SMA 9.5, the upper gradation control points are 21, 18, and 15% passing for the 1.18 mm, 0.600 mm, and 0.300 mm sieves respectively.'
+    );
+
+    // Table 4 — Superpave PCS Points
+    const pcsRows=[
+      ['Superpave 4.75','—','—'],
+      ['Superpave 9.5','2.36','47'],
+      ['Superpave 12.5, 12.5 FC1, and 12.5 FC2','2.36','39'],
+      ['Superpave 19.0','4.75','47'],
+      ['Superpave 25.0','4.75','40'],
+      ['Superpave 37.5','9.5','47'],
+    ];
+    const t4=tbl(
+      `<thead><tr>${th('HMA Type','text-align:left')}${th('Primary Control Sieve (mm)')}${th('PCS Control Point at % Passing')}</tr></thead>`,
+      `<tbody>${pcsRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${td(r[1])}${td(r[2])}</tr>`).join('')}</tbody>`
+    );
+
+    // Table 5 — Superpave HMA Volumetric Properties
+    const t5=tbl(
+      `<thead>
+        <tr>${th('Ontario<br>Traffic Cat.','rowspan:3')}${th('% Theoretical Max Specific Gravity','colspan:3')}${th('VMA % Minimum (NMPS mm)','colspan:6')}${th('VFA<br>%')}${th('Dust/Binder<br>Ratio')}${th('Min TSR<br>%')}</tr>
+        <tr>${th('N<sub>ini</sub>')}${th('N<sub>des</sub>')}${th('N<sub>max</sub>')}${['37.5','25.0','19.0','12.5','9.5','4.75'].map(s=>th(s)).join('')}${th('')}${th('')}${th('')}</tr>
+      </thead>`,
+      `<tbody>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">A</td>${td('≤91.5')}${td('96.0','rowspan:5')}${td('≤98.0','rowspan:5')}${['11.0','12.0','13.0','14.0','15.0','16.0'].map(v=>td(v,'rowspan:5')).join('')}${td('70–80')}<td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde;rowspan:5">0.6–1.2</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde;rowspan:5">80</td></tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">B</td>${td('≤90.5')}${td('65–78')}</tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">C</td>${td('')}${td('65–75')}</tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">D</td>${td('≤89.5')}${td('65–75')}</tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">E</td>${td('')}${td('65–75')}</tr>
+      </tbody>`,
+      'Notes: (1) For SP 4.75 mixes, DP = 0.9–2.0 (0.8–1.6 below PCS). (2) Cat. A, SP 25.0: VFA 67–80%. (3) SP 4.75: VFA 75–78%; SP 9.5: 73–76%; SP 37.5: 64–75%.'
+    );
+
+    // Table 6 — SMA Volumetric Properties
+    const t6=tbl(
+      `<thead><tr>${th('% Air Voids')}${th('Min VMA %<br>19.0 mm')}${th('Min VMA %<br>12.5 mm')}${th('Min VMA %<br>9.5 mm')}${th('VCA of Compacted Mix %')}${th('Max Draindown %')}${th('Min TSR %')}</tr></thead>`,
+      `<tbody><tr>${td('4.0')}${td('17')}${td('17')}${td('17')}${td('Less than VCA dry rodded')}${td('0.3')}${td('70')}</tr></tbody>`,
+      'Note 1: 100 gyrations unless L.A. Abrasion (LS-603) > 30%, then 75 gyrations. Note 2: Draindown tested per AASHTO T 305.'
+    );
+
+    // Table 7 — Superpave Compactive Effort
+    const gyrationRows=[
+      ['A','6','50','75'],
+      ['B and C','7','75','115'],
+      ['D','8','100','160'],
+      ['E','9','125','205'],
+    ];
+    const t7=tbl(
+      `<thead><tr>${th('Ontario Traffic Category')}${th('N<sub>initial</sub>')}${th('N<sub>design</sub>')}${th('N<sub>max</sub>')}</tr></thead>`,
+      `<tbody>${gyrationRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${r.map(v=>td(v)).join('')}</tr>`).join('')}</tbody>`,
+      'Note 1: Traffic categories as defined in Table 1.'
+    );
+
+    return`
+      <div class="st" style="margin-bottom:16px">OPSS.MUNI 1151 — Superpave and SMA Mix Design <span style="font-size:11px;font-weight:400;color:#888">(April 2018)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 1 — Traffic Categories by ESALs</div>${t1}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 4 — Superpave Gradation PCS Points</div>${t4}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 6 — SMA Volumetric Properties</div>${t6}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 7 — Superpave Compactive Effort</div>${t7}
+        </div>
+        <div>
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 2 — Superpave Aggregate Gradation Control Points (% passing)</div>${t2}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 3 — SMA Aggregate Gradation Control Points (% passing)</div>${t3}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 5 — Superpave HMA Volumetric Properties</div>${t5}
+        </div>
+      </div>`;
+  };
+
+  // ── PROV 1151 ───────────────────────────────────────
+  const prov1151=()=>{
+    // Table 1 — Aggregate Gradation (SP + SMA)
+    const gradRows=[
+      ['Superpave 4.75','—','—','—','—','100','95–100','90–100','—','30–60','6–12'],
+      ['Superpave 9.5','—','—','—','—','100','90–100','32–90','32–67','—','2–10'],
+      ['Superpave 12.5, 12.5FC1 & FC2','—','—','—','100','90–100','45–90','50–65 / 28–58','39–58 / 28–58','—','2–10'],
+      ['Superpave 19.0','—','—','100','90–100','23–90','—','—','23–49','—','2–8'],
+      ['Superpave 25.0','—','100','90–100','19–90','—','—','—','19–45','—','1–7'],
+      ['Superpave 37.5','100','90–100','15–90','—','—','—','—','15–41','—','0–6'],
+      ['SMA 9.5','—','—','—','100','70–95','30–50','20–30','—','8–12','—'],
+      ['SMA 12.5','—','—','100','90–100','50–80','20–35','16–24','—','8–11','—'],
+      ['SMA 19.0','—','100','90–100','50–88','25–60','20–28','16–24','—','8–11','—'],
+    ];
+    const t1=tbl(
+      `<thead><tr>${th('HMA Type','text-align:left')}${['50.0','37.5','25.0','19.0','12.5','9.5','4.75','2.36','1.18','0.075'].map(s=>th(s)).join('')}</tr></thead>`,
+      `<tbody>${gradRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${r.slice(1).map(v=>td(v)).join('')}</tr>`).join('')}</tbody>`,
+      'Note 1: SP 12.5FC1/FC2 coarse graded: 4.75 mm = 45–55%, 2.36 mm = 28–58%.'
+    );
+
+    // Table 2 — Superpave PCS Points
+    const pcsRows=[
+      ['Superpave 4.75','—','—'],
+      ['Superpave 9.5','2.36','47'],
+      ['Superpave 12.5, 12.5FC 1, and 12.5FC 2','2.36','39'],
+      ['Superpave 19.0','4.75','47'],
+      ['Superpave 25.0','4.75','40'],
+      ['Superpave 37.5','9.5','47'],
+    ];
+    const t2=tbl(
+      `<thead><tr>${th('HMA Type','text-align:left')}${th('Primary Control Sieve (mm)')}${th('PCS Control Point at % Passing')}</tr></thead>`,
+      `<tbody>${pcsRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${td(r[1])}${td(r[2])}</tr>`).join('')}</tbody>`
+    );
+
+    // Table 3 — Superpave HMA Properties
+    const t3=tbl(
+      `<thead>
+        <tr>${th('Traffic<br>Category')}${th('% Theoretical Max Specific Gravity','colspan:3')}${th('VMA % Minimum (NMPS mm)','colspan:6')}${th('VFA %')}${th('Dust/Binder<br>Ratio')}${th('Min TSR %')}</tr>
+        <tr>${th('')}${th('N<sub>ini</sub>')}${th('N<sub>des</sub>')}${th('N<sub>max</sub>')}${['37.5','25.0','19.0','12.5','9.5','4.75'].map(s=>th(s)).join('')}${th('')}${th('')}${th('')}</tr>
+      </thead>`,
+      `<tbody>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">A</td>${td('≤91.5')}${td('96.0','rowspan:5')}${td('≤98.0','rowspan:5')}${['11.0','12.0','13.0','14.0','15.0','16.0'].map(v=>td(v,'rowspan:5')).join('')}${td('70–80')}${td('0.6–1.2','rowspan:5')}${td('80','rowspan:5')}</tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">B</td>${td('≤90.5')}${td('65–78')}</tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">C</td>${td('')}${td('65–75')}</tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">D</td>${td('≤89.0')}<td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">65–75 (Note 6)</td></tr>
+        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">E</td>${td('')}${td('65–75')}</tr>
+      </tbody>`,
+      'Notes: (2) Cat. A, SP 25.0: VFA 67–80%. (3) SP 4.75: DP 0.9–2.0 (0.8–1.6 below PCS). (4) Cat. A VFA 70–80%. (6) SP 37.5: VFA 64–75%.'
+    );
+
+    // Table 4 — SMA Properties
+    const t4=tbl(
+      `<thead><tr>${th('% Air Voids')}${th('Min VMA %')}${th('VCA of Compacted Mix %')}${th('Max Draindown at Production Temp %')}${th('Min TSR %')}</tr></thead>`,
+      `<tbody><tr>${td('4.0')}${td('17')}${td('Less than VCA dry rodded')}${td('0.3')}${td('70')}</tr></tbody>`,
+      'Note 1: 100 gyrations unless L.A. Abrasion (LS-603) > 30%, then 75 gyrations. Note 2: Draindown per AASHTO T 305.'
+    );
+
+    // Table 5 — SMA Min Asphalt Content by Gsb
+    const smaAcRows=[
+      ['2.40','6.8'],['2.45','6.7'],['2.50','6.6'],['2.55','6.5'],['2.60','6.3'],
+      ['2.65','6.2'],['2.70','6.1'],['2.75','6.0'],['2.80','5.9'],['2.85','5.8'],
+      ['2.90','5.7'],['2.95','5.6'],['3.00','5.5'],
+    ];
+    const t5=tbl(
+      `<thead><tr>${th('Combined Aggregate Bulk Relative Density')}${th('Min Asphalt Content Based on Mass %')}</tr></thead>`,
+      `<tbody>${smaAcRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${td(r[0])}${td(r[1])}</tr>`).join('')}</tbody>`
+    );
+
+    // Table 6 — Max Binder Replacement
+    const t6=tbl(
+      `<thead><tr>${th('Traffic Category')}${th('Binder Course ≥150 mm Below Surface')}${th('Binder Course Within 150 mm of Surface')}${th('Surface Course')}</tr></thead>`,
+      `<tbody>
+        <tr>${td('A, B')}${td('40%')}${td('40%')}${td('0%')}</tr>
+        <tr style="background:#f8f9fc">${td('C, D')}${td('40%')}${td('20%')}${td('0%')}</tr>
+        <tr>${td('E')}${td('40%')}${td('20%')}${td('0%')}</tr>
+      </tbody>`,
+      'Note 1: Traffic category as specified in the Contract Documents.'
+    );
+
+    // Table 7 — Superpave Compactive Effort
+    const gyrationRows=[
+      ['A','6','50','75'],
+      ['B and C','7','75','115'],
+      ['D','8','100','160'],
+      ['E','9','125','205'],
+    ];
+    const t7=tbl(
+      `<thead><tr>${th('Ontario Traffic Category')}${th('N<sub>initial</sub>')}${th('N<sub>design</sub>')}${th('N<sub>max</sub>')}</tr></thead>`,
+      `<tbody>${gyrationRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${r.map(v=>td(v)).join('')}</tr>`).join('')}</tbody>`,
+      'Note 1: Traffic categories as specified in the Contract Documents.'
+    );
+
+    return`
+      <div class="st" style="margin-bottom:16px">OPSS.PROV 1151 — Superpave and SMA Mix Design <span style="font-size:11px;font-weight:400;color:#888">(April 2021)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 1 — Aggregate Gradation Control Points (% passing)</div>${t1}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 2 — Superpave Gradation PCS Points</div>${t2}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 5 — SMA Min Asphalt Content by Aggregate Gsb</div>${t5}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 6 — Maximum % Binder Replacement</div>${t6}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 7 — Superpave Compactive Effort</div>${t7}
+        </div>
+        <div>
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 3 — Superpave HMA Properties</div>${t3}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 4 — SMA Properties</div>${t4}
+        </div>
+      </div>`;
+  };
+
+  // ── MUNI 1150 placeholder ───────────────────────────
+  const muni1150=()=>`<div class="wbox" style="margin-top:20px">
+    <div style="font-size:13px;font-weight:700;color:#1f3864;margin-bottom:8px">OPSS.MUNI 1150 — Marshall Mix Design</div>
+    <div style="font-size:12px;color:#666">Tables will be added once the specification pages are uploaded.</div>
+  </div>`;
+
+  const tabs=[
+    {key:'muni1151',label:'OPSS.MUNI 1151'},
+    {key:'prov1151',label:'OPSS.PROV 1151'},
+    {key:'muni1150',label:'OPSS.MUNI 1150'},
+  ];
+
+  const content=_specTab==='muni1151'?muni1151():_specTab==='prov1151'?prov1151():muni1150();
+
+  return`<div class="card card-blue">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+      <div class="st" style="margin:0">Specification Reference</div>
+      <div style="display:flex;gap:6px">
+        ${tabs.map(t=>`<button class="btn${_specTab===t.key?' btn-primary':''}" style="font-size:12px;padding:5px 14px" onclick="_specTab='${t.key}';render()">${t.label}</button>`).join('')}
+      </div>
+    </div>
+    ${content}
+  </div>`;
+}
+
 function renderRec(){
   if(!db.mixes.length)return`<div style="text-align:center;padding:50px;color:#aaa">No mix designs. <a href="#" onclick="startNewMix();return false">Create one.</a></div>`;
   return`<div class="row" style="margin-bottom:14px;justify-content:space-between">
