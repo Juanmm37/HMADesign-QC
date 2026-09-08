@@ -3347,7 +3347,8 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     :`0.45 Power Aggregate Grading Chart — ${mt}${info.hasRAP==='Yes'?' RAP':''}`;
 
   // Legend — bottom-right corner; size scales with font
-  const legW=forPrint?230:150, legH=forPrint?76:52;
+  const hasPCS=(!isMarshall&&fam==='Superpave'&&SP_PCS[mt]!=null);
+  const legW=forPrint?230:150, legH=hasPCS?(forPrint?110:72):(forPrint?76:52);
   const legX=PL+cW-legW-10, legY=PT+cH-legH-10;
   const legLH=forPrint?32:22; // legend line height
   const legLW=forPrint?24:16; // legend line sample width
@@ -3358,7 +3359,8 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     <line x1="${legX}" y1="${r1cy}" x2="${legX+legLW}" y2="${r1cy}" stroke="#c0392b" stroke-width="${blendLw}"/>
     <text x="${legX+legLW+6}" y="${r1cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">Trial ${trial.id} Blend</text>
     <rect x="${legX}" y="${r2cy-legSq/2}" width="${legSq}" height="${legSq}" fill="#1f3864" opacity="0.85"/>
-    <text x="${legX+legLW+6}" y="${r2cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">Spec Limit</text>`;
+    <text x="${legX+legLW+6}" y="${r2cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">Spec Limit</text>
+    ${pcsLegRow}`;
 
   return`<div style="margin-bottom:${forPrint?0:12}px">
     <svg width="100%" viewBox="0 0 ${W} ${H}" style="display:block;font-family:'Segoe UI',sans-serif;${forPrint?'':'max-width:'+W+'px'}">
