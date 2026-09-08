@@ -2763,12 +2763,12 @@ function renderTBAChart(trialGrads, bands, info){
     if(pcs){
       const px=xOf(pcs.sieve),py=yOf(pcs.pct);
       if(px!==null){
-        const r=7;
-        pcsSvg=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${r}" fill="none" stroke="#e84393" stroke-width="2.5"/>
-        <line x1="${(px-r-3).toFixed(1)}" y1="${py.toFixed(1)}" x2="${(px+r+3).toFixed(1)}" y2="${py.toFixed(1)}" stroke="#e84393" stroke-width="1.5"/>
-        <line x1="${px.toFixed(1)}" y1="${(py-r-3).toFixed(1)}" x2="${px.toFixed(1)}" y2="${(py+r+3).toFixed(1)}" stroke="#e84393" stroke-width="1.5"/>
-        <text x="${(px+r+5).toFixed(1)}" y="${(py-4).toFixed(1)}" font-size="9" fill="#e84393" font-weight="700">PCS</text>
-        <text x="${(px+r+5).toFixed(1)}" y="${(py+8).toFixed(1)}" font-size="8" fill="#e84393">${pcs.pct}%</text>`;
+        const r=5;
+        pcsSvg=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${r}" fill="none" stroke="#e84393" stroke-width="1.8"/>
+        <line x1="${(px-r-3).toFixed(1)}" y1="${py.toFixed(1)}" x2="${(px+r+3).toFixed(1)}" y2="${py.toFixed(1)}" stroke="#e84393" stroke-width="1.2"/>
+        <line x1="${px.toFixed(1)}" y1="${(py-r-3).toFixed(1)}" x2="${px.toFixed(1)}" y2="${(py+r+3).toFixed(1)}" stroke="#e84393" stroke-width="1.2"/>
+        <text x="${(px+r+4).toFixed(1)}" y="${(py-3).toFixed(1)}" font-size="9" fill="#e84393" font-weight="700">PCS</text>
+        <text x="${(px+r+4).toFixed(1)}" y="${(py+8).toFixed(1)}" font-size="8" fill="#e84393">${pcs.pct}%</text>`;
       }
     }
   }
