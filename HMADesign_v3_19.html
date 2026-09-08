@@ -8752,7 +8752,7 @@ function renderS10Summary(){
           };
           const Va=predAt('Va',designPb),VMA=predAt('VMA',designPb),VFA=predAt('VFA',designPb);
           const tgt2=getVolTargets(info,mt);
-          if(isM){const{blendGsb:bgs,blendGrad:bgr}=calcBlendProps(selTrial||pts[0]||{blendPct:{},Pb:designPb,vol:null});const pct475=(bgr||{})['4.75'];const vmaMin=getMarshallVmaMin(mt,pct475);if(vmaMin!==null)tgt2.VMA=[vmaMin,null];}
+          if(fam==='Marshall'){const{blendGrad:bgr}=calcBlendProps(selTrial||pts[0]||{blendPct:{},Pb:designPb,vol:null});const pct475=(bgr||{})['4.75'];const vmaMin=getMarshallVmaMin(mt,pct475);if(vmaMin!==null)tgt2.VMA=[vmaMin,null];}
           return`<div class="mc"><div class="ml">Design Pb</div><div class="mv" style="font-size:24px;color:#f0b429">${designPb.toFixed(1)}%</div></div>
           ${pts.length?`
           <div class="mc"><div class="ml">Va @ Design</div><div class="mv" style="font-size:18px">${Va!==null?Va.toFixed(1):'—'}%</div>${tgt2.Va?`<div class="ms">Target: ${tgt2.Va[0]}–${tgt2.Va[1]}%</div>`:''}</div>
