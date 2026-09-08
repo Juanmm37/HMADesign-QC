@@ -762,7 +762,7 @@ function updateVolField(ti, key, val){
 function showView(v){
   view=v;
   document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['dashboard','library','newmix','records'][i]===v);
+    b.classList.toggle('active',['dashboard','library','newmix','records','specs'][i]===v);
   });
   render();
 }
