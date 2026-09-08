@@ -2747,6 +2747,23 @@ function renderTBAChart(trialGrads, bands, info){
   }
 
 
+  // PCS marker (Superpave only, OPSS 1151)
+  let pcsSvg='';
+  if(!isMarshall&&fam==='Superpave'){
+    const pcs=SP_PCS[mt];
+    if(pcs){
+      const px=xOf(pcs.sieve),py=yOf(pcs.pct);
+      if(px!==null){
+        const r=7;
+        pcsSvg=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${r}" fill="none" stroke="#e84393" stroke-width="2.5"/>
+        <line x1="${(px-r-3).toFixed(1)}" y1="${py.toFixed(1)}" x2="${(px+r+3).toFixed(1)}" y2="${py.toFixed(1)}" stroke="#e84393" stroke-width="1.5"/>
+        <line x1="${px.toFixed(1)}" y1="${(py-r-3).toFixed(1)}" x2="${px.toFixed(1)}" y2="${(py+r+3).toFixed(1)}" stroke="#e84393" stroke-width="1.5"/>
+        <text x="${(px+r+5).toFixed(1)}" y="${(py-4).toFixed(1)}" font-size="9" fill="#e84393" font-weight="700">PCS</text>
+        <text x="${(px+r+5).toFixed(1)}" y="${(py+8).toFixed(1)}" font-size="8" fill="#e84393">${pcs.pct}%</text>`;
+      }
+    }
+  }
+
   // Lines for each trial
   const trialLines=trialGrads.map((tg,idx)=>{
     const pts=activeSieves.map(s=>{const v=tg.grad[s];return(v!==null&&v!==undefined)?`${xOf(s)},${yOf(v)}`:null;}).filter(Boolean);
