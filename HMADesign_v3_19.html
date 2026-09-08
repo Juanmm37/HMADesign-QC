@@ -2693,23 +2693,25 @@ function renderTBAChart(trialGrads, bands, info){
   const mt=info.mixType||'',fam=info.family||'',isMarshall=fam==='Marshall';
   const W=920,H=400,PL=52,PR=24,PT=36,PB=64;
   const cW=W-PL-PR,cH=H-PT-PB;
-  const MARSHALL_MAX_SIEVE=26.5;
-  const activeSieves=isMarshall?SIEVES.filter(s=>parseFloat(s)<=MARSHALL_MAX_SIEVE):SIEVES;
+  // Max sieve to display per mix type (one step above the 100%-passing sieve)
+  const MIX_MAX_SIEVE={'SP 4.75':12.5,'SP 9.5':16.0,'SP 12.5':26.5,'SP 12.5 FC1':26.5,'SP 12.5 FC2':26.5,'SP 19.0':37.5,'SP 25.0':50,'SP 37.5':50,'SMA 9.5':16.0,'SMA 12.5':26.5,'SMA 19.0':37.5};
+  const maxSieveNum=isMarshall?26.5:(MIX_MAX_SIEVE[mt]||50);
+  const activeSieves=SIEVES.filter(s=>parseFloat(s)<=maxSieveNum);
 
   function xOf(s){
     const v=parseFloat(s);
     if(isNaN(v))return null;
     if(isMarshall){
-      // Marshall: semi-log scale, max sieve = 26.5mm
+      // Marshall: semi-log scale
       const logMin=Math.log10(parseFloat(PLOT_SIEVES[PLOT_SIEVES.length-1]));
-      const logMax=Math.log10(MARSHALL_MAX_SIEVE);
+      const logMax=Math.log10(maxSieveNum);
       const logV=Math.log10(v);
       const frac=(logV-logMin)/(logMax-logMin);
       return PL+frac*cW;
     } else {
-      // Superpave/SMA: 0.45 power scale
+      // Superpave/SMA: 0.45 power scale, clipped to mix-type max sieve
       const powMin=Math.pow(parseFloat(PLOT_SIEVES[PLOT_SIEVES.length-1]),0.45);
-      const powMax=Math.pow(parseFloat(PLOT_SIEVES[0]),0.45);
+      const powMax=Math.pow(maxSieveNum,0.45);
       const powV=Math.pow(v,0.45);
       const frac=(powV-powMin)/(powMax-powMin);
       return PL+frac*cW;
