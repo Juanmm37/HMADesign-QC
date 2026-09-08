@@ -3956,6 +3956,7 @@ function renderS4(){
         ${(()=>{
           const{blendGrad}=calcBlendProps(trial);
           const ep=res?calcEstimatedProps(res,trial,info,blendGsb,blendGrad):null;
+          const dr=getDPRange(info,blendGrad);
           return res?`
           <div style="font-size:10px;color:#1f3864;font-weight:600;margin-bottom:6px;opacity:0.75;letter-spacing:0.03em">
             Targets per ${specCite(info,'VolProps')}
