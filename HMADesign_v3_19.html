@@ -3929,7 +3929,7 @@ function renderS4(){
             ${res.pGmmNini!==null&&tgt.pGmmNini?chkCell(res.pGmmNini,tgt.pGmmNini,’%Gmm Nini’,1,’per ‘+specCite(info,’GmmNini’)):’’}
             ${res.pGmmNdes!==null&&tgt.pGmmNdes?chkCell(res.pGmmNdes,tgt.pGmmNdes,’%Gmm Ndes’):’’}
             ${res.Stab&&tgt.Stab?chkCell(res.Stab,tgt.Stab,’Stability (N)’,0,’per ‘+specCite(info,’Stab’)):’’}
-            ${res.Flow&&tgt.Flow?chkCell(res.Flow,tgt.Flow,’Flow ×0.25mm’,’’,’per ‘+specCite(info,’Flow’)):’’}
+            ${res.Flow&&tgt.Flow?chkCell(res.Flow,tgt.Flow,’Flow ×0.25mm’,1,’per ‘+specCite(info,’Flow’)):’’}
             <div class="mc"><div class="ml">Avg BRD</div><div class="mv" style="font-size:18px">${res.avgGmb.toFixed(3)}</div></div>
             <div class="mc"><div class="ml">Avg MRD</div><div class="mv" style="font-size:18px">${res.Gmm_val.toFixed(3)}</div></div>
             <div class="mc"><div class="ml">Gse</div><div class="mv" style="font-size:18px">${fN(res.Gse)}</div></div>
