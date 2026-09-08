@@ -6572,7 +6572,8 @@ function rehydratePropertyCurves(){
 
 function renderS7PropCurves(){
   rehydratePropertyCurves();
-  const fam=ms.info.family||'Superpave',pc=ms.propertyCurves||{},pts=pc.pts||[];
+  const info=ms.info;
+  const fam=info.family||'Superpave',pc=ms.propertyCurves||{},pts=pc.pts||[];
   const designPb=ms.designPb;
   const regType=ms.propCurvesRegType||'linear';
   if(!pts.length)return`<div class="card card-blue"><div class="st">Step 8 — Property Curves</div><div class="wbox">No volumetric data yet. Complete Step 7 (Selected Volumetrics) first, then click Next: Property Curves.</div><div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn" onclick="ms.step=7;render()">← Back: Selected Volumetrics</button><button class="btn btn-primary" onclick="ms.step=9;render()">Next: TSR Batching →</button></div></div>`;
