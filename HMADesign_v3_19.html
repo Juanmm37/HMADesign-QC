@@ -6523,9 +6523,10 @@ function calcDesignPb(){
     }
   } else if(regType==='poly'){
     // For polynomial, use numerical method (binary search) to find where predict(Pb) = 4.0
-    // Extend range ±3% beyond data to handle cases where 4.0% Va is outside the data range
+    // Search within the data range first (avoids upward-parabola endpoints both above 4.0).
+    // A small ±0.5 buffer handles the case where design Pb is just outside the data range.
     const pbVals=pc.pts.map(p=>p.Pb);
-    const minPb=Math.min(...pbVals)-3, maxPb=Math.max(...pbVals)+3;
+    const minPb=Math.min(...pbVals)-0.5, maxPb=Math.max(...pbVals)+0.5;
     const minVal=reg.predict(minPb);
     const maxVal=reg.predict(maxPb);
 
