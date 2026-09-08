@@ -6074,6 +6074,7 @@ function renderS6VolSelected(){
   const vfaRange=(SP_VOL.VFA_by_traffic[tc]||{})[mt]||(SP_VOL.VFA_by_traffic[tc]||{})['default']||[65,78];
   const pNiniMax=SP_VOL['%GmmNini'][tc]||90.5;
   const pbeMin=SP_VOL.minPbe[mt]||3.5;
+  const dpR=getDPRange(ms.info,blendGrad);
   const fn3=v=>(v!=null&&!isNaN(v))?v.toFixed(3):'—';
   const fn2=v=>(v!=null&&!isNaN(v))?v.toFixed(2):'—';
   const fn1=v=>(v!=null&&!isNaN(v))?v.toFixed(1):'—';
