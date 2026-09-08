@@ -6227,17 +6227,17 @@ function renderS6VolSelected(){
           const v0=pt.vols[0]||{};
           const v1=pt.vols[1]||{};
           const v2=pt.vols[2]||{};
-          // Avg BRD
+          // Avg BRD — roundAvg handles half-up rounding to avoid float truncation
           const brdVals=[v0.Gmb,v1.Gmb,isM?v2.Gmb:null].filter(v=>v&&!isNaN(v));
-          const avgBRD=brdVals.length?brdVals.reduce((a,b)=>a+b,0)/brdVals.length:null;
+          const avgBRD=brdVals.length?roundAvg(brdVals,3):null;
           // Avg MRD
           const mrdA=v0.GmmA, mrdB=v0.GmmB;
-          const avgMRD=mrdA&&mrdB?((mrdA+mrdB)/2):(mrdA||null);
+          const avgMRD=mrdA&&mrdB?roundAvg([mrdA,mrdB],3):(mrdA||null);
           // Heights
           const hNiniA=v0.hNiniA,hNiniB=v0.hNiniB;
           const hNdesA=v0.hNdesA,hNdesB=v0.hNdesB;
-          const avgNini=hNiniA&&hNiniB?((hNiniA+hNiniB)/2):(hNiniA||null);
-          const avgNdes=hNdesA&&hNdesB?((hNdesA+hNdesB)/2):(hNdesA||null);
+          const avgNini=hNiniA&&hNiniB?roundAvg([hNiniA,hNiniB],1):(hNiniA||null);
+          const avgNdes=hNdesA&&hNdesB?roundAvg([hNdesA,hNdesB],1):(hNdesA||null);
           // Sync cached averages for calcVolSelected
           pt.vols[0].Gmm=avgMRD;
           pt.vols[0].hNini=avgNini;
