@@ -3799,8 +3799,8 @@ function calcVol(trial,info,blendGsb){
   // Average two height readings if both present
   const hNini1=vol.hNiniA,hNini2=vol.hNiniB;
   const hNdes1=vol.hNdesA,hNdes2=vol.hNdesB;
-  const hNini=hNini1&&hNini2?((hNini1+hNini2)/2):(hNini1||vol.hNini||null);
-  const hNdes=hNdes1&&hNdes2?((hNdes1+hNdes2)/2):(hNdes1||vol.hNdes||null);
+  const hNini=hNini1&&hNini2?roundAvg([hNini1,hNini2],1):(hNini1||vol.hNini||null);
+  const hNdes=hNdes1&&hNdes2?roundAvg([hNdes1,hNdes2],1):(hNdes1||vol.hNdes||null);
   let pGmmNini=null,pGmmNdes=null;
   if(hNini&&hNdes){
     pGmmNdes=(avgGmb/Gmm)*100;
