@@ -6481,11 +6481,12 @@ function computePropertyCurves(){
     };
   }
 
-  const pbs=pts.map(p=>p.Pb);
   const data={pts};
   ['Va','VMA','VFA','pGmmNini','avgGmb','pGmmNdes','DP','Gmm'].forEach(prop=>{
-    const ys=pts.filter(p=>p[prop]!==null).map(p=>p[prop]);
-    if(ys.length<2)return;
+    const validPts=pts.filter(p=>p[prop]!==null&&p[prop]!==undefined);
+    if(validPts.length<2)return;
+    const pbs=validPts.map(p=>p.Pb);
+    const ys=validPts.map(p=>p[prop]);
     data[prop]={
       linear:linReg(pbs,ys),
       poly:polyReg(pbs,ys,2),
