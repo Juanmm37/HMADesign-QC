@@ -6376,28 +6376,28 @@ function setACVol(pi,li,field,val){
 function calcVolSelected(pt,info,Gsb,p075){
   const v0=pt.vols[0]||{},v1=pt.vols[1]||{};
   const GmmA=v0.GmmA,GmmB=v0.GmmB;
-  const Gmm=GmmA&&GmmB?((GmmA+GmmB)/2):(GmmA||v0.Gmm||null);
+  const Gmm=GmmA&&GmmB?roundAvg([GmmA,GmmB],3):(GmmA||v0.Gmm||null);
   const GmbA=v0.Gmb,GmbB=v1.Gmb;
   const Gmbs=[GmbA,GmbB].filter(v=>v&&!isNaN(v));
   if(!Gmbs.length||!Gmm)return null;
-  const avgGmb=Gmbs.reduce((a,b)=>a+b,0)/Gmbs.length;
+  const avgGmb=roundAvg(Gmbs,3);
   const Pb=pt.Pb/100,Gb=info.Gb||1.022;
   const Va=(1-avgGmb/Gmm)*100;
   // Per-specimen Gse (uses individual Gmm); avg Gse for Pbe calc
   const GseA=GmmA?(1-Pb)/(1/GmmA-Pb/Gb):null;
   const GseB=GmmB?(1-Pb)/(1/GmmB-Pb/Gb):null;
   const Gse=(1-Pb)/(1/Gmm-Pb/Gb);  // from avg Gmm (backward compat)
-  const avgGse=GseA&&GseB?(GseA+GseB)/2:Gse;
+  const avgGse=GseA&&GseB?roundAvg([GseA,GseB],3):Gse;
   const VMA=(1-avgGmb*(1-Pb)/(Gsb||2.7))*100;
   const VFA=VMA>0?((VMA-Va)/VMA)*100:null;
   const hNiniA=v0.hNiniA,hNiniB=v0.hNiniB;
   const hNdesA=v0.hNdesA,hNdesB=v0.hNdesB;
-  const hNini=hNiniA&&hNiniB?((hNiniA+hNiniB)/2):(hNiniA||v0.hNini||null);
-  const hNdes=hNdesA&&hNdesB?((hNdesA+hNdesB)/2):(hNdesA||v0.hNdes||null);
+  const hNini=hNiniA&&hNiniB?roundAvg([hNiniA,hNiniB],1):(hNiniA||v0.hNini||null);
+  const hNdes=hNdesA&&hNdesB?roundAvg([hNdesA,hNdesB],1):(hNdesA||v0.hNdes||null);
   // %GmmNini per specimen: uses per-specimen Gmb + heights, averaged Gmm
   const pGmmNiniA=hNiniA&&hNdesA&&GmbA?(GmbA*(hNdesA/hNiniA)/Gmm*100):null;
   const pGmmNiniB=hNiniB&&hNdesB&&GmbB?(GmbB*(hNdesB/hNiniB)/Gmm*100):null;
-  const pGmmNini=pGmmNiniA!=null&&pGmmNiniB!=null?(pGmmNiniA+pGmmNiniB)/2:
+  const pGmmNini=pGmmNiniA!=null&&pGmmNiniB!=null?roundAvg([pGmmNiniA,pGmmNiniB],1):
     (hNini&&hNdes?(avgGmb*(hNdes/hNini)/Gmm*100):null);
   // %GmmNdes per specimen
   const pGmmNdesA=GmbA?GmbA/Gmm*100:null;
