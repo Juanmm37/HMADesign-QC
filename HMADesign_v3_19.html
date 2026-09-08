@@ -4288,11 +4288,118 @@ function renderSpecRef(){
       </div>`;
   };
 
-  // ── MUNI 1150 placeholder ───────────────────────────
-  const muni1150=()=>`<div class="wbox" style="margin-top:20px">
-    <div style="font-size:13px;font-weight:700;color:#1f3864;margin-bottom:8px">OPSS.MUNI 1150 — Marshall Mix Design</div>
-    <div style="font-size:12px;color:#666">Tables will be added once the specification pages are uploaded.</div>
-  </div>`;
+  // ── MUNI 1150 ───────────────────────────────────────
+  const muni1150=()=>{
+    // Table 2 — Gradation Requirements
+    const gradRows=[
+      ['DFC and HL 1','','','100','98–100','75–90','(Note 1)','36–64','25–58','16–45','7–26','3–10','0–5'],
+      ['HL 2','','','','','100','85–100','70–90','50–75','30–55','15–55','5–16','3–8'],
+      ['HL 3 and HL 3HS','','','100','98–100','75–90','50–60','36–60','25–58','16–45','7–26','3–10','0–5'],
+      ['HL 3F','','','100','98–100','85–94','65–75','52–75','36–72','23–56','10–32','3–12','0–6'],
+      ['HL 4','','100','98–100','83–95','62–82','45–60','27–60','16–60','8–47','4–27','1–10','0–6'],
+      ['HL 4F','','100','98–100','90–98','80–92','65–80','52–80','36–72','21–56','10–32','3–12','0–6'],
+      ['HL 8 and MDBC','100','94–100','77–95','65–90','48–78','30–50','21–50','12–49','6–38','3–22','1–9','0–6'],
+      ['HDBC','100','94–100','77–95','65–90','48–78','(Note 2)','21–54','12–49','6–38','3–22','1–9','0–6'],
+    ];
+    const sievesMM=['26.5','19.0','16.0','13.2','9.5','4.75','2.36','1.18'];
+    const sievesUM=['600','300','150','75'];
+    const t2=tbl(
+      `<thead>
+        <tr>${th('Mix Type','text-align:left;rowspan:2')}${th('mm','colspan:8')}${th('μm','colspan:4')}</tr>
+        <tr>${[...sievesMM,...sievesUM].map(s=>th(s)).join('')}</tr>
+      </thead>`,
+      `<tbody>${gradRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${r.slice(1).map(v=>td(v||'—')).join('')}</tr>`).join('')}</tbody>`,
+      'Note 1: HL1 at &lt;80 km/h: max 60% passing 4.75mm; HL1 at ≥80 km/h: max 50% passing 4.75mm; DFC: 50–55% passing 4.75mm by volume. Note 2: HDBC: 35–52% passing 4.75mm by volume.'
+    );
+
+    // Table 3 — Asphalt Cement Content (min %)
+    const acRows=[
+      ['HL 1, HL 3, and HL 4','—','5.0'],
+      ['DFC','100% Trap Rock Aggregate','4.8'],
+      ['DFC','100% Dolomitic Sandstone Aggregate','5.1'],
+      ['DFC','100% Meta-arkose','5.1'],
+      ['DFC','100% Gneiss','5.1'],
+      ['HL 2','—','6.0'],
+      ['HL 3F and HL 4F','—','5.5'],
+      ['HDBC, MDBC, and HL 8','—','4.7'],
+      ['HL 3HS','—','5.0'],
+    ];
+    const t3=tbl(
+      `<thead><tr>${th('Hot Mix Type','text-align:left')}${th('Aggregate Type')}${th('Min AC % by Mass of Mix')}</tr></thead>`,
+      `<tbody>${acRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${td(r[1])}${td(r[2])}</tr>`).join('')}</tbody>`
+    );
+
+    // Table 4 — Air Voids
+    const t4=tbl(
+      `<thead><tr>${th('Hot Mix Type','text-align:left')}${th('% Air Voids')}</tr></thead>`,
+      `<tbody>
+        <tr>${tdl('All mixes, except HL 2 Surface and DFC')}${td('4.0 ± 0.5')}</tr>
+        <tr style="background:#f8f9fc">${tdl('HL 2 Surface')}${td('5.0 ± 0.5')}</tr>
+        <tr>${tdl('DFC')}${td('3.5 ± 0.3')}</tr>
+      </tbody>`
+    );
+
+    // Table 5 — Marshall Flow
+    const t5=tbl(
+      `<thead><tr>${th('Hot Mix Type','text-align:left')}${th('Min Marshall Flow (units of 0.2 mm at 3.5% Va)')}</tr></thead>`,
+      `<tbody>
+        <tr>${tdl('All mixes, except HL 2, HL 3F, and HL 4F')}${td('8')}</tr>
+        <tr style="background:#f8f9fc">${tdl('HL 2, HL 3F, and HL 4F')}${td('9')}</tr>
+      </tbody>`
+    );
+
+    // Table 6 — Marshall Stability
+    const stabRows=[
+      ['DFC, HL 1, and HL 3','8,900'],
+      ['Binder, Levelling, and Padding Courses (except HL 2, HL 3F, HL 4F, HL 3HS, HDBC)','8,000'],
+      ['HL 2, HL 3F, and HL 4F Surface Course','5,800'],
+      ['HL 2, HL 3F, and HL 4F Levelling and Binder Courses','4,400'],
+      ['HL 3HS and HDBC','12,000'],
+    ];
+    const t6=tbl(
+      `<thead><tr>${th('Application','text-align:left')}${th('Min Marshall Stability N at 60°C')}</tr></thead>`,
+      `<tbody>${stabRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${td(r[1])}</tr>`).join('')}</tbody>`
+    );
+
+    // Table 7 — VMA Requirements
+    const nmps=['2.36','4.75','9.5','13.2','16.0','19.0','26.5','37.5'];
+    const vmaRows=[
+      ['40%','—','—','—','13.5','13.0','12.5','11.5','11.0'],
+      ['45%','—','—','—','14.0','13.5','13.0','12.0','11.5'],
+      ['50%','—','—','—','14.5','14.0','13.5','12.5','12.0'],
+      ['55%','—','—','—','15.0','14.5','14.0','13.0','12.5'],
+      ['60%','—','—','—','15.5','15.0','14.5','13.5','13.0'],
+      ['> 60%','21','18','16','16.0','15.5','15.0','14.0','13.5'],
+    ];
+    const t7=tbl(
+      `<thead>
+        <tr>${th('% Passing<br>4.75 mm','rowspan:2')}${th('Nominal Maximum Particle Size (mm)','colspan:8')}</tr>
+        <tr>${nmps.map(s=>th(s)).join('')}</tr>
+      </thead>`,
+      `<tbody>
+        <tr><td colspan="9" style="padding:4px 8px;font-size:11px;font-weight:700;color:#1f3864;background:#e8f0fe;border:1px solid #dde">All Mixes Except HL 2 and DFC</td></tr>
+        ${vmaRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${r.map(v=>td(v)).join('')}</tr>`).join('')}
+        <tr><td colspan="9" style="padding:4px 8px;font-size:11px;font-weight:700;color:#1f3864;background:#e8f0fe;border:1px solid #dde">HL 2</td></tr>
+        <tr>${td('(all)')}${td('21.0')}${td('18.0')}${td('16.0')}${td('—')}${td('—')}${td('—')}${td('—')}${td('—')}</tr>
+      </tbody>`,
+      'Note 1: VMA is based on NMPS = sieve next larger than the designated large sieve where ≤10% is retained cumulatively. Note 2: DFC — VMA and film thickness reported per MS-02.'
+    );
+
+    return`
+      <div class="st" style="margin-bottom:16px">OPSS.MUNI 1150 — Marshall Mix Design <span style="font-size:11px;font-weight:400;color:#888">(November 2020)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div>
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 2 — Gradation Requirements (% passing)</div>${t2}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 4 — Air Voids</div>${t4}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 5 — Marshall Flow</div>${t5}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 6 — Marshall Stability (N at 60°C)</div>${t6}
+        </div>
+        <div>
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 3 — Minimum Asphalt Cement Content</div>${t3}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 7 — VMA Requirements by % Passing 4.75 mm and NMPS</div>${t7}
+        </div>
+      </div>`;
+  };
 
   const tabs=[
     {key:'muni1151',label:'OPSS.MUNI 1151'},
