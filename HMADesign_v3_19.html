@@ -5203,16 +5203,16 @@ function renderAnalytics(){
   const yOf=v=>PT+cH-(v/100)*cH;
 
   function line(grad,color,dash='',wt=2){
-    const pts=PLOT_SIEVES.map(s=>{const v=grad[s];return(v!==null&&v!==undefined)?`${xOf(s)},${yOf(v)}`:null;}).filter(Boolean);
+    const pts=activePlotSieves.map(s=>{const v=grad[s];return(v!==null&&v!==undefined)?`${xOf(s)},${yOf(v)}`:null;}).filter(Boolean);
     if(pts.length<2)return'';
     return`<path d="${pts.map((p,i)=>`${i===0?'M':'L'}${p}`).join(' ')}" fill="none" stroke="${color}" stroke-width="${wt}" stroke-dasharray="${dash}" stroke-linejoin="round" stroke-linecap="round"/>`;
   }
   function dots(grad,color,r=4){
-    return PLOT_SIEVES.map(s=>{const v=grad[s];return(v!==null&&v!==undefined)?`<circle cx="${xOf(s)}" cy="${yOf(v)}" r="${r}" fill="${color}" stroke="white" stroke-width="1.5"/>`:''}).join('');
+    return activePlotSieves.map(s=>{const v=grad[s];return(v!==null&&v!==undefined)?`<circle cx="${xOf(s)}" cy="${yOf(v)}" r="${r}" fill="${color}" stroke="white" stroke-width="1.5"/>`:''}).join('');
   }
 
   // Spec band shading
-  const bandSieves=PLOT_SIEVES.filter(s=>bands[s]);
+  const bandSieves=activePlotSieves.filter(s=>bands[s]);
   let bandSvg='';
   if(bandSieves.length){
     const h=4;
