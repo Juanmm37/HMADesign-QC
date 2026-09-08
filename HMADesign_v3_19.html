@@ -3307,6 +3307,29 @@ function renderGradChart(trial, aggs, bands, blendGrad, info, forPrint=false){
     bandSvg=bandSieves.map(s=>{const x=xOf(s);return`<rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][1])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/><rect x="${(x-h).toFixed(1)}" y="${(yOf(bands[s][0])-h).toFixed(1)}" width="${h*2}" height="${h*2}" fill="#1f3864" opacity="0.85"/>`;}).join('');
   }
 
+  // PCS marker (Superpave OPSS 1151 only)
+  let pcsSvg='';
+  let pcsLegRow='';
+  if(!isMarshall&&fam==='Superpave'){
+    const pcs=SP_PCS[mt];
+    if(pcs){
+      const px=xOf(pcs.sieve),py=yOf(pcs.pct);
+      if(px!==null){
+        const r=forPrint?14:7;
+        const lw=forPrint?3:1.5;
+        const fs=forPrint?14:9;
+        pcsSvg=`<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${r}" fill="none" stroke="#e84393" stroke-width="${r*0.35}"/>
+        <line x1="${(px-r-4).toFixed(1)}" y1="${py.toFixed(1)}" x2="${(px+r+4).toFixed(1)}" y2="${py.toFixed(1)}" stroke="#e84393" stroke-width="${lw}"/>
+        <line x1="${px.toFixed(1)}" y1="${(py-r-4).toFixed(1)}" x2="${px.toFixed(1)}" y2="${(py+r+4).toFixed(1)}" stroke="#e84393" stroke-width="${lw}"/>
+        <text x="${(px+r+6).toFixed(1)}" y="${(py-3).toFixed(1)}" font-size="${fs}" fill="#e84393" font-weight="700">PCS</text>
+        <text x="${(px+r+6).toFixed(1)}" y="${(py+fs).toFixed(1)}" font-size="${fs}" fill="#e84393">${pcs.pct}%</text>`;
+        const r3cy=legY+legLH*2.5;
+        pcsLegRow=`<circle cx="${legX+legSq/2}" cy="${r3cy}" r="${legSq/2}" fill="none" stroke="#e84393" stroke-width="2"/>
+        <text x="${legX+legLW+6}" y="${r3cy+fsLeg*0.38}" font-size="${fsLeg}" font-weight="700" fill="#333" font-family="'Segoe UI',sans-serif">PCS (${pcs.pct}%)</text>`;
+      }
+    }
+  }
+
   const blendPts=chartSieves.map(s=>{
     const v=blendGrad[s];
     return(v!==null&&v!==undefined&&xOf(s)!==null)?`${xOf(s)},${yOf(v)}`:null;
