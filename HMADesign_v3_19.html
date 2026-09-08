@@ -3993,7 +3993,7 @@ function renderS4(){
                 <td style="padding:2px 8px;text-align:center">${tgt.VFA?tgt.VFA[0]+'-'+tgt.VFA[1]:'—'}</td>
                 ${res.pGmmNini!==null&&res.pGmmNini!==undefined?`<td style="padding:2px 8px;text-align:center">${tgt.pGmmNini?'≤'+tgt.pGmmNini[1]:'—'}</td>`:''}
                 <td style="padding:2px 8px;text-align:center">—</td>
-                <td style="padding:2px 8px;text-align:center">0.6 – 1.2</td>
+                <td style="padding:2px 8px;text-align:center">${dr.min.toFixed(1)} – ${dr.max.toFixed(1)}</td>
               </tr>
             </thead>
             <tbody>
