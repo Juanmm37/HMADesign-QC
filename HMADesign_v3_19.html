@@ -4142,6 +4142,16 @@ function chkCell(val,rng,unit,dec=1,note=''){
 function getVolTargets(info,mt){
   const fam=info.family||'',tc=info.traffic||'B';
   if(fam==='Superpave'){
+    if(info.specType==='CUSTOM'&&info.customSpecId){
+      const cs=csById(info.customSpecId);
+      if(cs){
+        const vmaMin=cs.VMA&&cs.VMA[mt]!=null?cs.VMA[mt]:(SP_VOL.VMA[mt]||14);
+        const vfaPair=cs.VFA&&cs.VFA[tc]?cs.VFA[tc]:[65,78];
+        const pNiniMax=cs.GmmNini&&cs.GmmNini[tc]!=null?cs.GmmNini[tc]:null;
+        const ndes=cs.GmmNdes||96.0;
+        return{Va:null,VMA:[vmaMin,null],VFA:vfaPair,pGmmNini:pNiniMax?[null,pNiniMax]:null,pGmmNdes:[ndes-0.5,ndes+0.5],Stab:null,Flow:null};
+      }
+    }
     const vmaMin=SP_VOL.VMA[mt]||14;
     const vfaRow=SP_VOL.VFA_by_traffic[tc]||{};
     const vfa=vfaRow[mt]||vfaRow['default']||[65,78];
