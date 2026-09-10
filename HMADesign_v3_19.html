@@ -4109,6 +4109,10 @@ function calcVol(trial,info,blendGsb){
 }
 function specCite(info,what){
   const fam=info.family||'',isM=fam==='Marshall',isMUNI=(info.specType||'PROV')==='MUNI';
+  if(info.specType==='CUSTOM'&&info.customSpecId){
+    const cs=csById(info.customSpecId);
+    return cs?`${cs.name} (${cs.year})`:'Custom Spec';
+  }
   if(isM){
     const tMap={Grad:'Table 2',AC:'Table 3',Va:'Table 4',Flow:'Table 5',Stab:'Table 6',VMA:'Table 7'};
     return`OPSS.MUNI 1150 ${tMap[what]||''}`.trim();
