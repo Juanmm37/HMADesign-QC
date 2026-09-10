@@ -4835,19 +4835,62 @@ function renderSpecRef(){
       </div>`;
   };
 
+  // ── Custom spec tab renderer (uses local th/td/tbl helpers) ──
+  const csRenderTab=(id)=>{
+    const cs=csById(id);
+    if(!cs)return`<div style="padding:30px;text-align:center;color:#888">Specification not found.</div>`;
+    const VMA_SIZES=[['37.5',cs.VMA?.['SP 37.5']],['25.0',cs.VMA?.['SP 25.0']],['19.0',cs.VMA?.['SP 19.0']],['12.5',cs.VMA?.['SP 12.5']],['9.5',cs.VMA?.['SP 9.5']],['4.75',cs.VMA?.['SP 4.75']]];
+    const volTbl=tbl(
+      `<thead>
+        <tr>${th('Traffic<br>Category','rowspan:2')}${th('% Theoretical Max Specific Gravity','colspan:3')}${th('VMA % Minimum (NMPS mm)','colspan:6')}${th('VFA %','rowspan:2')}${th('Dust/Binder<br>Ratio','rowspan:2')}${th('Min TSR %','rowspan:2')}</tr>
+        <tr>${th('N<sub>ini</sub>')}${th('N<sub>des</sub>')}${th('N<sub>max</sub>')}${VMA_SIZES.map(([s])=>th(s)).join('')}</tr>
+      </thead>`,
+      `<tbody>${['A','B','C','D','E'].map((tc,i)=>{
+        const nini=cs.GmmNini?.[tc];
+        const vfa=cs.VFA?.[tc]||[65,78];
+        return`<tr style="${i%2?'background:#f8f9fc':''}">
+          ${td(tc)}
+          ${td(nini!=null?`≤${nini}`:'—')}
+          ${i===0?td(`${cs.GmmNdes||96.0}`,'rowspan:5'):''}
+          ${i===0?td(`≤${cs.GmmNmax||98.0}`,'rowspan:5'):''}
+          ${i===0?VMA_SIZES.map(([,v])=>td(v!=null?v:'—','rowspan:5')).join(''):''}
+          ${td(`${vfa[0]}–${vfa[1]}`)}
+          ${i===0?td(`${cs.DP?.min||0.6}–${cs.DP?.max||1.2}`,'rowspan:5'):''}
+          ${i===0?td(`${cs.minTSR||80}`,'rowspan:5'):''}
+        </tr>`;
+      }).join('')}</tbody>`,
+      `<strong>Custom specification:</strong> ${cs.name} — added ${cs.addedDate||cs.year}. Air Voids target: ${cs.Va||4.0}%.`
+    );
+    return`<div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <div class="st" style="margin:0">${cs.name} <span style="font-size:11px;font-weight:400;color:#888">(${cs.year})</span></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" style="font-size:11px;padding:4px 12px" onclick="csShowModal('${cs.id}')">✏ Edit</button>
+          <button class="btn" style="font-size:11px;padding:4px 12px;color:#c0392b;border-color:#e0b0b0" onclick="csDelete('${cs.id}')">🗑 Delete</button>
+        </div>
+      </div>
+      <div class="st" style="font-size:11px;margin-bottom:8px">Volumetric Properties</div>
+      ${volTbl}
+    </div>`;
+  };
+
+  const _custSpecList=csGet();
   const tabs=[
     {key:'muni1151',label:'OPSS.MUNI 1151'},
     {key:'prov1151',label:'OPSS.PROV 1151'},
     {key:'muni1150',label:'OPSS.MUNI 1150'},
+    ..._custSpecList.map(cs=>({key:cs.id,label:`${cs.name} (${cs.year})`})),
   ];
 
-  const content=_specTab==='muni1151'?muni1151():_specTab==='prov1151'?prov1151():muni1150();
+  const isCustomTab=_custSpecList.some(cs=>cs.id===_specTab);
+  const content=_specTab==='muni1151'?muni1151():_specTab==='prov1151'?prov1151():_specTab==='muni1150'?muni1150():isCustomTab?csRenderTab(_specTab):(()=>{_specTab='muni1151';return muni1151();})();
 
   return`<div class="card card-blue">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
       <div class="st" style="margin:0">Specification Reference</div>
-      <div style="display:flex;gap:6px">
-        ${tabs.map(t=>`<button class="btn${_specTab===t.key?' btn-primary':''}" style="font-size:12px;padding:5px 14px" onclick="_specTab='${t.key}';render()">${t.label}</button>`).join('')}
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        ${tabs.map(t=>`<button class="btn${_specTab===t.key?' btn-primary':''}" style="font-size:12px;padding:5px 14px;white-space:nowrap" onclick="_specTab='${t.key}';render()">${t.label}</button>`).join('')}
+        <button class="btn" style="font-size:12px;padding:5px 14px;background:#e8f0fe;color:#1f3864;border-color:#b8cfff;font-weight:700;white-space:nowrap" onclick="csShowModal()">+ Add Custom Spec</button>
       </div>
     </div>
     ${content}
