@@ -425,6 +425,289 @@ let _showCardsIdx=null; // persists across renders
 let targetGrad={},targetName='Target';
 const CHART_COLORS=['#1f3864','#e65100','#1a7a1a','#6b1a9a','#b36000','#0277bd','#880e4f'];
 
+// ── CUSTOM SPECS ──────────────────────────────────────────────────────────────
+function csGet(){try{return JSON.parse(localStorage.getItem('capmix_custom_specs')||'[]');}catch(e){return[];}}
+function csSaveAll(arr){try{localStorage.setItem('capmix_custom_specs',JSON.stringify(arr));}catch(e){}}
+function csById(id){return csGet().find(s=>s.id===id)||null;}
+function csDelete(id){
+  if(!confirm('Delete this custom specification? Existing mix designs that use it will keep the spec name but lose criteria linking.'))return;
+  csSaveAll(csGet().filter(s=>s.id!==id));
+  if(_specTab===id)_specTab='muni1151';
+  render();
+}
+
+const CS_DEF={
+  Va:4.0,
+  VMA:{'SP 4.75':16,'SP 9.5':15,'SP 12.5':14,'SP 12.5 FC1':14,'SP 12.5 FC2':14,'SP 19.0':13,'SP 25.0':12,'SP 37.5':11},
+  GmmNdes:96.0,GmmNmax:98.0,
+  GmmNini:{A:91.5,B:90.5,C:89.0,D:89.0,E:89.0},
+  VFA:{A:[70,80],B:[65,78],C:[65,75],D:[65,75],E:[65,75]},
+  DP:{min:0.6,max:1.2},
+  minTSR:80
+};
+
+function csParse(text){
+  const T=text.replace(/\r\n/g,'\n');
+  const result=JSON.parse(JSON.stringify(CS_DEF));
+  let m;
+
+  // Air voids target
+  m=T.match(/air\s*void[s]?\s*[=:@]?\s*(\d+\.?\d*)\s*%/i);
+  if(m){const v=parseFloat(m[1]);if(v>0.5&&v<15)result.Va=v;}
+
+  // VMA by sieve size — look for the sieve label near a number in 8–22 range
+  const vmaSz=[['SP 37.5','37\\.5'],['SP 25.0','25\\.0'],['SP 19.0','19\\.0'],['SP 12.5','12\\.5'],['SP 9.5','9\\.5'],['SP 4.75','4\\.75']];
+  for(const [key,pat] of vmaSz){
+    const r=new RegExp(`${pat}\\s*(?:mm)?[\\s\\S]{0,300}?\\b(1[0-9]|20)(?:\\.\\d{1,2})?\\b`,'i');
+    const m2=T.match(r);
+    if(m2){const v=parseFloat(m2[1]);if(v>=8&&v<=22)result.VMA[key]=v;}
+  }
+
+  // %Gmm Ndes — e.g. "96.0" near "Ndes"
+  m=T.match(/N\s*des(?:ign)?\b[\s\S]{0,150}?(9[5-9][\d.]*)\s*%/i);
+  if(!m)m=T.match(/(9[5-9][\d.]*)\s*%[\s\S]{0,100}?N\s*des/i);
+  if(m){const v=parseFloat(m[1]);if(v>=93&&v<=100)result.GmmNdes=v;}
+
+  // %Gmm Nmax
+  m=T.match(/N\s*max\b[\s\S]{0,150}?≤?\s*(9[7-9][\d.]*)\s*%/i);
+  if(!m)m=T.match(/≤\s*(9[7-9][\d.]*)\s*%[\s\S]{0,100}?N\s*max/i);
+  if(m){const v=parseFloat(m[1]);if(v>=95&&v<=100)result.GmmNmax=v;}
+
+  // %Gmm Nini by traffic category
+  const tcL=['A','B','C','D','E'];
+  for(const tc of tcL){
+    const r=new RegExp(`(?:[Cc]at(?:egory)?[\\s.]*|[Tt]raffic\\s+)${tc}[\\s\\S]{0,200}?N\\s*ini[\\s\\S]{0,100}?≤\\s*(9[012][\\d.]*)`,'i');
+    const m2=T.match(r);
+    if(m2){const v=parseFloat(m2[1]);if(v>=85&&v<=95)result.GmmNini[tc]=v;}
+  }
+  // Fallback: first general Nini value
+  m=T.match(/N\s*ini(?:tial)?\b[\s\S]{0,200}?≤\s*(9[012][\d.]*)\s*%/i);
+  if(!m)m=T.match(/≤\s*(9[012][\d.]*)\s*%[\s\S]{0,100}?N\s*ini/i);
+  if(m){const v=parseFloat(m[1]);if(v>=85&&v<=95){for(const tc of tcL)if(result.GmmNini[tc]===CS_DEF.GmmNini[tc])result.GmmNini[tc]=v;}}
+
+  // VFA per traffic category
+  for(const tc of tcL){
+    const r=new RegExp(`(?:[Cc]at(?:egory)?[\\s.]*|[Tt]raffic\\s+)${tc}[\\s\\S]{0,300}?VFA[\\s\\S]{0,100}?(\\d+)\\s*[-–]\\s*(\\d+)\\s*%`,'i');
+    const m2=T.match(r);
+    if(m2){const lo=parseInt(m2[1]),hi=parseInt(m2[2]);if(lo>=50&&hi<=95)result.VFA[tc]=[lo,hi];}
+  }
+  // Fallback: first VFA range seen
+  m=T.match(/VFA[^0-9]{0,30}(\d+)\s*[-–]\s*(\d+)\s*%/i);
+  if(m){const lo=parseInt(m[1]),hi=parseInt(m[2]);if(lo>=50&&hi<=95){for(const tc of tcL)if(!result.VFA[tc]||JSON.stringify(result.VFA[tc])===JSON.stringify(CS_DEF.VFA[tc]))result.VFA[tc]=[lo,hi];}}
+
+  // Dust-to-binder ratio
+  m=T.match(/dust.{0,30}(?:binder|asphalt)[^0-9]{0,20}(\d+\.?\d*)\s*[-–to]+\s*(\d+\.?\d*)/i);
+  if(!m)m=T.match(/D\s*\/\s*B[^0-9]{0,20}(\d+\.?\d*)\s*[-–to]+\s*(\d+\.?\d*)/i);
+  if(m){const lo=parseFloat(m[1]),hi=parseFloat(m[2]);if(lo>=0.2&&hi<=5.0)result.DP={min:lo,max:hi};}
+
+  // TSR
+  m=T.match(/TSR\b[^0-9]{0,20}(\d+)\s*%?/i)||T.match(/tensile\s+strength\s+ratio[^0-9]{0,20}(\d+)\s*%/i);
+  if(m){const v=parseInt(m[1]);if(v>=40&&v<=100)result.minTSR=v;}
+
+  return result;
+}
+
+async function csExtract(){
+  const fileInput=document.getElementById('cs-pdf');
+  if(!fileInput||!fileInput.files.length){alert('Please select a PDF file first.');return;}
+  const file=fileInput.files[0];
+  const pdfjsLib=window['pdfjs-dist/build/pdf'];
+  if(!pdfjsLib){alert('PDF reader not loaded. Please refresh the page.');return;}
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  const el=document.getElementById('cs-extract-status');
+  if(el){el.textContent='Reading PDF…';el.style.color='#1f3864';}
+  try{
+    const buf=await file.arrayBuffer();
+    const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    let text='';
+    for(let i=1;i<=pdf.numPages;i++){
+      if(el)el.textContent=`Reading page ${i} of ${pdf.numPages}…`;
+      const page=await pdf.getPage(i);
+      const content=await page.getTextContent();
+      const items=content.items.map(it=>({x:it.transform[4],y:it.transform[5],str:it.str}));
+      items.sort((a,b)=>b.y-a.y||a.x-b.x);
+      let prevY=null;
+      for(const it of items){
+        if(prevY!==null&&Math.abs(it.y-prevY)>3)text+='\n';
+        text+=it.str+' ';
+        prevY=it.y;
+      }
+      text+='\n\n';
+    }
+    _csVals=csParse(text);
+    if(el){el.textContent='✓ Values extracted — review and correct the fields below.';el.style.color='#1a6b1a';}
+    csRenderModal();
+  }catch(err){
+    if(el){el.textContent='Error: '+err.message;el.style.color='#c0392b';}
+  }
+}
+
+let _csEdit=null;
+let _csVals=null;
+
+function csShowModal(id=null){
+  _csEdit=id?csById(id):null;
+  if(_csEdit){
+    _csVals={
+      Va:_csEdit.Va??CS_DEF.Va,
+      VMA:{...CS_DEF.VMA,...(_csEdit.VMA||{})},
+      GmmNdes:_csEdit.GmmNdes??CS_DEF.GmmNdes,
+      GmmNmax:_csEdit.GmmNmax??CS_DEF.GmmNmax,
+      GmmNini:{...CS_DEF.GmmNini,...(_csEdit.GmmNini||{})},
+      VFA:{...CS_DEF.VFA,...(_csEdit.VFA||{})},
+      DP:{...CS_DEF.DP,...(_csEdit.DP||{})},
+      minTSR:_csEdit.minTSR??CS_DEF.minTSR
+    };
+  }else{
+    _csVals=JSON.parse(JSON.stringify(CS_DEF));
+  }
+  csRenderModal();
+}
+
+function csHideModal(){
+  const c=document.getElementById('spec-modal-container');
+  if(c)c.innerHTML='';
+  _csEdit=null;_csVals=null;
+}
+
+function csRenderModal(){
+  const v=_csVals||CS_DEF;
+  const nm=_csEdit?_csEdit.name:'';
+  const yr=_csEdit?_csEdit.year:new Date().getFullYear();
+  const VMA_SHOW=[['SP 4.75',4.75],['SP 9.5',9.5],['SP 12.5',12.5],['SP 19.0',19.0],['SP 25.0',25.0],['SP 37.5',37.5]];
+  const lbl=(t)=>`<div style="font-size:10px;font-weight:700;color:#1f3864;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">${t}</div>`;
+  const inp=(id,val,w=64,step='0.1',mn='',mx='')=>
+    `<input id="${id}" type="number" step="${step}" value="${val}" ${mn?`min="${mn}"`:''}${mx?` max="${mx}"`:''}
+       style="width:${w}px;padding:4px 6px;border:1px solid #ccd;border-radius:4px;font-size:12px;text-align:center;font-family:inherit">`;
+  const html=`<div style="position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9100;display:flex;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)csHideModal()">
+    <div style="background:#fff;border-radius:12px;box-shadow:0 8px 48px rgba(0,0,0,0.28);width:820px;max-width:96vw;max-height:93vh;overflow-y:auto;padding:28px 32px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div style="font-size:16px;font-weight:900;color:#1f3864">${_csEdit?'Edit':'Add'} Custom Specification</div>
+        <button onclick="csHideModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#888;line-height:1;padding:0 4px">✕</button>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:16px">
+        <div>${lbl('Specification Name *')}
+          <input id="cs-name" placeholder="e.g. Costco, MTO, City of Toronto…" value="${nm}"
+            style="width:100%;padding:8px 10px;border:1px solid #ccd;border-radius:6px;font-size:13px;font-family:inherit">
+        </div>
+        <div>${lbl('Year')}
+          <input id="cs-year" type="number" value="${yr}" min="1990" max="2099"
+            style="width:100%;padding:8px 10px;border:1px solid #ccd;border-radius:6px;font-size:13px;font-family:inherit">
+        </div>
+      </div>
+
+      <div style="background:#f4f7fc;border-radius:8px;padding:14px 16px;margin-bottom:20px">
+        ${lbl('Auto-Extract from PDF (optional)')}
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="file" id="cs-pdf" accept=".pdf" style="font-size:12px;flex:1;min-width:200px">
+          <button onclick="csExtract()" style="padding:7px 16px;background:#1f3864;color:#fff;border:none;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">Extract Values</button>
+        </div>
+        <div id="cs-extract-status" style="font-size:11px;color:#888;margin-top:6px">Upload a PDF and click Extract — criteria values will pre-fill below for you to review and correct.</div>
+      </div>
+
+      <div style="border-top:2px solid #e8ecf2;padding-top:18px">
+
+        <div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:18px">
+          <div>${lbl('Air Voids Target')}
+            <div style="display:flex;align-items:center;gap:5px">${inp('cs-va',v.Va,68,'0.1','0.5','15')}<span style="font-size:11px;color:#666">%</span></div>
+          </div>
+          <div>${lbl('Min TSR')}
+            <div style="display:flex;align-items:center;gap:5px">${inp('cs-tsr',v.minTSR,68,'1','40','100')}<span style="font-size:11px;color:#666">%</span></div>
+          </div>
+          <div>${lbl('Dust/Binder Ratio')}
+            <div style="display:flex;align-items:center;gap:5px">${inp('cs-dp-min',v.DP.min,56,'0.01','0.1','5')}<span style="font-size:11px;color:#888">–</span>${inp('cs-dp-max',v.DP.max,56,'0.01','0.1','5')}</div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:18px">
+          ${lbl('% Theoretical Maximum Specific Gravity (Design compaction levels)')}
+          <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px;color:#555">N<sub>des</sub>:</span>${inp('cs-ndes',v.GmmNdes,66,'0.1','90','100')}<span style="font-size:11px;color:#666">%</span></div>
+            <div style="display:flex;align-items:center;gap:5px"><span style="font-size:11px;color:#555">N<sub>max</sub> ≤:</span>${inp('cs-nmax',v.GmmNmax,66,'0.1','90','100')}<span style="font-size:11px;color:#666">%</span></div>
+          </div>
+          <div style="margin-top:10px">
+            <div style="font-size:10px;font-weight:700;color:#1f3864;margin-bottom:6px">N<sub>ini</sub> Maximum (%) by Traffic Category:</div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap">
+              ${['A','B','C','D','E'].map(tc=>`<div style="text-align:center">
+                <div style="font-size:10px;font-weight:700;color:#1f3864;margin-bottom:3px">Cat. ${tc}</div>
+                <div style="display:flex;align-items:center;gap:3px">${inp('cs-nini-'+tc,v.GmmNini[tc],60,'0.5','80','98')}<span style="font-size:10px;color:#666">%</span></div>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:18px">
+          ${lbl('Minimum VMA (%) by Nominal Maximum Particle Size')}
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            ${VMA_SHOW.map(([k,s])=>`<div style="text-align:center">
+              <div style="font-size:10px;color:#555;margin-bottom:3px">${s} mm</div>
+              ${inp('cs-vma-'+k.replace(/[\s.]/g,'_'),v.VMA[k]??CS_DEF.VMA[k]??14,56,'0.5','5','25')}
+            </div>`).join('')}
+          </div>
+        </div>
+
+        <div style="margin-bottom:8px">
+          ${lbl('VFA % Range by Traffic Category')}
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            ${['A','B','C','D','E'].map(tc=>{const[lo,hi]=v.VFA[tc]||[65,75];return`<div>
+              <div style="font-size:10px;font-weight:700;color:#1f3864;margin-bottom:3px;text-align:center">Cat. ${tc}</div>
+              <div style="display:flex;align-items:center;gap:3px">${inp('cs-vfa-lo-'+tc,lo,50,'1','40','90')}<span style="font-size:11px;color:#888">–</span>${inp('cs-vfa-hi-'+tc,hi,50,'1','40','90')}<span style="font-size:10px;color:#888">%</span></div>
+            </div>`;}).join('')}
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #e8ecf2;padding-top:16px;margin-top:16px">
+        <button onclick="csHideModal()" style="padding:8px 20px;border:1px solid #ccd;background:#fff;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>
+        <button onclick="csSaveModal()" style="padding:8px 24px;background:#1f3864;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Specification</button>
+      </div>
+    </div>
+  </div>`;
+  const c=document.getElementById('spec-modal-container');
+  if(c)c.innerHTML=html;
+}
+
+function csSaveModal(){
+  const name=(document.getElementById('cs-name').value||'').trim();
+  if(!name){alert('Please enter a specification name.');return;}
+  const year=parseInt(document.getElementById('cs-year').value)||new Date().getFullYear();
+  const va=parseFloat(document.getElementById('cs-va').value)||4.0;
+  const ndes=parseFloat(document.getElementById('cs-ndes').value)||96.0;
+  const nmax=parseFloat(document.getElementById('cs-nmax').value)||98.0;
+  const tsr=parseInt(document.getElementById('cs-tsr').value)||80;
+  const dpMin=parseFloat(document.getElementById('cs-dp-min').value)||0.6;
+  const dpMax=parseFloat(document.getElementById('cs-dp-max').value)||1.2;
+  const VMA_FORM=[['SP 4.75','SP_4_75'],['SP 9.5','SP_9_5'],['SP 12.5','SP_12_5'],['SP 19.0','SP_19_0'],['SP 25.0','SP_25_0'],['SP 37.5','SP_37_5']];
+  const vma={...CS_DEF.VMA};
+  VMA_FORM.forEach(([k,fk])=>{
+    const v=parseFloat((document.getElementById('cs-vma-'+fk)||{}).value);
+    if(!isNaN(v)&&v>0){vma[k]=v;if(k==='SP 12.5'){vma['SP 12.5 FC1']=v;vma['SP 12.5 FC2']=v;}}
+  });
+  const nini={};
+  ['A','B','C','D','E'].forEach(tc=>{const v=parseFloat((document.getElementById('cs-nini-'+tc)||{}).value);if(!isNaN(v))nini[tc]=v;});
+  const vfa={};
+  ['A','B','C','D','E'].forEach(tc=>{
+    const lo=parseFloat((document.getElementById('cs-vfa-lo-'+tc)||{}).value);
+    const hi=parseFloat((document.getElementById('cs-vfa-hi-'+tc)||{}).value);
+    if(!isNaN(lo)&&!isNaN(hi))vfa[tc]=[lo,hi];
+  });
+  const spec={
+    id:_csEdit?_csEdit.id:'custom_'+Date.now(),
+    name,year,
+    addedDate:_csEdit?(_csEdit.addedDate||new Date().toISOString().slice(0,10)):new Date().toISOString().slice(0,10),
+    Va:va,VMA:vma,GmmNdes:ndes,GmmNmax:nmax,GmmNini:nini,VFA:vfa,
+    DP:{min:dpMin,max:dpMax},minTSR:tsr
+  };
+  const all=csGet();
+  if(_csEdit){const idx=all.findIndex(s=>s.id===spec.id);if(idx>=0)all[idx]=spec;else all.push(spec);}
+  else all.push(spec);
+  csSaveAll(all);
+  _specTab=spec.id;
+  csHideModal();
+  if(view==='specs')render();
+}
+
 // ── SUPABASE SYNC (direct fetch — no SDK dependency) ──
 const SB_URL='https://gndkcdfvntmixdvpgbah.supabase.co';
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImduZGtjZGZ2bnRtaXhkdnBnYmFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQyNTc0NjksImV4cCI6MjA5OTgzMzQ2OX0.DhF77avZvZCB1Y0yr-oF9w4nmoOQ1k9orzxYSS5gjVw';
