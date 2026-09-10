@@ -1964,9 +1964,12 @@ function renderNewMix(){
 function renderS1(){
   const i=ms.info,fam=i.family||'';
   const mixes={Superpave:['SP 4.75','SP 9.5','SP 12.5','SP 12.5 FC1','SP 12.5 FC2','SP 19.0','SP 25.0','SP 37.5'],Marshall:['HL1','HL2','HL3','HL3HS','HL3F','HL4','HL4F','HL8','DFC','MDBC','HDBC'],SMA:['SMA 9.5','SMA 12.5','SMA 19.0']};
+  const _customSpecs=csGet();
+  const _customOptGroup=_customSpecs.length?`<optgroup label="── Custom Specifications ──">${_customSpecs.map(cs=>`<option value="${cs.id}" ${i.customSpecId===cs.id?'selected':''}>${cs.name} (${cs.year})</option>`).join('')}</optgroup>`:'';
   const specOpts=fam==='Superpave'
-    ?`<option value="OPSS.PROV 1151" ${i.spec==='OPSS.PROV 1151'||!i.spec?'selected':''}>OPSS.PROV 1151 (Provincial)</option>
-       <option value="OPSS.MUNI 1151" ${i.spec==='OPSS.MUNI 1151'?'selected':''}>OPSS.MUNI 1151 (Municipal)</option>`
+    ?`<option value="OPSS.PROV 1151" ${i.spec==='OPSS.PROV 1151'||((!i.spec||i.spec==='')&&!i.customSpecId)?'selected':''}>OPSS.PROV 1151 (Provincial)</option>
+       <option value="OPSS.MUNI 1151" ${i.spec==='OPSS.MUNI 1151'?'selected':''}>OPSS.MUNI 1151 (Municipal)</option>
+       ${_customOptGroup}`
     :fam==='SMA'?`<option value="OPSS.PROV 1151" selected>OPSS.PROV 1151 (Provincial)</option>`
     :`<option value="OPSS.MUNI 1150" selected>OPSS.MUNI 1150 (Municipal)</option>`;
   return `<div class="card card-blue">
