@@ -4293,7 +4293,7 @@ function renderSpecRef(){
     const t1=tbl(
       `<thead><tr>${th('HMA Type','text-align:left')}${['50.0','37.5','25.0','19.0','12.5','9.5','4.75','2.36','1.18','0.075'].map(s=>th(s)).join('')}</tr></thead>`,
       `<tbody>${gradRows.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r[0])}${r.slice(1).map(v=>td(v)).join('')}</tr>`).join('')}</tbody>`,
-      'Note 1: SP 12.5FC1/FC2 coarse graded: 4.75 mm = 45–55%, 2.36 mm = 28–58%.'
+      'Note 1: SP 12.5FC1/FC2 coarse graded: 4.75 mm = 45–55%, 2.36 mm = 28–58%.<br>Note 2: For the SMA 9.5 mm, the maximum percentage passing the 1.18 mm, 0.600 mm, and 0.300 mm sieves is 21, 18, and 15 respectively.'
     );
 
     // Table 2 — Superpave PCS Points
