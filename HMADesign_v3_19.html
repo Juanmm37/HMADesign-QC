@@ -2046,13 +2046,18 @@ function renderS1(){
 }
 function saveS1(){
   const sp=document.getElementById('s1_sp').value;
+  const _allCs=csGet();
+  const _selCs=_allCs.find(s=>s.id===sp);
+  const specType=_selCs?'CUSTOM':sp.includes('MUNI')?'MUNI':'PROV';
+  const customSpecId=_selCs?_selCs.id:null;
+  const specDisplay=_selCs?`${_selCs.name} (${_selCs.year})`:sp;
   ms.info={mixNo:document.getElementById('s1_mn').value,family:document.getElementById('s1_fam').value,
     mixType:document.getElementById('s1_mt').value,hasRAP:document.getElementById('s1_rap').value,
     traffic:(document.getElementById('s1_tc')||{value:''}).value,
     mixYear:parseInt(document.getElementById('s1_mixYear').value)||CURRENT_YEAR,pgac:document.getElementById('s1_pg').value,
     pgacSup:document.getElementById('s1_pgs').value,tMix:parseFloat(document.getElementById('s1_tm').value)||165,
     tComp:parseFloat(document.getElementById('s1_tc2').value)||150,muni:document.getElementById('s1_mu').value,
-    spec:sp,specType:sp.includes('MUNI')?'MUNI':'PROV',surface:document.getElementById('s1_sur').value,
+    spec:specDisplay,specType,customSpecId,surface:document.getElementById('s1_sur').value,
     Gb:parseFloat(document.getElementById('s1_gb').value)||1.022,
     customer:document.getElementById('s1_customer').value,project:document.getElementById('s1_project').value,
     contractNo:document.getElementById('s1_contractNo').value,region:document.getElementById('s1_region').value,
