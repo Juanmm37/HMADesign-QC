@@ -4226,17 +4226,17 @@ function renderSpecRef(){
     // Table 5 — Superpave HMA Volumetric Properties
     const t5=tbl(
       `<thead>
-        <tr>${th('Ontario<br>Traffic Cat.','rowspan:3')}${th('% Theoretical Max Specific Gravity','colspan:3')}${th('VMA % Minimum (NMPS mm)','colspan:6')}${th('VFA<br>%')}${th('Dust/Binder<br>Ratio')}${th('Min TSR<br>%')}</tr>
-        <tr>${th('N<sub>ini</sub>')}${th('N<sub>des</sub>')}${th('N<sub>max</sub>')}${['37.5','25.0','19.0','12.5','9.5','4.75'].map(s=>th(s)).join('')}${th('')}${th('')}${th('')}</tr>
+        <tr>${th('Ontario<br>Traffic Cat.','rowspan:2')}${th('% Theoretical Max Specific Gravity','colspan:3')}${th('VMA % Minimum (NMPS mm)','colspan:6')}${th('VFA %','rowspan:2')}${th('Dust/Binder<br>Ratio','rowspan:2')}${th('Min TSR %','rowspan:2')}</tr>
+        <tr>${th('N<sub>ini</sub>')}${th('N<sub>des</sub>')}${th('N<sub>max</sub>')}${['37.5','25.0','19.0','12.5','9.5','4.75'].map(s=>th(s)).join('')}</tr>
       </thead>`,
       `<tbody>
-        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">A</td>${td('≤91.5')}${td('96.0','rowspan:5')}${td('≤98.0','rowspan:5')}${['11.0','12.0','13.0','14.0','15.0','16.0'].map(v=>td(v,'rowspan:5')).join('')}${td('70–80')}<td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde;rowspan:5">0.6–1.2</td><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde;rowspan:5">80</td></tr>
-        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">B</td>${td('≤90.5')}${td('65–78')}</tr>
-        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">C</td>${td('')}${td('65–75')}</tr>
-        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">D</td>${td('≤89.5')}${td('65–75')}</tr>
-        <tr><td style="padding:5px 8px;font-size:11px;text-align:center;border:1px solid #dde">E</td>${td('')}${td('65–75')}</tr>
+        <tr>${td('A')}${td('≤91.5')}${td('96.0','rowspan:5')}${td('≤98.0','rowspan:5')}${['11.0','12.0','13.0','14.0','15.0','16.0'].map(v=>td(v,'rowspan:5')).join('')}${td('70–80')}${td('0.6–1.2','rowspan:5')}${td('80','rowspan:5')}</tr>
+        <tr>${td('B')}${td('≤90.5')}${td('65–78')}</tr>
+        <tr>${td('C')}${td('—')}${td('65–75')}</tr>
+        <tr>${td('D')}${td('≤89.5')}${td('65–75')}</tr>
+        <tr>${td('E')}${td('—')}${td('65–75')}</tr>
       </tbody>`,
-      'Notes: (1) For SP 4.75 mixes, DP = 0.9–2.0 (0.8–1.6 below PCS). (2) Cat. A, SP 25.0: VFA 67–80%. (3) SP 4.75: VFA 75–78%; SP 9.5: 73–76%; SP 37.5: 64–75%.'
+      '<strong>Notes:</strong><br>(1) For Superpave 4.75 mixes, the dust-to-binder ratio shall be 0.9 to 2.0. Superpave mixes with gradations that pass beneath the PCS Control Point specified in Table 4, the dust-to-binder ratio shall be 0.8–1.6.<br>(2) For Traffic Category A, Superpave 25.0 mixes shall have a VFA range of 67% to 80%.<br>(3) Superpave 4.75 mixes shall have a VFA range of 75% to 78%. Superpave 9.5 mixes shall have a VFA range of 73% to 76%. Superpave 37.5 mixes shall have a VFA range of 64% to 75%.<br>(4) Density testing of the coarse and fine aggregate shall be carried out in accordance with LS-604 and LS-605 respectively using the procedure for blended aggregates.'
     );
 
     // Table 6 — SMA Volumetric Properties
