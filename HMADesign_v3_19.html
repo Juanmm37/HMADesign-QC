@@ -4774,7 +4774,16 @@ function renderSpecRef(){
     );
 
     return`
-      <div class="st" style="margin-bottom:16px">OPSS.PROV 1151 — Superpave and SMA Mix Design <span style="font-size:11px;font-weight:400;color:#888">(April 2021)</span></div>
+    const _ov1151p=getSpecOverride('prov1151');
+    const _t3Display=_ov1151p?suVolTable(_ov1151p,'prov1151'):t3;
+    return`
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div class="st" style="margin:0">OPSS.PROV 1151 — Superpave and SMA Mix Design <span style="font-size:11px;font-weight:400;color:#888">(April 2021)</span></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${_ov1151p?`<span style="font-size:10px;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;padding:2px 8px">⚡ Updated ${_ov1151p.updatedDate}</span>`:''}
+          <button class="btn" style="font-size:11px;padding:4px 12px;background:#e8f0fe;color:#1f3864;border-color:#b8cfff;font-weight:700" onclick="suShowModal('prov1151')">↑ Update from PDF</button>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div>
           <div class="st" style="margin-bottom:8px;font-size:11px">Table 1 — Aggregate Gradation Control Points (% passing)</div>${t1}
@@ -4784,7 +4793,7 @@ function renderSpecRef(){
           <div class="st" style="margin-bottom:8px;font-size:11px">Table 7 — Superpave Compactive Effort</div>${t7}
         </div>
         <div>
-          <div class="st" style="margin-bottom:8px;font-size:11px">Table 3 — Superpave HMA Properties</div>${t3}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 3 — Superpave HMA Properties${_ov1151p?' <span style="font-size:9px;color:#1a6b1a;font-weight:700">(updated)</span>':''}</div>${_t3Display}
           <div class="st" style="margin-bottom:8px;font-size:11px">Table 4 — SMA Properties</div>${t4}
         </div>
       </div>`;
