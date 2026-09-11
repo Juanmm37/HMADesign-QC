@@ -4234,6 +4234,16 @@ function getVolTargets(info,mt){
         return{Va:null,VMA:[vmaMin,null],VFA:vfaPair,pGmmNini:pNiniMax?[null,pNiniMax]:null,pGmmNdes:[ndes-0.5,ndes+0.5],Stab:null,Flow:null};
       }
     }
+    // Check for built-in spec override (user-uploaded updated PDF)
+    const _ovKey=(info.specType||'PROV')==='MUNI'?'muni1151':'prov1151';
+    const _ov=getSpecOverride(_ovKey);
+    if(_ov){
+      const vmaMin=_ov.VMA&&_ov.VMA[mt]!=null?_ov.VMA[mt]:(SP_VOL.VMA[mt]||14);
+      const vfaPair=_ov.VFA&&_ov.VFA[tc]?_ov.VFA[tc]:(SP_VOL.VFA_by_traffic[tc]?.['default']||[65,78]);
+      const pNiniMax=_ov.GmmNini&&_ov.GmmNini[tc]!=null?_ov.GmmNini[tc]:null;
+      const ndes=_ov.GmmNdes||96.0;
+      return{Va:null,VMA:[vmaMin,null],VFA:vfaPair,pGmmNini:pNiniMax?[null,pNiniMax]:null,pGmmNdes:[ndes-0.5,ndes+0.5],Stab:null,Flow:null};
+    }
     const vmaMin=SP_VOL.VMA[mt]||14;
     const vfaRow=SP_VOL.VFA_by_traffic[tc]||{};
     const vfa=vfaRow[mt]||vfaRow['default']||[65,78];
