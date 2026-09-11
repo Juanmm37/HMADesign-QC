@@ -667,7 +667,7 @@ function csRenderModal(){
 
       <div style="display:flex;gap:8px;justify-content:flex-end;border-top:1px solid #e8ecf2;padding-top:16px;margin-top:16px">
         <button onclick="csHideModal()" style="padding:8px 20px;border:1px solid #ccd;background:#fff;border-radius:6px;font-size:13px;cursor:pointer;font-family:inherit">Cancel</button>
-        <button onclick="csSaveModal()" style="padding:8px 24px;background:#1f3864;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Specification</button>
+        <button onclick="${_suKey?'suSaveModal()':'csSaveModal()'}" style="padding:8px 24px;background:#1f3864;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">${_suKey?'Update Specification':'Save Specification'}</button>
       </div>
     </div>
   </div>`;
