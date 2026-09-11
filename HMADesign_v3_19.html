@@ -1552,7 +1552,7 @@ function libToggleGsbLock(year, id){
   if(agg.Gsb_locked){
     const lk=agg.Gsb_locked;
     const val=eff(agg,'Gsb');
-    if(!confirm(`Unlock Gsb for "${agg.material}"?\n\nLocked by ${lk.by} on ${lk.date} — Gsb = ${val!=null?Number(val).toFixed(3):'—'}\n\nUnlocking allows the Gsb value to be changed.`)) return;
+    if(!confirm(`Unlock Gsb for "${agg.material}"?\n\nLocked by ${lk.by} on ${fmtLockDate(lk.date)} — Gsb = ${val!=null?Number(val).toFixed(3):'—'}\n\nUnlocking allows the Gsb value to be changed.`)) return;
     agg.Gsb_locked=null;
   } else {
     const val=eff(agg,'Gsb');
