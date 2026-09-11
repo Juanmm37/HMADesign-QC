@@ -1802,8 +1802,10 @@ function renderLibEditForm(year){
     </table>
 
     <!-- ── Densities & Absorption ── -->
-    <div class="st">Densities &amp; Absorption
-      <span style="font-size:9px;font-weight:400;color:#888;margin-left:8px;text-transform:none">⚡ Modified overrides Measured</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px">
+      <div class="st" style="margin:0">Densities &amp; Absorption
+        <span style="font-size:9px;font-weight:400;color:#888;margin-left:8px;text-transform:none">⚡ Modified overrides Measured</span>
+      </div>
     </div>
     <table style="border-collapse:collapse;width:100%;margin-bottom:14px;font-size:12px">
       <thead>
@@ -1819,12 +1821,14 @@ function renderLibEditForm(year){
           const meas = ea[mf], mod = ea[modf];
           const used = (mod!==null&&mod!==undefined)?mod:meas;
           const isModActive = mod!==null&&mod!==undefined;
-          const bg = i%2===0?'#ffffff':'#f8fafc';
+          const isGsbLocked = i===0 && ea.Gsb_locked;
+          const bg = isGsbLocked?'#fffbeb':i%2===0?'#ffffff':'#f8fafc';
           return `<tr style="background:${bg}">
-            <td style="padding:6px 10px;font-weight:600;color:#1f3864">${lbl}</td>
-            <td style="padding:4px 8px">${numInp('d_'+mf, meas, mf, null, '0.001')}</td>
-            <td style="padding:4px 8px;background:#fffef0">${numInp('d_'+modf, mod, modf, null, '0.001')}</td>
-            <td style="padding:6px 8px;text-align:center;font-weight:800;color:${isModActive?'#e65100':'#1f3864'};background:${isModActive?'#fff8e8':'#f0f5ff'}">${used!==null&&used!==undefined?Number(used).toFixed(dec):'—'}${isModActive?' ⚡':''}</td>
+            <td style="padding:6px 10px;font-weight:600;color:${isGsbLocked?'#a07000':'#1f3864'}">${lbl}${isGsbLocked?` 🔒 <span style="font-size:9px;font-weight:400">locked ${ea.Gsb_locked}</span>`:''}
+            </td>
+            <td style="padding:4px 8px">${isGsbLocked?`<span style="color:#888;font-size:12px;padding:5px 8px;display:block;text-align:right">${meas!=null?Number(meas).toFixed(dec):'—'}</span>`:numInp('d_'+mf, meas, mf, null, '0.001')}</td>
+            <td style="padding:4px 8px;background:${isGsbLocked?'#fffbeb':'#fffef0'}">${isGsbLocked?`<span style="color:#bbb;font-size:12px;padding:5px 8px;display:block;text-align:right">—</span>`:numInp('d_'+modf, mod, modf, null, '0.001')}</td>
+            <td style="padding:6px 8px;text-align:center;font-weight:800;color:${isGsbLocked?'#a07000':isModActive?'#e65100':'#1f3864'};background:${isGsbLocked?'#fff3cd':isModActive?'#fff8e8':'#f0f5ff'}">${used!==null&&used!==undefined?Number(used).toFixed(dec):'—'}${isGsbLocked?' 🔒':isModActive?' ⚡':''}</td>
           </tr>`;
         }).join('')}
       </tbody>
