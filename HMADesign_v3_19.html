@@ -4563,6 +4563,24 @@ function renderSpecRef(){
   const tdl=(t,s='')=>`<td style="padding:5px 8px;font-size:11px;text-align:left;border:1px solid #dde;font-weight:600${s?';'+s:''}">${t}</td>`;
   const tbl=(head,rows,note='')=>`<div style="overflow-x:auto;margin-bottom:4px"><table style="border-collapse:collapse;width:100%;min-width:400px">${head}${rows}</table></div>${note?`<div style="font-size:10px;color:#555;margin-bottom:12px;padding:4px 6px;background:#f8f9fc;border-radius:4px;border-left:3px solid #c5d3ef">${note}</div>`:''}`;
 
+  const suVolTable=(ov,specKey)=>{
+    const cats=['A','B','C','D','E'];
+    const nmps=['SP 4.75','SP 9.5','SP 12.5','SP 12.5 FC1','SP 12.5 FC2','SP 19.0','SP 25.0','SP 37.5'];
+    const bk=specKey==='muni1151'?suBuiltin('muni1151'):suBuiltin('prov1151');
+    const vmaRow=nmps.map(n=>{const v=(ov.VMA&&ov.VMA[n]!=null)?ov.VMA[n]:bk.VMA[n];return td(v!=null?v:'—');}).join('');
+    const niniRows=cats.map((c,i)=>{
+      const nini=(ov.GmmNini&&ov.GmmNini[c]!=null)?ov.GmmNini[c]:bk.GmmNini[c];
+      const vfa=(ov.VFA&&ov.VFA[c])?ov.VFA[c]:bk.VFA[c];
+      const vfaStr=vfa?`${vfa[0]}–${vfa[1]}`:'—';
+      return`<tr${i%2?'':' style="background:#f8f9fc"'}>${tdl('Cat '+c)}${td((ov.GmmNdes||bk.GmmNdes||96).toFixed(1)+'±0.5')}${td((ov.GmmNmax||bk.GmmNmax||98).toFixed(1))}${td(nini!=null?'≤'+nini:'—')}${td(vfaStr)}${i===0?td(((ov.DP&&ov.DP.min)||bk.DP.min)+'–'+((ov.DP&&ov.DP.max)||bk.DP.max),'rowspan:5'):''}</tr>`;
+    }).join('');
+    const head=`<thead><tr>${th('Traffic Cat')}${th('%Gmm Ndes')}${th('%Gmm Nmax')}${th('%Gmm Nini Max')}${th('VFA %')}${th('D/B Ratio')}</tr></thead>`;
+    const vmaHead=`<thead><tr>${th('Mix Type')}${nmps.map(n=>th(n)).join('')}</tr></thead>`;
+    const vmaBody=`<tbody><tr>${tdl('VMA Min %')}${vmaRow}</tr></tbody>`;
+    return tbl(vmaHead,vmaBody)+tbl(head,`<tbody>${niniRows}</tbody>`,
+      `Va target: ${ov.Va||bk.Va||4.0}% &nbsp;|&nbsp; Min TSR: ${ov.minTSR||bk.minTSR||80}%`);
+  };
+
   // ── MUNI 1151 ───────────────────────────────────────
   const muni1151=()=>{
     // Table 1 — Traffic Categories
