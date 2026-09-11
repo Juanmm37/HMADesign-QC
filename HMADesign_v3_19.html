@@ -672,6 +672,73 @@ function csRenderModal(){
   if(c)c.innerHTML=html;
 }
 
+// ── BUILT-IN SPEC OVERRIDES ───────────────────────────────
+let _suKey=null; // 'muni1151' | 'prov1151' | 'muni1150' | null
+
+const SU_LABELS={muni1151:'OPSS.MUNI 1151',prov1151:'OPSS.PROV 1151',muni1150:'OPSS.MUNI 1150'};
+
+function getSpecOverride(key){try{return JSON.parse(localStorage.getItem('capmix_specupd_'+key)||'null');}catch(e){return null;}}
+function setSpecOverride(key,data){try{localStorage.setItem('capmix_specupd_'+key,JSON.stringify(data));}catch(e){}}
+function clearSpecOverride(key){try{localStorage.removeItem('capmix_specupd_'+key);}catch(e){}}
+
+function suBuiltin(key){
+  if(key==='muni1151')return{Va:4.0,VMA:{...SP_VOL.VMA},GmmNdes:96.0,GmmNmax:98.0,
+    GmmNini:{A:91.5,B:90.5,C:89.0,D:89.5,E:89.0},
+    VFA:{A:[70,80],B:[65,78],C:[65,75],D:[65,75],E:[65,75]},DP:{min:0.6,max:1.2},minTSR:80};
+  if(key==='prov1151')return{Va:4.0,VMA:{...SP_VOL.VMA},GmmNdes:96.0,GmmNmax:98.0,
+    GmmNini:{A:91.5,B:90.5,C:89.0,D:89.0,E:89.0},
+    VFA:{A:[70,80],B:[65,78],C:[65,75],D:[65,75],E:[65,75]},DP:{min:0.6,max:1.2},minTSR:80};
+  return{Va:4.0,VMA:{},GmmNdes:96.0,GmmNmax:98.0,
+    GmmNini:{A:91.5,B:90.5,C:89.0,D:89.0,E:89.0},
+    VFA:{A:[70,80],B:[65,78],C:[65,75],D:[65,75],E:[65,75]},DP:{min:0.6,max:1.2},minTSR:80};
+}
+
+function suShowModal(key){
+  _suKey=key; _csEdit=null;
+  const override=getSpecOverride(key);
+  const b=suBuiltin(key);
+  _csVals=override?{
+    Va:override.Va??b.Va,VMA:{...b.VMA,...(override.VMA||{})},
+    GmmNdes:override.GmmNdes??b.GmmNdes,GmmNmax:override.GmmNmax??b.GmmNmax,
+    GmmNini:{...b.GmmNini,...(override.GmmNini||{})},
+    VFA:{...b.VFA,...(override.VFA||{})},
+    DP:override.DP?{...override.DP}:{...b.DP},minTSR:override.minTSR??b.minTSR
+  }:{...b};
+  csRenderModal();
+}
+
+function suResetOverride(key){
+  if(!confirm('Reset '+SU_LABELS[key]+' to built-in defaults?\nAny PDF-uploaded changes will be discarded.'))return;
+  clearSpecOverride(key);
+  _suKey=null; csHideModal(); render();
+}
+
+function suSaveModal(){
+  if(!_suKey){csSaveModal();return;}
+  const VMA_FORM=[['SP 4.75','SP_4_75'],['SP 9.5','SP_9_5'],['SP 12.5','SP_12_5'],['SP 19.0','SP_19_0'],['SP 25.0','SP_25_0'],['SP 37.5','SP_37_5']];
+  const vma={...suBuiltin(_suKey).VMA};
+  VMA_FORM.forEach(([k,fk])=>{const v=parseFloat((document.getElementById('cs-vma-'+fk)||{}).value);if(!isNaN(v)&&v>0){vma[k]=v;if(k==='SP 12.5'){vma['SP 12.5 FC1']=v;vma['SP 12.5 FC2']=v;}}});
+  const nini={},vfa={};
+  ['A','B','C','D','E'].forEach(tc=>{
+    const ni=parseFloat((document.getElementById('cs-nini-'+tc)||{}).value);if(!isNaN(ni))nini[tc]=ni;
+    const lo=parseFloat((document.getElementById('cs-vfa-lo-'+tc)||{}).value);
+    const hi=parseFloat((document.getElementById('cs-vfa-hi-'+tc)||{}).value);
+    if(!isNaN(lo)&&!isNaN(hi))vfa[tc]=[lo,hi];
+  });
+  const override={
+    updatedDate:new Date().toISOString().slice(0,10),
+    Va:parseFloat(document.getElementById('cs-va').value)||4.0,
+    VMA:vma,GmmNdes:parseFloat(document.getElementById('cs-ndes').value)||96.0,
+    GmmNmax:parseFloat(document.getElementById('cs-nmax').value)||98.0,
+    GmmNini:nini,VFA:vfa,
+    DP:{min:parseFloat(document.getElementById('cs-dp-min').value)||0.6,max:parseFloat(document.getElementById('cs-dp-max').value)||1.2},
+    minTSR:parseInt(document.getElementById('cs-tsr').value)||80
+  };
+  setSpecOverride(_suKey,override);
+  const k=_suKey; _suKey=null; csHideModal();
+  if(view==='specs')render();
+}
+
 function csSaveModal(){
   const name=(document.getElementById('cs-name').value||'').trim();
   if(!name){alert('Please enter a specification name.');return;}
