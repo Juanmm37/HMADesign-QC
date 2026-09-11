@@ -1972,7 +1972,7 @@ function renderAggDetail(a, showEdit=false){
       <div class="st" style="margin:0">Densities &amp; Absorption</div>
       ${showEdit?`<button class="btn btn-sm" style="font-size:10px;padding:2px 10px;${a.Gsb_locked?'background:#fff3cd;color:#a07000;border-color:#f0c400':'background:#f0f5ff;color:#1f3864;border-color:#b8cfff'}" onclick="libToggleGsbLock(${libYear},'${a.id}')">${a.Gsb_locked?'🔒 Gsb Locked':'🔓 Lock Gsb'}</button>`:''}
     </div>
-    ${a.Gsb_locked?`<div style="font-size:10px;color:#a07000;background:#fffbeb;border:1px solid #f0c400;border-radius:4px;padding:4px 10px;margin-bottom:8px">🔒 Gsb locked by <strong>${a.Gsb_locked.by}</strong> on ${a.Gsb_locked.date}</div>`:''}
+    ${a.Gsb_locked?`<div style="font-size:10px;color:#a07000;background:#fffbeb;border:1px solid #f0c400;border-radius:4px;padding:4px 10px;margin-bottom:8px">🔒 Gsb locked by <strong>${a.Gsb_locked.by}</strong> on ${fmtLockDate(a.Gsb_locked.date)}</div>`:''}
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
       ${[['Gsb',gsb,effLbl(a,'Gsb')],['Gsa',gsa,effLbl(a,'Gsa')],['Water Abs. (%)',wa,effLbl(a,'WA')]].map(([l,v,n],di)=>`
       <div class="mc" style="text-align:left;padding:12px">
