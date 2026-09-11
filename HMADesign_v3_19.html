@@ -4027,7 +4027,7 @@ function printTrial(trialIdx){
   const _caa1p=calcCAABlend(trial,'CAA1FF'),_caa2p=calcCAABlend(trial,'CAA2FF');
   const propRows=[
     ...(_rapACcombP!==null?[['% AC',...aggs.map(s=>{const ac=_getACp(s);return ac!=null?Number(ac).toFixed(1):'—';}),Number(_rapACcombP).toFixed(1),'','']]:[]),
-    ['Gsb',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsb'))),fN(blendGsb),'',''],
+    ['Gsb',...aggs.map(s=>{const _a=getAgg(ms.slots[s]);return fN(eff(_a,'Gsb'))+(_a?.Gsb_locked?' 🔒':'');}),fN(blendGsb),'',''],
     ['Gsa',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsa'))),fN(blendGsa),'',''],
     ['Water Abs.',...aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'WA'),2)),fN(blendWA,2),'',''],
     ...(_caa1p!==null?[['CAA 1FF',...aggs.map(s=>{const v=getAgg(ms.slots[s])?.CAA1FF;return(v!=null&&v!==0)?v.toFixed(0):'—';}),_caa1p.toFixed(0),'','']]:[]),
