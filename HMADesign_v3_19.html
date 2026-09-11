@@ -368,6 +368,12 @@ function getDPRange(info,blendGrad){
     const cs=csById(info.customSpecId);
     if(cs&&cs.DP)return{...cs.DP};
   }
+  // Check for built-in spec override
+  if(fam==='Superpave'){
+    const _ovKey=(info.specType||'PROV')==='MUNI'?'muni1151':'prov1151';
+    const _ov=getSpecOverride(_ovKey);
+    if(_ov&&_ov.DP)return{..._ov.DP};
+  }
   if(mt==='SP 4.75')return{min:0.9,max:2.0};
   const pcs=SP_PCS[mt];
   if(pcs&&blendGrad){
