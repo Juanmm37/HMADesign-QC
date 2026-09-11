@@ -4656,8 +4656,16 @@ function renderSpecRef(){
       'Note 1: Traffic categories as defined in Table 1.'
     );
 
+    const _ov1151=getSpecOverride('muni1151');
+    const _t5Display=_ov1151?suVolTable(_ov1151,'muni1151'):t5;
     return`
-      <div class="st" style="margin-bottom:16px">OPSS.MUNI 1151 — Superpave and SMA Mix Design <span style="font-size:11px;font-weight:400;color:#888">(April 2018)</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+        <div class="st" style="margin:0">OPSS.MUNI 1151 — Superpave and SMA Mix Design <span style="font-size:11px;font-weight:400;color:#888">(April 2018)</span></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          ${_ov1151?`<span style="font-size:10px;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;padding:2px 8px">⚡ Updated ${_ov1151.updatedDate}</span>`:''}
+          <button class="btn" style="font-size:11px;padding:4px 12px;background:#e8f0fe;color:#1f3864;border-color:#b8cfff;font-weight:700" onclick="suShowModal('muni1151')">↑ Update from PDF</button>
+        </div>
+      </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div>
           <div class="st" style="margin-bottom:8px;font-size:11px">Table 1 — Traffic Categories by ESALs</div>${t1}
@@ -4668,7 +4676,7 @@ function renderSpecRef(){
         <div>
           <div class="st" style="margin-bottom:8px;font-size:11px">Table 2 — Superpave Aggregate Gradation Control Points (% passing)</div>${t2}
           <div class="st" style="margin-bottom:8px;font-size:11px">Table 3 — SMA Aggregate Gradation Control Points (% passing)</div>${t3}
-          <div class="st" style="margin-bottom:8px;font-size:11px">Table 5 — Superpave HMA Volumetric Properties</div>${t5}
+          <div class="st" style="margin-bottom:8px;font-size:11px">Table 5 — Superpave HMA Volumetric Properties${_ov1151?' <span style="font-size:9px;color:#1a6b1a;font-weight:700">(updated)</span>':''}</div>${_t5Display}
         </div>
       </div>`;
   };
