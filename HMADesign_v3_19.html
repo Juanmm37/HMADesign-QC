@@ -1824,8 +1824,9 @@ function renderLibEditForm(year){
           const isModActive = mod!==null&&mod!==undefined;
           const isGsbLocked = i===0 && ea.Gsb_locked;
           const bg = isGsbLocked?'#fffbeb':i%2===0?'#ffffff':'#f8fafc';
+          const lkBy = isGsbLocked?(ea.Gsb_locked.by||'?')+' · '+(ea.Gsb_locked.date||''):'';
           return `<tr style="background:${bg}">
-            <td style="padding:6px 10px;font-weight:600;color:${isGsbLocked?'#a07000':'#1f3864'}">${lbl}${isGsbLocked?` 🔒 <span style="font-size:9px;font-weight:400">locked ${ea.Gsb_locked}</span>`:''}
+            <td style="padding:6px 10px;font-weight:600;color:${isGsbLocked?'#a07000':'#1f3864'}">${lbl}${isGsbLocked?` 🔒 <span style="font-size:9px;font-weight:400">${lkBy}</span>`:''}
             </td>
             <td style="padding:4px 8px">${isGsbLocked?`<span style="color:#888;font-size:12px;padding:5px 8px;display:block;text-align:right">${meas!=null?Number(meas).toFixed(dec):'—'}</span>`:numInp('d_'+mf, meas, mf, null, '0.001')}</td>
             <td style="padding:4px 8px;background:${isGsbLocked?'#fffbeb':'#fffef0'}">${isGsbLocked?`<span style="color:#bbb;font-size:12px;padding:5px 8px;display:block;text-align:right">—</span>`:numInp('d_'+modf, mod, modf, null, '0.001')}</td>
