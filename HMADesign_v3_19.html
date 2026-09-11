@@ -2926,7 +2926,8 @@ function renderS3TrialBlendAnalysis(){
                 } else if(prop.key==='BR'){
                   val=calcBinderReplacement(ms.tbaTrials[bi].pcts,ms.tbaTrials[bi].Pb);
                 }
-                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':prop.key==='minVMA'?'#555':'#1f3864'}">${val!==null?prop.fmt(val):'—'}</td>`;
+                const gsbLock=prop.key==='Gsb'&&aggs.some(s=>{const _a=getAgg(ms.slots[s]);return((ms.tbaTrials[bi].pcts[s]||0)/100)>0&&_a?.Gsb_locked;});
+                return`<td style="padding:6px 8px;text-align:center;font-weight:700;color:${prop.key==='BR'&&val!==null&&val>15?'#c0392b':prop.key==='minVMA'?'#555':'#1f3864'}">${val!==null?prop.fmt(val)+(gsbLock?' 🔒':''):'—'}</td>`;
               }).join('')}
             </tr>`;
           }).join('')}
