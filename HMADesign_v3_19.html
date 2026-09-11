@@ -3467,7 +3467,7 @@ function renderS3(){
   const _caa1=calcCAABlend(trial,'CAA1FF'), _caa2=calcCAABlend(trial,'CAA2FF');
   const propRowDefs=[
     ...(_rapACcomb4!==null?[{lbl:'% AC',id:'',aggVals:aggs.map(s=>{const ac=_getAC(s);return ac!=null?Number(ac).toFixed(1):'—';}),blend:Number(_rapACcomb4).toFixed(1)}]:[]),
-    {lbl:'Gsb',      id:'s3-blend-gsb-tbl', aggVals:aggs.map(s=>{const _a=getAgg(ms.slots[s]);return fN(eff(_a,'Gsb'))+(_a?.Gsb_locked?'🔒':'');}),    blend:fN(blendGsb)},
+    {lbl:'Gsb',      id:'s3-blend-gsb-tbl', aggVals:aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsb'))),    blend:fN(blendGsb)},
     {lbl:'Gsa',      id:'s3-blend-gsa-tbl', aggVals:aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'Gsa'))),    blend:fN(blendGsa)},
     {lbl:'Water Abs.',id:'s3-blend-wa-tbl', aggVals:aggs.map(s=>fN(eff(getAgg(ms.slots[s]),'WA'),2)),   blend:fN(blendWA,2)},
     ...(_caa1!==null?[{lbl:'CAA 1FF',id:'', aggVals:aggs.map(s=>{const v=getAgg(ms.slots[s])?.CAA1FF;return(v!=null&&v!==0)?v.toFixed(0):'—';}), blend:_caa1.toFixed(0)}]:[]),
