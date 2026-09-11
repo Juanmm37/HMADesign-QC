@@ -1538,6 +1538,13 @@ function libDeleteAgg(year, id){
   libSel=null; libEditing=null; render();
 }
 
+function fmtLockDate(d){
+  if(!d)return'';
+  const mo=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const[y,m,day]=d.split('-');
+  return`${mo[parseInt(m)-1]} ${parseInt(day)}, ${y}`;
+}
+
 function libToggleGsbLock(year, id){
   const data=getLibYear(year);
   const agg=data.find(a=>a.id===id);
