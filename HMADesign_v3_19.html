@@ -1543,13 +1543,14 @@ function libToggleGsbLock(year, id){
   const agg=data.find(a=>a.id===id);
   if(!agg) return;
   if(agg.Gsb_locked){
+    const lk=agg.Gsb_locked;
     const val=eff(agg,'Gsb');
-    if(!confirm(`Unlock Gsb for "${agg.material}"?\n\nLocked ${agg.Gsb_locked} — Gsb = ${val!=null?Number(val).toFixed(3):'—'}\n\nUnlocking allows the Gsb value to be changed.`)) return;
+    if(!confirm(`Unlock Gsb for "${agg.material}"?\n\nLocked by ${lk.by} on ${lk.date} — Gsb = ${val!=null?Number(val).toFixed(3):'—'}\n\nUnlocking allows the Gsb value to be changed.`)) return;
     agg.Gsb_locked=null;
   } else {
     const val=eff(agg,'Gsb');
     if(val===null||val===undefined){alert('No Gsb value to lock.');return;}
-    agg.Gsb_locked=new Date().toISOString().slice(0,10);
+    agg.Gsb_locked={date:new Date().toISOString().slice(0,10),by:currentUser?.name||'Unknown'};
   }
   libSaveAgg(year,agg);
   render();
