@@ -4710,6 +4710,17 @@ function renderSpecRef(){
       'Note 1: Traffic categories as defined in Table 1.'
     );
 
+    // Appendix B Table 1 — Max Binder Replacement (§1151.04.01.01)
+    const t8=tbl(
+      `<thead><tr>${th('Course Type','text-align:left')}${th('Max % Binder Replacement')}</tr></thead>`,
+      `<tbody>
+        <tr>${tdl('Surface Course')}${td('15%')}</tr>
+        <tr style="background:#f8f9fc">${tdl('Binder Course')}${td('30%')}</tr>
+        <tr>${tdl('Any Course — above 30%')}${td('Not Permitted')}</tr>
+      </tbody>`,
+      'RAP not permitted in SMA, 12.5FC1, or 12.5FC2 mixes unless otherwise specified in the Contract Documents.<br>When Binder Replacement exceeds 15%, the PGAC high and low temperature grades shall each be reduced by one grade (6°C) — Level II per Appendix B Table 1.'
+    );
+
     const _ov1151=getSpecOverride('muni1151');
     const _t5Display=_ov1151?suVolTable(_ov1151,'muni1151'):t5;
     return`
