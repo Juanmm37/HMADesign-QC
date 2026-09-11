@@ -3091,7 +3091,7 @@ function printS3TrialBlendAnalysis(){
           ${trialGrads.map(tg=>{
             const v=tg[prop.key];
             const isBRHigh=prop.key==='BR'&&v!==null&&v>15;
-            return`<td style="padding:5px 8px;text-align:center;font-weight:700;color:${isBRHigh?'#c0392b':'#1f3864'}">${v!==null?prop.fmt(v):'—'}</td>`;
+            return`<td style="padding:5px 8px;text-align:center;font-weight:700;color:${isBRHigh?'#c0392b':'#1f3864'}">${v!==null?prop.fmt(v)+(prop.key==='Gsb'&&tg.GsbLocked?' 🔒':''):'—'}</td>`;
           }).join('')}
         </tr>`).join('')}
       </tbody>
