@@ -1831,7 +1831,7 @@ function renderLibEditForm(year){
           const isModActive = mod!==null&&mod!==undefined;
           const isGsbLocked = i===0 && ea.Gsb_locked;
           const bg = isGsbLocked?'#fffbeb':i%2===0?'#ffffff':'#f8fafc';
-          const lkBy = isGsbLocked?(ea.Gsb_locked.by||'?')+' · '+(ea.Gsb_locked.date||''):'';
+          const lkBy = isGsbLocked?(ea.Gsb_locked.by||'?')+' · '+fmtLockDate(ea.Gsb_locked.date||''):'';
           return `<tr style="background:${bg}">
             <td style="padding:6px 10px;font-weight:600;color:${isGsbLocked?'#a07000':'#1f3864'}">${lbl}${isGsbLocked?` 🔒 <span style="font-size:9px;font-weight:400">${lkBy}</span>`:''}
             </td>
