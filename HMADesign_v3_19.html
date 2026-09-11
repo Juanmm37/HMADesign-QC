@@ -2969,7 +2969,8 @@ function printS3TrialBlendAnalysis(){
     const Gsb=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(b.pcts[s]||0)/100;const gsb=eff(a,'Gsb');return sum+(gsb!==null?gsb*pct:0);},0);
     const Gsa=aggs.reduce((sum,s)=>{const a=getAgg(ms.slots[s]);const pct=(b.pcts[s]||0)/100;const gsa=eff(a,'Gsa');return sum+(gsa!==null?gsa*pct:0);},0);
     const BR=calcBinderReplacement(b.pcts,b.Pb);
-    return{name:b.name,grad,totalPct,Pb:b.Pb,selected:b.selected,Gsb,Gsa,BR};
+    const GsbLocked=aggs.some(s=>{const _a=getAgg(ms.slots[s]);return((b.pcts[s]||0)/100)>0&&_a?.Gsb_locked;});
+    return{name:b.name,grad,totalPct,Pb:b.Pb,selected:b.selected,Gsb,Gsa,BR,GsbLocked};
   });
 
   const selectedTarget=ms.tbaTargets[ms.selectedTargetIdx]||{label:'',values:{}};
