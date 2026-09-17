@@ -618,7 +618,7 @@ function csShowModal(id=null){
       DP:{...CS_DEF.DP,...(_csEdit.DP||{})},
       minTSR:_csEdit.minTSR??CS_DEF.minTSR
     };
-    _csGradRows=(_csEdit.gradation||[]).map(r=>({mixType:r.mixType||'',pct:CS_GRAD_SIEVES.map((_s,j)=>{const v=(r.pct||[])[j];if(!v)return{max:'',min:''};if(typeof v==='string')return{max:v,min:''};return{max:v.max||'',min:v.min||''};});}));
+    _csGradRows=(_csEdit.gradation||[]).map(r=>({mixType:r.mixType||'',pct:CS_GRAD_SIEVES.map((_s,j)=>{const v=(r.pct||[])[j];if(!v)return{max:'',min:''};if(typeof v==='string')return{max:v,min:''};return{max:v.max||'',min:v.min||''};}) }));
   }else{
     _csVals=JSON.parse(JSON.stringify(CS_DEF));
     _csGradRows=[];
