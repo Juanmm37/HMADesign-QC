@@ -602,8 +602,10 @@ function csShowModal(id=null){
       DP:{...CS_DEF.DP,...(_csEdit.DP||{})},
       minTSR:_csEdit.minTSR??CS_DEF.minTSR
     };
+    _csGradRows=(_csEdit.gradation||[]).map(r=>({mixType:r.mixType||'',pct:(r.pct||[]).concat(CS_GRAD_SIEVES.map(()=>'')).slice(0,CS_GRAD_SIEVES.length)}));
   }else{
     _csVals=JSON.parse(JSON.stringify(CS_DEF));
+    _csGradRows=[];
   }
   csRenderModal();
 }
