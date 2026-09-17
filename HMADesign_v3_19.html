@@ -5017,7 +5017,7 @@ function renderSpecRef(){
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
         <div class="st" style="margin:0">OPSS.MUNI 1150 — Marshall Mix Design <span style="font-size:11px;font-weight:400;color:#888">(November 2020)</span></div>
         <div style="display:flex;gap:6px;align-items:center">
-          ${_ov1150?`<span style="font-size:10px;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;padding:2px 8px">⚡ Updated ${_ov1150.updatedDate}</span>`:''}
+          ${_ov1150?`<span style="font-size:10px;background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:4px;padding:2px 8px">⚡ Updated by ${_ov1150.updatedBy||'Unknown'} on ${fmtLockDate(_ov1150.updatedDate)}</span>`:''}
           <button class="btn" style="font-size:11px;padding:4px 12px;background:#e8f0fe;color:#1f3864;border-color:#b8cfff;font-weight:700" onclick="suShowModal('muni1150')">↑ Update from PDF</button>
         </div>
       </div>
