@@ -5105,7 +5105,7 @@ function renderSpecRef(){
     );
     const gradTbl=(cs.gradation&&cs.gradation.length)?tbl(
       `<thead><tr>${th('Mix Type','text-align:left')}${CS_GRAD_SIEVES.map(s=>th(s)).join('')}</tr></thead>`,
-      `<tbody>${cs.gradation.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r.mixType||'—')}${CS_GRAD_SIEVES.map((_s,j)=>td((r.pct||[])[j]||'—')).join('')}</tr>`).join('')}</tbody>`,
+      `<tbody>${cs.gradation.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r.mixType||'—')}${CS_GRAD_SIEVES.map((_s,j)=>{const p=(r.pct||[])[j];if(!p)return td('—');if(typeof p==='string')return td(p||'—');const lo=p.min,hi=p.max;return td(lo&&hi?lo+'–'+hi:hi||lo||'—');}).join('')}</tr>`).join('')}</tbody>`,
       'Percentage passing by dry mass. Ranges shown as specified.'
     ):null;
     const addedStr=`Added by <strong>${cs.addedBy||'Unknown'}</strong> on ${fmtLockDate(cs.addedDate)||cs.year}`;
