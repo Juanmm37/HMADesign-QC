@@ -5085,18 +5085,31 @@ function renderSpecRef(){
           ${i===0?td(`${cs.minTSR||80}`,'rowspan:5'):''}
         </tr>`;
       }).join('')}</tbody>`,
-      `<strong>Custom specification:</strong> ${cs.name} — added ${cs.addedDate||cs.year}. Air Voids target: ${cs.Va||4.0}%.`
+      `Air Voids target: ${cs.Va||4.0}%.`
     );
+    const gradTbl=(cs.gradation&&cs.gradation.length)?tbl(
+      `<thead><tr>${th('Mix Type','text-align:left')}${CS_GRAD_SIEVES.map(s=>th(s)).join('')}</tr></thead>`,
+      `<tbody>${cs.gradation.map((r,i)=>`<tr style="${i%2?'background:#f8f9fc':''}">${tdl(r.mixType||'—')}${CS_GRAD_SIEVES.map((_s,j)=>td((r.pct||[])[j]||'—')).join('')}</tr>`).join('')}</tbody>`,
+      'Percentage passing by dry mass. Ranges shown as specified.'
+    ):null;
+    const addedStr=`Added by <strong>${cs.addedBy||'Unknown'}</strong> on ${fmtLockDate(cs.addedDate)||cs.year}`;
+    const updStr=cs.updatedDate?` &nbsp;·&nbsp; Last updated by <strong>${cs.updatedBy||'Unknown'}</strong> on ${fmtLockDate(cs.updatedDate)}`:'';
     return`<div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-        <div class="st" style="margin:0">${cs.name} <span style="font-size:11px;font-weight:400;color:#888">(${cs.year})</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div class="st" style="margin:0">${cs.name} <span style="font-size:11px;font-weight:400;color:#888">(${cs.year})</span></div>
+          <div style="font-size:11px;color:#666;margin-top:3px">${addedStr}${updStr}</div>
+        </div>
         <div style="display:flex;gap:8px">
           <button class="btn" style="font-size:11px;padding:4px 12px" onclick="csShowModal('${cs.id}')">✏ Edit</button>
           <button class="btn" style="font-size:11px;padding:4px 12px;color:#c0392b;border-color:#e0b0b0" onclick="csDelete('${cs.id}')">🗑 Delete</button>
         </div>
       </div>
-      <div class="st" style="font-size:11px;margin-bottom:8px">Volumetric Properties</div>
-      ${volTbl}
+      <div style="margin-top:14px">
+        <div class="st" style="font-size:11px;margin-bottom:8px">Volumetric Properties</div>
+        ${volTbl}
+      </div>
+      ${gradTbl?`<div style="margin-top:16px"><div class="st" style="font-size:11px;margin-bottom:8px">Gradation Bands — % Passing by Mass (sieve mm)</div>${gradTbl}</div>`:`<div style="margin-top:14px;font-size:11px;color:#999;font-style:italic">No gradation bands defined — click ✏ Edit to add them.</div>`}
     </div>`;
   };
 
