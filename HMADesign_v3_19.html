@@ -815,12 +815,18 @@ function csSaveModal(){
     const hi=parseFloat((document.getElementById('cs-vfa-hi-'+tc)||{}).value);
     if(!isNaN(lo)&&!isNaN(hi))vfa[tc]=[lo,hi];
   });
+  csGradCollect();
+  const gradation=_csGradRows.filter(r=>r.mixType.trim());
+  const now=new Date().toISOString().slice(0,10);
   const spec={
     id:_csEdit?_csEdit.id:'custom_'+Date.now(),
     name,year,
-    addedDate:_csEdit?(_csEdit.addedDate||new Date().toISOString().slice(0,10)):new Date().toISOString().slice(0,10),
+    addedDate:_csEdit?(_csEdit.addedDate||now):now,
+    addedBy:_csEdit?(_csEdit.addedBy||currentUser?.name||'Unknown'):currentUser?.name||'Unknown',
+    updatedDate:_csEdit?now:null,
+    updatedBy:_csEdit?currentUser?.name||'Unknown':null,
     Va:va,VMA:vma,GmmNdes:ndes,GmmNmax:nmax,GmmNini:nini,VFA:vfa,
-    DP:{min:dpMin,max:dpMax},minTSR:tsr
+    DP:{min:dpMin,max:dpMax},minTSR:tsr,gradation
   };
   const all=csGet();
   if(_csEdit){const idx=all.findIndex(s=>s.id===spec.id);if(idx>=0)all[idx]=spec;else all.push(spec);}
