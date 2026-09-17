@@ -560,26 +560,42 @@ let _csGradRows=[];
 
 function csGradCollect(){
   const rows=[];
-  const cells=document.querySelectorAll('.cs-grad-row');
-  cells.forEach((_,i)=>{
+  document.querySelectorAll('.cs-grad-row').forEach((_,i)=>{
     const mtEl=document.getElementById('cs-grad-type-'+i);
     const mixType=mtEl?mtEl.value.trim():'';
-    const pct=CS_GRAD_SIEVES.map((_s,j)=>{const el=document.getElementById('cs-grad-pct-'+i+'-'+j);return el?el.value.trim():'';});
+    const pct=CS_GRAD_SIEVES.map((_s,j)=>{
+      const maxEl=document.getElementById('cs-grad-max-'+i+'-'+j);
+      const minEl=document.getElementById('cs-grad-min-'+i+'-'+j);
+      return{max:maxEl?maxEl.value.trim():'',min:minEl?minEl.value.trim():''};
+    });
     rows.push({mixType,pct});
   });
   _csGradRows=rows;
 }
 
 function csGradSectionHtml(){
-  const gInp=(id,val,w)=>`<input id="${id}" type="text" value="${(val||'').replace(/"/g,'&quot;')}" style="width:${w||48}px;padding:3px 4px;border:1px solid #ccd;border-radius:3px;font-size:11px;text-align:center;font-family:inherit">`;
-  const hdr=`<tr><th style="padding:4px 8px;background:#f0f4ff;border:1px solid #dde;text-align:left;font-weight:700;color:#1f3864;min-width:140px">Mix Type</th>${CS_GRAD_SIEVES.map(s=>`<th style="padding:4px 5px;background:#f0f4ff;border:1px solid #dde;text-align:center;font-weight:700;color:#1f3864;white-space:nowrap">${s}</th>`).join('')}<th style="padding:4px;background:#f0f4ff;border:1px solid #dde;width:28px"></th></tr>`;
-  const bdy=_csGradRows.map((r,i)=>`<tr class="cs-grad-row"><td style="padding:3px 4px">${gInp('cs-grad-type-'+i,r.mixType,138)}</td>${CS_GRAD_SIEVES.map((_s,j)=>`<td style="padding:3px 2px">${gInp('cs-grad-pct-'+i+'-'+j,r.pct[j]||'',46)}</td>`).join('')}<td style="padding:3px;text-align:center"><button onclick="csRemoveGradRow(${i})" style="border:none;background:none;cursor:pointer;color:#c0392b;font-size:14px;line-height:1;padding:2px 4px">✕</button></td></tr>`).join('');
+  const gInp=(id,val,ph)=>`<input id="${id}" type="text" value="${(val||'').replace(/"/g,'&quot;')}" placeholder="${ph}" style="width:44px;padding:2px 3px;border:1px solid #ccd;border-radius:3px;font-size:11px;text-align:center;font-family:inherit;display:block">`;
+  const thStyle='padding:4px 5px;background:#f0f4ff;border:1px solid #dde;text-align:center;font-weight:700;color:#1f3864;white-space:nowrap';
+  const hdr=`<tr>
+    <th style="${thStyle};text-align:left;min-width:140px;vertical-align:bottom">Mix Type</th>
+    ${CS_GRAD_SIEVES.map(s=>`<th style="${thStyle}">${s}<div style="font-size:9px;font-weight:400;color:#888;margin-top:2px">Max / Min</div></th>`).join('')}
+    <th style="${thStyle};width:28px"></th>
+  </tr>`;
+  const bdy=_csGradRows.map((r,i)=>{
+    const pctCells=CS_GRAD_SIEVES.map((_s,j)=>{
+      const p=r.pct[j]||{};
+      const maxV=typeof p==='string'?p:(p.max||'');
+      const minV=typeof p==='string'?'':(p.min||'');
+      return`<td style="padding:3px 2px;vertical-align:middle"><div style="display:flex;flex-direction:column;gap:2px;align-items:center">${gInp('cs-grad-max-'+i+'-'+j,maxV,'max')}${gInp('cs-grad-min-'+i+'-'+j,minV,'min')}</div></td>`;
+    }).join('');
+    return`<tr class="cs-grad-row"><td style="padding:3px 4px;vertical-align:middle">${gInp('cs-grad-type-'+i,r.mixType,'Mix type').replace('display:block','width:136px')}</td>${pctCells}<td style="padding:3px;text-align:center;vertical-align:middle"><button onclick="csRemoveGradRow(${i})" style="border:none;background:none;cursor:pointer;color:#c0392b;font-size:14px;line-height:1;padding:2px 4px">✕</button></td></tr>`;
+  }).join('');
   return`<div style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px"><thead>${hdr}</thead><tbody>${bdy}</tbody></table></div><button onclick="csAddGradRow()" style="margin-top:8px;padding:4px 14px;border:1px solid #b8cfff;background:#e8f0fe;color:#1f3864;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">+ Add Mix Type Row</button>`;
 }
 
 function csAddGradRow(){
   csGradCollect();
-  _csGradRows.push({mixType:'',pct:CS_GRAD_SIEVES.map(()=>'')});
+  _csGradRows.push({mixType:'',pct:CS_GRAD_SIEVES.map(()=>({max:'',min:''}))});
   const s=document.getElementById('cs-grad-section');if(s)s.innerHTML=csGradSectionHtml();
 }
 
