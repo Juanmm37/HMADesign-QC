@@ -778,6 +778,7 @@ function suSaveModal(){
   });
   const override={
     updatedDate:new Date().toISOString().slice(0,10),
+    updatedBy:currentUser?.name||'Unknown',
     Va:parseFloat(document.getElementById('cs-va').value)||4.0,
     VMA:vma,GmmNdes:parseFloat(document.getElementById('cs-ndes').value)||96.0,
     GmmNmax:parseFloat(document.getElementById('cs-nmax').value)||98.0,
