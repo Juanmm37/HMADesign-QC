@@ -878,18 +878,35 @@ async function cloudLoadMixes(){
     if(!res.ok)return;
     const rows=await res.json();
     if(!Array.isArray(rows))return;
-    let changed=false;
+    let changed=false;let libChanged=false;
     rows.forEach(row=>{
-      const mix=row.data;
-      if(!mix||!mix.id)return;
-      const idx=db.mixes.findIndex(m=>m.id===mix.id);
+      const d=row.data;
+      if(!d||!d.id)return;
+      // Aggregate library record
+      if(d.type==='agg_library'){
+        if(d.year&&Array.isArray(d.entries)){
+          localStorage.setItem(libKey(d.year),JSON.stringify(d.entries));
+          if(d.year===2026)localStorage.setItem('capmix_seed_version',SEED_VERSION);
+          libChanged=true;
+        }
+        return;
+      }
+      const idx=db.mixes.findIndex(m=>m.id===d.id);
+      // Soft-deleted mix — remove locally if present
+      if(d.deleted){
+        if(idx>=0){db.mixes.splice(idx,1);changed=true;}
+        return;
+      }
+      // New or updated mix
       if(idx>=0){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
         const cloudTs=new Date(row.updated_at||0).getTime();
-        if(cloudTs>localTs){db.mixes[idx]=mix;changed=true;}
-      }else{db.mixes.push(mix);changed=true;}
+        if(cloudTs>localTs){db.mixes[idx]=d;changed=true;}
+      }else{db.mixes.push(d);changed=true;}
     });
-    if(changed){localStorage.setItem('capmix_v4',JSON.stringify(db));if(view==='dashboard'||view==='records')render();}
+    if(changed)localStorage.setItem('capmix_v4',JSON.stringify(db));
+    if(changed&&(view==='dashboard'||view==='records'))render();
+    if(libChanged&&view==='library')render();
   }catch(e){console.warn('Cloud load failed:',e);}
 }
 
