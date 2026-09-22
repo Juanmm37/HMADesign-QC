@@ -4327,7 +4327,7 @@ function calcVol(trial,info,blendGsb){
     pGmmNdes=(avgGmb/Gmm)*100;
     pGmmNini=(avgGmb*(hNdes/hNini))/Gmm*100;
   }
-  return{avgGmb,Va,VMA,VFA,Gse,pGmmNini,pGmmNdes,Stab:vol.Stab,Flow:vol.Flow,
+  return{avgGmb,Va,VMA,VFA,Gse,pGmmNini,pGmmNdes,Stab:vol.Stab,Flow:vol.Flow,avgHeight:vol.avgHeight||null,
     Gmm_val:Gmm,GmmA:Gmm1,GmmB:Gmm2,hNini,hNdes};
 }
 function specCite(info,what){
