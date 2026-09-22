@@ -1567,6 +1567,7 @@ function getLibYear(year){
 
 function saveLibYear(year, data){
   localStorage.setItem(libKey(year), JSON.stringify(data));
+  cloudSaveAggLib(year, data);
 }
 
 function getLibYears(){
