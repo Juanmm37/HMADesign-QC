@@ -4302,9 +4302,10 @@ function roundAvg(arr,dec){const m=Math.pow(10,dec);return Math.round(arr.reduce
 function calcVol(trial,info,blendGsb){
   const vol=trial.vol;
   if(!vol)return null;
-  // Average two Gmm readings if both present
+  // Average Gmm readings — either or both may be present
   const Gmm1=vol.GmmA, Gmm2=vol.GmmB;
-  const Gmm=Gmm1&&Gmm2?roundAvg([Gmm1,Gmm2],3):Gmm1||(vol.Gmm||null);
+  const gmms=[Gmm1,Gmm2].filter(v=>v!=null&&!isNaN(v));
+  const Gmm=gmms.length?roundAvg(gmms,3):(vol.Gmm||null);
   if(!Gmm)return null;
   const fam=info.family||'',Pb=trial.Pb/100,Gb=info.Gb||1.022;
   // Gmb specimens
@@ -4316,11 +4317,11 @@ function calcVol(trial,info,blendGsb){
   const Gse=(1-Pb)/(1/Gmm-Pb/Gb);
   const VMA=(1-avgGmb*(1-Pb)/Gsb)*100;
   const VFA=VMA>0?((VMA-Va)/VMA)*100:null;
-  // Average two height readings if both present
-  const hNini1=vol.hNiniA,hNini2=vol.hNiniB;
-  const hNdes1=vol.hNdesA,hNdes2=vol.hNdesB;
-  const hNini=hNini1&&hNini2?roundAvg([hNini1,hNini2],1):(hNini1||vol.hNini||null);
-  const hNdes=hNdes1&&hNdes2?roundAvg([hNdes1,hNdes2],1):(hNdes1||vol.hNdes||null);
+  // Average height readings — either or both may be present
+  const hNiniVals=[vol.hNiniA,vol.hNiniB].filter(v=>v!=null&&!isNaN(v));
+  const hNdesVals=[vol.hNdesA,vol.hNdesB].filter(v=>v!=null&&!isNaN(v));
+  const hNini=hNiniVals.length?roundAvg(hNiniVals,1):(vol.hNini||null);
+  const hNdes=hNdesVals.length?roundAvg(hNdesVals,1):(vol.hNdes||null);
   let pGmmNini=null,pGmmNdes=null;
   if(hNini&&hNdes){
     pGmmNdes=(avgGmb/Gmm)*100;
