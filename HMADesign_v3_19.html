@@ -889,7 +889,7 @@ async function cloudLoadMixes(){
     if(!res.ok)return;
     const rows=await res.json();
     if(!Array.isArray(rows))return;
-    let changed=false;let libChanged=false;
+    let changed=false;let libChanged=false;let activeMixUpdated=false;
     rows.forEach(row=>{
       const d=row.data;
       if(!d||!d.id)return;
@@ -908,17 +908,52 @@ async function cloudLoadMixes(){
         if(idx>=0){db.mixes.splice(idx,1);changed=true;}
         return;
       }
+      const cloudTs=new Date(row.updated_at||0).getTime();
       // New or updated mix
       if(idx>=0){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
-        const cloudTs=new Date(row.updated_at||0).getTime();
-        if(cloudTs>localTs){db.mixes[idx]=d;changed=true;}
-      }else{db.mixes.push(d);changed=true;}
+        if(cloudTs>localTs){
+          db.mixes[idx]=d;changed=true;
+          if(ms&&ms.id===d.id)activeMixUpdated=true;
+        }
+      }else{
+        db.mixes.push(d);changed=true;
+        if(ms&&ms.id===d.id)activeMixUpdated=true;
+      }
     });
     if(changed)localStorage.setItem('capmix_v4',JSON.stringify(db));
     if(changed&&(view==='dashboard'||view==='records'))render();
     if(libChanged&&view==='library')render();
+    // Refresh active mix session from cloud if it was updated
+    if(activeMixUpdated&&view==='newmix'&&ms&&ms.id){
+      _refreshMsFromDb();
+      // Auto-render only when user isn't mid-input (to avoid wiping partial typing)
+      const ae=document.activeElement;
+      if(!ae||ae.tagName!=='INPUT'&&ae.tagName!=='TEXTAREA')render();
+    }
   }catch(e){console.warn('Cloud load failed:',e);}
+}
+
+// Pull the latest data from db.mixes into the active ms session, preserving the current step.
+function _refreshMsFromDb(){
+  if(!ms||!ms.id)return;
+  const src=db.mixes.find(m=>m.id===ms.id);
+  if(!src)return;
+  const savedStep=ms.step;
+  ms.trials=JSON.parse(JSON.stringify(src.trials||[]));
+  ms.acPoints=JSON.parse(JSON.stringify(src.acPoints||[]));
+  ms.designPb=src.designPb??null;
+  ms.designPbAuto=src.designPbAuto??null;
+  ms.propertyCurves=JSON.parse(JSON.stringify(src.propertyCurves||{}));
+  ms.slots=JSON.parse(JSON.stringify(src.slots||{}));
+  ms.notes=src.notes||'';
+  if(src.tbaTrials)ms.tbaTrials=JSON.parse(JSON.stringify(src.tbaTrials));
+  if(src.tbaTargets)ms.tbaTargets=JSON.parse(JSON.stringify(src.tbaTargets));
+  if(src.tsrBatch)ms.tsrBatch=JSON.parse(JSON.stringify(src.tsrBatch));
+  if(src.nmaxBatch)ms.nmaxBatch=JSON.parse(JSON.stringify(src.nmaxBatch));
+  if(src.aggTesting)ms.aggTesting=JSON.parse(JSON.stringify(src.aggTesting));
+  ms.step=savedStep; // keep the user on the step they're viewing
+  try{localStorage.setItem('capmix_session',JSON.stringify({ms,view}));}catch(e){}
 }
 
 function initRealtime(){
