@@ -1530,7 +1530,7 @@ function renderDash(){
     <td style="text-align:center;font-size:11px">${m.dateCompleted?new Date(m.dateCompleted+'T00:00:00').toLocaleDateString('en-CA'):'—'}</td>
     <td><button class="btn btn-sm btn-primary" onclick="openMix('${m.id}')">${m.status==='In Progress'?'Resume':'Open'}</button></td>
   </tr>`).join('')}</tbody></table></div>`
-  :`<div style="text-align:center;padding:40px;color:#aaa;font-size:13px">No mix designs yet. <a href="#" onclick="startNewMix();return false">Create your first one.</a></div>`}`;
+  :`<div style="text-align:center;padding:40px;color:#aaa;font-size:13px">No mix designs found locally. <a href="#" onclick="syncNow();return false">Sync from cloud</a> or <a href="#" onclick="startNewMix();return false">create a new one.</a></div>`}`;
 }
 
 // ── LIBRARY ──
