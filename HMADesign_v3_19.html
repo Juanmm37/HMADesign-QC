@@ -968,6 +968,11 @@ async function syncNow(){
   if(btn){btn.disabled=true;btn.textContent='⟳ Syncing...';}
   showSyncBadge('⟳ Syncing...');
   await cloudLoadMixes();
+  // Explicit sync: always refresh ms and re-render, even if typing
+  if(view==='newmix'&&ms&&ms.id){
+    _refreshMsFromDb();
+    render();
+  }
   if(btn){btn.disabled=false;btn.textContent='⟳ Sync';}
 }
 
