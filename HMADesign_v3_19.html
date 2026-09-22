@@ -927,6 +927,14 @@ function initRealtime(){
   cloudLoadMixes();
 }
 
+async function syncNow(){
+  const btn=document.getElementById('syncNowBtn');
+  if(btn){btn.disabled=true;btn.textContent='⟳ Syncing...';}
+  showSyncBadge('⟳ Syncing...');
+  await cloudLoadMixes();
+  if(btn){btn.disabled=false;btn.textContent='⟳ Sync Now';}
+}
+
 function autoSyncActiveMix(){
   if(!ms||!ms.id||view!=='newmix')return;
   const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
