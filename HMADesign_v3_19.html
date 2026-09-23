@@ -881,10 +881,11 @@ async function cloudSaveMix(mix){
 
 async function cloudSaveAggLib(year,entries){
   try{
-    await fetch(SB_URL+'/rest/v1/hma_design_mixes',{method:'POST',headers:SB_HEADERS,
+    const res=await fetch(SB_URL+'/rest/v1/hma_design_mixes',{method:'POST',headers:SB_HEADERS,
       body:JSON.stringify({id:'agg_lib_'+year,data:{type:'agg_library',id:'agg_lib_'+year,year,entries},
         updated_at:new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
     });
+    if(!res.ok){const t=await res.text();console.warn('cloudSaveAggLib HTTP '+res.status+':',t);showSyncBadge('⚠ Lib sync error '+res.status);return;}
     showSyncBadge('✓ Synced');
   }catch(e){console.warn('cloudSaveAggLib failed:',e);showSyncBadge('⚠ Offline');}
 }
