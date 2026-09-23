@@ -979,12 +979,14 @@ async function syncNow(){
   const btn=document.getElementById('syncNowBtn');
   if(btn){btn.disabled=true;btn.classList.add('syncing');btn.classList.remove('done');}
   showSyncBadge('⟳ Syncing...');
+  // Step 1: Pull — merges any cloud agg entries into local, updates mixes
   await cloudLoadMixes();
-  // Explicit sync: always refresh ms and re-render, even if typing
-  if(view==='newmix'&&ms&&ms.id){
-    _refreshMsFromDb();
-    render();
+  // Step 2: Push local agg library for each year (catches additions made before auto-sync was wired up)
+  for(const yr of getLibYears()){
+    await cloudSaveAggLib(yr,getLibYear(yr));
   }
+  // Step 3: Refresh active mix if inside one
+  if(view==='newmix'&&ms&&ms.id){_refreshMsFromDb();render();}
   if(btn){
     btn.disabled=false;btn.classList.remove('syncing');btn.classList.add('done');
     showSyncBadge('✓ Synced',true);
