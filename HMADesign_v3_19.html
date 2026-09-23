@@ -899,12 +899,18 @@ async function cloudLoadMixes(){
     rows.forEach(row=>{
       const d=row.data;
       if(!d||!d.id)return;
-      // Aggregate library record
+      // Aggregate library record — merge cloud entries into local (additive only, never removes local)
       if(d.type==='agg_library'){
         if(d.year&&Array.isArray(d.entries)){
-          localStorage.setItem(libKey(d.year),JSON.stringify(d.entries));
-          if(d.year===2026)localStorage.setItem('capmix_seed_version',SEED_VERSION);
-          libChanged=true;
+          const local=getLibYear(d.year);
+          const localIds=new Set(local.map(e=>e.id));
+          const toAdd=d.entries.filter(e=>e&&e.id&&!localIds.has(e.id));
+          if(toAdd.length){
+            const merged=[...local,...toAdd];
+            localStorage.setItem(libKey(d.year),JSON.stringify(merged));
+            if(d.year===2026)localStorage.setItem('capmix_seed_version',SEED_VERSION);
+            libChanged=true;
+          }
         }
         return;
       }
