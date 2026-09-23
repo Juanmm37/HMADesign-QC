@@ -1773,8 +1773,13 @@ function renderLib(){
   const data = getLibYear(libYear);
   const sources = [...new Set(data.map(a=>a.source).filter(Boolean))];
 
+  // Group sources by their display label (last segment after ' - ') so minor company name differences don't split the group
+  const sourceGroups={};
+  sources.forEach(s=>{const lbl=s.split(' - ').slice(-1)[0];if(!sourceGroups[lbl])sourceGroups[lbl]=[];sourceGroups[lbl].push(s);});
+  const srcLabel=s=>s?s.split(' - ').slice(-1)[0]:'';
+
   const fl = data.filter(a=>{
-    const so = !libSource || a.source===libSource;
+    const so = !libSource || srcLabel(a.source)===libSource;
     const q = libFilter.toLowerCase();
     return so && (!q || a.material.toLowerCase().includes(q) || (a.source||'').toLowerCase().includes(q));
   });
