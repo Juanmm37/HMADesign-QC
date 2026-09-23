@@ -1207,7 +1207,8 @@ function scheduleRender(){
 function updateLiveChart(){
   const chartEl = document.getElementById('live-grad-chart');
   if(!chartEl) return;
-  const trial = ms.trials[ms.trials.length-1];
+  const _tIdx=(ms.selectedTrialIdx!==null&&ms.selectedTrialIdx<ms.trials.length)?ms.selectedTrialIdx:ms.trials.length-1;
+  const trial = ms.trials[_tIdx];
   const info = ms.info;
   const aggs = SLOTS.filter(s=>ms.slots[s]);
   const bands = getBands(info);
