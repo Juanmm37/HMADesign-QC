@@ -1811,8 +1811,8 @@ function renderLib(){
       onchange="libFilter=this.value;render()" onkeydown="if(event.key==='Enter'){libFilter=this.value;render()}">
     <button class="btn btn-primary btn-sm" onclick="startAddAgg()">+ Add Aggregate</button>
     <button class="btn btn-sm" onclick="libSource='';render()" style="${!libSource?'border-color:#1f3864;color:#1f3864;font-weight:700':''}">All (${data.length})</button>
-    ${sources.map(s=>`<button class="btn btn-sm" onclick="libSource='${s}';render()" style="${libSource===s?'border-color:#1f3864;color:#1f3864;font-weight:700':''}">
-      ${s.split(' - ').slice(-1)[0]} (${data.filter(a=>a.source===s).length})
+    ${Object.entries(sourceGroups).map(([lbl,srcs])=>`<button class="btn btn-sm" onclick="libSource='${lbl.replace(/'/g,"\\'")}';render()" style="${libSource===lbl?'border-color:#1f3864;color:#1f3864;font-weight:700':''}">
+      ${lbl} (${data.filter(a=>srcs.includes(a.source)).length})
     </button>`).join('')}
   </div>`;
 
