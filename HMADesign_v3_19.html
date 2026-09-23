@@ -1299,8 +1299,11 @@ function updateVolField(ti, key, val){
 
 function showView(v){
   view=v;
-  document.querySelectorAll('.nav-btn').forEach((b,i)=>{
-    b.classList.toggle('active',['dashboard','library','newmix','records','specs'][i]===v);
+  const views=['dashboard','library','newmix','records','specs'];
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.id==='syncNowBtn')return;
+    const idx=Array.from(b.parentNode.children).filter(c=>c.classList.contains('nav-btn')&&c.id!=='syncNowBtn').indexOf(b);
+    b.classList.toggle('active',views[idx]===v);
   });
   render();
 }
