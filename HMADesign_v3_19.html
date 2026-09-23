@@ -1217,7 +1217,8 @@ function updateLiveChart(){
   chartEl.innerHTML = newChart;
 }
 function updateBlendTotals(){
-  const trial = ms.trials[ms.trials.length-1];
+  const _tIdx=(ms.selectedTrialIdx!==null&&ms.selectedTrialIdx<ms.trials.length)?ms.selectedTrialIdx:ms.trials.length-1;
+  const trial = ms.trials[_tIdx];
   const slots = ms.slots;
   const aggs = SLOTS.filter(s=>slots[s]);
   let total = 0;
