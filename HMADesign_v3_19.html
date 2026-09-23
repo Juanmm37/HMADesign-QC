@@ -952,7 +952,16 @@ function _refreshMsFromDb(){
   const src=db.mixes.find(m=>m.id===ms.id);
   if(!src)return;
   const savedStep=ms.step;
-  ms.trials=JSON.parse(JSON.stringify(src.trials||[]));
+  // Merge trials: if cloud has fewer than local, keep local extras (they may not have synced yet)
+  const cloudTrials=src.trials||[];
+  const localTrials=ms.trials||[];
+  if(cloudTrials.length>=localTrials.length){
+    ms.trials=JSON.parse(JSON.stringify(cloudTrials));
+  } else {
+    // Cloud has fewer — update existing trials from cloud, preserve local-only extras
+    const merged=localTrials.map((lt,i)=>i<cloudTrials.length?JSON.parse(JSON.stringify(cloudTrials[i])):JSON.parse(JSON.stringify(lt)));
+    ms.trials=merged;
+  }
   ms.acPoints=JSON.parse(JSON.stringify(src.acPoints||[]));
   ms.designPb=src.designPb??null;
   ms.designPbAuto=src.designPbAuto??null;
