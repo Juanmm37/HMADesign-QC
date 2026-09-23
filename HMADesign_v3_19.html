@@ -4337,7 +4337,7 @@ function printTrial(trialIdx){
   setTimeout(()=>{win.print();},500);
 }
 
-function addDesignTrial(){const last=ms.trials[ms.trials.length-1];ms.trials.push({id:last.id+1,blendPct:{...last.blendPct},Pb:last.Pb,notes:'',vol:null,brdGb:last.brdGb??1.030,brdVa:last.brdVa??4.0,brdMode:last.brdMode??'auto',brdManual:last.brdManual??null,brdGmbNdes:last.brdGmbNdes??null});render();}
+function addDesignTrial(){const last=ms.trials[ms.trials.length-1];ms.trials.push({id:last.id+1,blendPct:{...last.blendPct},Pb:last.Pb,notes:'',vol:null,brdGb:last.brdGb??1.030,brdVa:last.brdVa??4.0,brdMode:last.brdMode??'auto',brdManual:last.brdManual??null,brdGmbNdes:last.brdGmbNdes??null});saveDB();render();}
 function remTrial(){if(ms.trials.length>1)ms.trials.pop();render();}
 
 // ── STEP 4 ──
