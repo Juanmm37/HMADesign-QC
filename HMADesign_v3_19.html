@@ -971,7 +971,7 @@ function initRealtime(){
 
 async function syncNow(){
   const btn=document.getElementById('syncNowBtn');
-  if(btn){btn.disabled=true;btn.textContent='⟳ Syncing...';}
+  if(btn){btn.disabled=true;btn.classList.add('syncing');btn.classList.remove('done');}
   showSyncBadge('⟳ Syncing...');
   await cloudLoadMixes();
   // Explicit sync: always refresh ms and re-render, even if typing
@@ -979,7 +979,11 @@ async function syncNow(){
     _refreshMsFromDb();
     render();
   }
-  if(btn){btn.disabled=false;btn.textContent='⟳ Sync';}
+  if(btn){
+    btn.disabled=false;btn.classList.remove('syncing');btn.classList.add('done');
+    showSyncBadge('✓ Synced',true);
+    setTimeout(()=>{if(btn)btn.classList.remove('done');},2000);
+  }
 }
 
 function autoSyncActiveMix(){
