@@ -1040,6 +1040,20 @@ function showSyncBadge(msg,fade){
 }
 
 function saveDB(){
+  // Keep db.mixes current with ms so the cloud poll never replaces us with stale data
+  if(ms&&ms.id&&view==='newmix'){
+    const now=new Date().toISOString();
+    const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
+      slots:ms.slots,trials:ms.trials,notes:ms.notes,
+      selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
+      designPb:ms.designPb,designPbAuto:ms.designPbAuto||null,
+      propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch||null,
+      nmaxBatch:ms.nmaxBatch||null,aggTesting:ms.aggTesting||null,
+      tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
+      createdAt:ms.createdAt||now,updatedAt:now};
+    db.mixes=db.mixes.filter(m=>m.id!==mix.id);
+    db.mixes.push(mix);
+  }
   localStorage.setItem('capmix_v4',JSON.stringify(db));
   try{localStorage.setItem('capmix_session',JSON.stringify({ms,view}));}catch(e){}
   // Auto-sync active mix to cloud (debounced 15s) while working
