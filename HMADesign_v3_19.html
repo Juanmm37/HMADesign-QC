@@ -969,7 +969,16 @@ function _refreshMsFromDb(){
   ms.propertyCurves=JSON.parse(JSON.stringify(src.propertyCurves||{}));
   ms.slots=JSON.parse(JSON.stringify(src.slots||{}));
   ms.notes=src.notes||'';
-  if(src.tbaTrials)ms.tbaTrials=JSON.parse(JSON.stringify(src.tbaTrials));
+  // Merge tbaTrials: same as ms.trials — never shrink below local count (local extras may not have synced yet)
+  if(src.tbaTrials){
+    const cloudTba=src.tbaTrials;
+    const localTba=ms.tbaTrials||[];
+    if(cloudTba.length>=localTba.length){
+      ms.tbaTrials=JSON.parse(JSON.stringify(cloudTba));
+    } else {
+      ms.tbaTrials=localTba.map((lt,i)=>i<cloudTba.length?JSON.parse(JSON.stringify(cloudTba[i])):JSON.parse(JSON.stringify(lt)));
+    }
+  }
   if(src.tbaTargets)ms.tbaTargets=JSON.parse(JSON.stringify(src.tbaTargets));
   if(src.tsrBatch)ms.tsrBatch=JSON.parse(JSON.stringify(src.tsrBatch));
   if(src.nmaxBatch)ms.nmaxBatch=JSON.parse(JSON.stringify(src.nmaxBatch));
