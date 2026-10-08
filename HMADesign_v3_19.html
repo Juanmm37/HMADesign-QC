@@ -998,13 +998,30 @@ async function syncNow(){
   const btn=document.getElementById('syncNowBtn');
   if(btn){btn.disabled=true;btn.classList.add('syncing');btn.classList.remove('done');}
   showSyncBadge('⟳ Syncing...');
-  // Step 1: Pull — merges any cloud agg entries into local, updates mixes
+  // Step 1: Push active mix first so other users see our latest data immediately
+  if(view==='newmix'&&ms&&ms.id){
+    if(_autoSyncTimer){clearTimeout(_autoSyncTimer);_autoSyncTimer=null;}
+    const now=new Date().toISOString();
+    const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
+      slots:ms.slots,trials:ms.trials,notes:ms.notes,
+      selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
+      designPb:ms.designPb,designPbAuto:ms.designPbAuto||null,
+      propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch||null,
+      nmaxBatch:ms.nmaxBatch||null,aggTesting:ms.aggTesting||null,
+      tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
+      createdAt:ms.createdAt||now,updatedAt:now};
+    db.mixes=db.mixes.filter(m=>m.id!==mix.id);
+    db.mixes.push(mix);
+    localStorage.setItem('capmix_v4',JSON.stringify(db));
+    await cloudSaveMix(mix);
+  }
+  // Step 2: Pull — merges any cloud agg entries into local, updates mixes from other users
   await cloudLoadMixes();
-  // Step 2: Push local agg library for each year (catches additions made before auto-sync was wired up)
+  // Step 3: Push local agg library for each year
   for(const yr of getLibYears()){
     await cloudSaveAggLib(yr,getLibYear(yr));
   }
-  // Step 3: Refresh active mix if inside one
+  // Step 4: Refresh active mix display
   if(view==='newmix'&&ms&&ms.id){_refreshMsFromDb();render();}
   if(btn){
     btn.disabled=false;btn.classList.remove('syncing');btn.classList.add('done');
