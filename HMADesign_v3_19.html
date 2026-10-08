@@ -2330,7 +2330,7 @@ function renderS1(){
     </div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px">
       ${fam!=='Marshall'?`<div class="fg"><label>Traffic Category</label>
-        <select id="s1_tc">
+        <select id="s1_tc" onchange="ms.info.traffic=this.value;saveDB()">
           <option value="">Select...</option>
           ${['A','B','C','D','E'].map(t=>`<option ${i.traffic===t?'selected':''} value="${t}">${t}</option>`).join('')}
         </select>
