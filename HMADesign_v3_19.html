@@ -2776,6 +2776,7 @@ function generateWeighCardTitle(trial, cardType){
 function renderWeighCard(trial, cardType, forPrint=false){
   const{rows,aggTotalMass,binderMass,totalBatch,virginAggMass,rapTotalMass,rapACcombined,virginBinderMass,actualTotal}=calcWeighCard(trial,cardType);
   const info=ms.info,mt=info.mixType||'';
+  const{blendGsb}=calcBlendProps(trial);
   const rapLabel=info.hasRAP==='Yes'?' RAP':'';
 
   // Column headers: slot name + material — equal width via colgroup
