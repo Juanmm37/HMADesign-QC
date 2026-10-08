@@ -3539,6 +3539,15 @@ function updateTrialTotal(trialIndex){
   }
 }
 
+// Toggle visibility of a trial line on the Step 3 chart
+function toggleTbaTrialVisible(idx){
+  if(!ms.tbaHiddenTrials)ms.tbaHiddenTrials=[];
+  const pos=ms.tbaHiddenTrials.indexOf(idx);
+  if(pos>=0)ms.tbaHiddenTrials.splice(pos,1);
+  else ms.tbaHiddenTrials.push(idx);
+  render();
+}
+
 // Add a new trial to the trial blend analysis
 function addTrial(){
   if(!ms.tbaTrials)ms.tbaTrials=[];
