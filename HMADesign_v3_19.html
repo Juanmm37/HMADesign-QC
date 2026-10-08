@@ -969,6 +969,15 @@ function _refreshMsFromDb(){
   ms.propertyCurves=JSON.parse(JSON.stringify(src.propertyCurves||{}));
   ms.slots=JSON.parse(JSON.stringify(src.slots||{}));
   ms.notes=src.notes||'';
+  // Restore ms.info fields from cloud (stored flat via ...ms.info in saveDB/autoSync)
+  // Merge so local-only fields are kept; cloud values win for fields that exist in both
+  const _INFO_KEYS=['mixNo','family','mixType','hasRAP','traffic','mixYear','pgac','pgacSup',
+    'tMix','tComp','muni','spec','specType','customSpecId','surface','Gb',
+    'customer','project','contractNo','region','location','itemNo',
+    'dateStarted','dateCollected','dateCompleted'];
+  const _srcInfo={};
+  _INFO_KEYS.forEach(k=>{if(src[k]!==undefined&&src[k]!==null&&src[k]!=='')_srcInfo[k]=src[k];});
+  if(Object.keys(_srcInfo).length)ms.info=Object.assign({},ms.info||{},_srcInfo);
   // Merge tbaTrials: same as ms.trials — never shrink below local count (local extras may not have synced yet)
   if(src.tbaTrials){
     const cloudTba=src.tbaTrials;
