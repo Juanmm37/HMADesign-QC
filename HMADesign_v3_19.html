@@ -2881,6 +2881,7 @@ function renderWeighCard(trial, cardType, forPrint=false){
           PGAC: <strong>${info.pgac||'—'}</strong> &nbsp;|&nbsp;
           Traffic: <strong>${info.traffic||'—'}</strong> &nbsp;|&nbsp;
           Pb: <strong>${Number(trial.Pb).toFixed(1)}%</strong> &nbsp;|&nbsp;
+          Blend G<sub>sb</sub>: <strong>${blendGsb!==null?blendGsb.toFixed(3):'—'}</strong> &nbsp;|&nbsp;
           Target: <strong>${totalBatch.toFixed(0)} g</strong> &nbsp;|&nbsp;
           Mix Temp: ${info.tMix||165}°C &nbsp;|&nbsp;
           Comp Temp: ${info.tComp||150}°C
