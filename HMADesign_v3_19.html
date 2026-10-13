@@ -5389,6 +5389,8 @@ function openMix(id){
     aggTesting:mix.aggTesting||null,tbaTrials:mix.tbaTrials||null,tbaTargets:mix.tbaTargets||null};
   console.log('Calling showView');
   showView('newmix');
+  // Immediately push to cloud so other users see who has this mix open and what state it's in
+  autoSyncActiveMix();
   console.log('openMix completed');
 }
 function delMix(id){
