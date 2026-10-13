@@ -937,8 +937,8 @@ async function cloudLoadMixes(){
       }
     });
     if(changed)localStorage.setItem('capmix_v4',JSON.stringify(db));
-    if(changed&&(view==='dashboard'||view==='records'))render();
-    if(libChanged&&view==='library')render();
+    if(changed&&(view==='dashboard'||view==='records'||view==='library'))render();
+    else if(libChanged&&view==='library')render();
     // Refresh active mix session from cloud if it was updated
     if(activeMixUpdated&&view==='newmix'&&ms&&ms.id){
       _refreshMsFromDb();
