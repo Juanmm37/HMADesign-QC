@@ -1052,8 +1052,24 @@ function autoSyncActiveMix(){
   // No view guard — push even if user navigated away during the debounce window
   if(!ms||!ms.id)return;
   const now=new Date().toISOString();
+  // Before pushing, merge ms.trials with the cloud copy so we don't overwrite
+  // another user's trial vol data with our stale local version
+  const cloudMix=db.mixes.find(m=>m.id===ms.id);
+  const cloudTrials=cloudMix?.trials||[];
+  const localTrials=ms.trials||[];
+  const maxLen=Math.max(cloudTrials.length,localTrials.length);
+  const mergedTrials=[];
+  for(let i=0;i<maxLen;i++){
+    const ct=i<cloudTrials.length?cloudTrials[i]:null;
+    const lt=i<localTrials.length?localTrials[i]:null;
+    if(!ct){mergedTrials.push(lt);continue;}
+    if(!lt){mergedTrials.push(ct);continue;}
+    const cloudVolTs=new Date(ct.vol?.updatedAt||0).getTime();
+    const localVolTs=new Date(lt.vol?.updatedAt||0).getTime();
+    mergedTrials.push(localVolTs>=cloudVolTs?lt:ct);
+  }
   const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
-    slots:ms.slots,trials:ms.trials,notes:ms.notes,
+    slots:ms.slots,trials:mergedTrials,notes:ms.notes,
     selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
     designPb:ms.designPb,designPbAuto:ms.designPbAuto||null,
     propertyCurves:ms.propertyCurves,
