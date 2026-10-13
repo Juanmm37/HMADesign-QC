@@ -1020,8 +1020,23 @@ async function syncNow(){
   if(view==='newmix'&&ms&&ms.id){
     if(_autoSyncTimer){clearTimeout(_autoSyncTimer);_autoSyncTimer=null;}
     const now=new Date().toISOString();
+    // Merge trials with cloud before pushing to avoid overwriting other user's vol data
+    const _cloudMix=db.mixes.find(m=>m.id===ms.id);
+    const _cloudTr=_cloudMix?.trials||[];
+    const _localTr=ms.trials||[];
+    const _maxLen=Math.max(_cloudTr.length,_localTr.length);
+    const _mergedTr=[];
+    for(let i=0;i<_maxLen;i++){
+      const ct=i<_cloudTr.length?_cloudTr[i]:null;
+      const lt=i<_localTr.length?_localTr[i]:null;
+      if(!ct){_mergedTr.push(lt);continue;}
+      if(!lt){_mergedTr.push(ct);continue;}
+      const cTs=new Date(ct.vol?.updatedAt||0).getTime();
+      const lTs=new Date(lt.vol?.updatedAt||0).getTime();
+      _mergedTr.push(lTs>=cTs?lt:ct);
+    }
     const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
-      slots:ms.slots,trials:ms.trials,notes:ms.notes,
+      slots:ms.slots,trials:_mergedTr,notes:ms.notes,
       selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
       designPb:ms.designPb,designPbAuto:ms.designPbAuto||null,
       propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch||null,
