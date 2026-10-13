@@ -870,9 +870,11 @@ let _autoSyncTimer=null;
 async function cloudSaveMix(mix){
   if(!mix||!mix.id)return;
   try{
+    // Use mix.updatedAt so Supabase updated_at matches local — prevents perpetual re-download loop
+    const ts=mix.updatedAt||new Date().toISOString();
     const res=await fetch(SB_URL+'/rest/v1/hma_design_mixes',{
       method:'POST',headers:SB_HEADERS,
-      body:JSON.stringify({id:mix.id,data:mix,updated_at:new Date().toISOString(),updated_by:currentUser?.email||'unknown'})
+      body:JSON.stringify({id:mix.id,data:mix,updated_at:ts,updated_by:currentUser?.email||'unknown'})
     });
     if(!res.ok){const t=await res.text();console.warn('Cloud save error:',res.status,t);showSyncBadge('⚠ Sync error');return;}
     showSyncBadge('✓ Synced');
