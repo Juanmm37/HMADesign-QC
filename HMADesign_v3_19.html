@@ -1106,11 +1106,11 @@ function saveDB(){
   }
   localStorage.setItem('capmix_v4',JSON.stringify(db));
   try{localStorage.setItem('capmix_session',JSON.stringify({ms,view}));}catch(e){}
-  // Auto-sync active mix to cloud (debounced 15s) while working
+  // Auto-sync active mix to cloud (debounced 5s) while working
   if(view==='newmix'&&ms&&ms.id){
     if(_autoSyncTimer)clearTimeout(_autoSyncTimer);
     showSyncBadge('⟳ Saving...');
-    _autoSyncTimer=setTimeout(autoSyncActiveMix,15000);
+    _autoSyncTimer=setTimeout(autoSyncActiveMix,5000);
   }
 }
 // Restore active session on page load (survives code-change refreshes)
