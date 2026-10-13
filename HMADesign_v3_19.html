@@ -1001,7 +1001,7 @@ function _refreshMsFromDb(){
 function initRealtime(){
   // Poll every 20 seconds for changes from other users
   if(_pollTimer)clearInterval(_pollTimer);
-  _pollTimer=setInterval(cloudLoadMixes,20000);
+  _pollTimer=setInterval(cloudLoadMixes,10000);
   cloudLoadMixes();
 }
 
