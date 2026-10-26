@@ -1044,12 +1044,15 @@ async function syncNow(){
       const lTs=new Date(lt.vol?.updatedAt||0).getTime();
       _mergedTr.push(lTs>=cTs?lt:ct);
     }
+    const _syncCm=db.mixes.find(m=>m.id===ms.id);
     const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
       slots:ms.slots,trials:_mergedTr,notes:ms.notes,
       selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
       designPb:ms.designPb,designPbAuto:ms.designPbAuto||null,
-      propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch||null,
-      nmaxBatch:ms.nmaxBatch||null,aggTesting:ms.aggTesting||null,
+      propertyCurves:ms.propertyCurves,
+      tsrBatch:_mergeSectionPush(ms.tsrBatch,_syncCm?.tsrBatch),
+      nmaxBatch:_mergeSectionPush(ms.nmaxBatch,_syncCm?.nmaxBatch),
+      aggTesting:_mergeSectionPush(ms.aggTesting,_syncCm?.aggTesting),
       tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
       createdAt:ms.createdAt||now,updatedAt:now};
     db.mixes=db.mixes.filter(m=>m.id!==mix.id);
