@@ -1060,8 +1060,8 @@ async function syncNow(){
     localStorage.setItem('capmix_v4',JSON.stringify(db));
     await cloudSaveMix(mix);
   }
-  // Step 2: Pull — merges any cloud agg entries into local, updates mixes from other users
-  await cloudLoadMixes();
+  // Step 2: Pull — force refresh bypasses timestamp check so we always get other users' latest data
+  await cloudLoadMixes(true);
   // Step 3: Push local agg library for each year
   for(const yr of getLibYears()){
     await cloudSaveAggLib(yr,getLibYear(yr));
