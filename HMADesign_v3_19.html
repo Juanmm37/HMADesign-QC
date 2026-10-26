@@ -998,9 +998,18 @@ function _refreshMsFromDb(){
     }
   }
   if(src.tbaTargets)ms.tbaTargets=JSON.parse(JSON.stringify(src.tbaTargets));
-  if(src.tsrBatch)ms.tsrBatch=JSON.parse(JSON.stringify(src.tsrBatch));
-  if(src.nmaxBatch)ms.nmaxBatch=JSON.parse(JSON.stringify(src.nmaxBatch));
-  if(src.aggTesting)ms.aggTesting=JSON.parse(JSON.stringify(src.aggTesting));
+  // For tsrBatch/nmaxBatch/aggTesting: prefer whichever was edited more recently (_updatedAt)
+  // If only one side has data, always use it (never overwrite real data with null)
+  function _mergeSection(local,cloud){
+    if(!cloud)return local;
+    if(!local)return JSON.parse(JSON.stringify(cloud));
+    const cTs=new Date(cloud._updatedAt||0).getTime();
+    const lTs=new Date(local._updatedAt||0).getTime();
+    return JSON.parse(JSON.stringify(lTs>=cTs?local:cloud));
+  }
+  ms.tsrBatch=_mergeSection(ms.tsrBatch,src.tsrBatch);
+  ms.nmaxBatch=_mergeSection(ms.nmaxBatch,src.nmaxBatch);
+  ms.aggTesting=_mergeSection(ms.aggTesting,src.aggTesting);
   ms.step=savedStep; // keep the user on the step they're viewing
   try{localStorage.setItem('capmix_session',JSON.stringify({ms,view}));}catch(e){}
 }
