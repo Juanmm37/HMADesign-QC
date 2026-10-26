@@ -892,7 +892,7 @@ async function cloudSaveAggLib(year,entries){
   }catch(e){console.warn('cloudSaveAggLib failed:',e);showSyncBadge('⚠ Offline');}
 }
 
-async function cloudLoadMixes(){
+async function cloudLoadMixes(forceRefresh=false){
   try{
     const res=await fetch(SB_URL+'/rest/v1/hma_design_mixes?select=*',{headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
     if(!res.ok)return;
@@ -924,10 +924,10 @@ async function cloudLoadMixes(){
         return;
       }
       const cloudTs=new Date(row.updated_at||0).getTime();
-      // New or updated mix
+      // New or updated mix — forceRefresh bypasses timestamp check (used by syncNow)
       if(idx>=0){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
-        if(cloudTs>localTs){
+        if(forceRefresh||cloudTs>localTs){
           db.mixes[idx]=d;changed=true;
           if(ms&&ms.id===d.id)activeMixUpdated=true;
         }
@@ -8097,7 +8097,7 @@ function renderS8TSR(){
         return`<input type="text" inputmode="decimal" data-tsrcol="${col}" data-tsrrow="${row}" value="${display}" placeholder="${placeholder}"
           style="width:${w}px;padding:3px 4px;border:1px solid #ccd3dd;border-radius:3px;font-size:11px;text-align:center;background:#fff"
           onkeydown="if(event.key==='Tab'&&!event.shiftKey){event.preventDefault();_tsrTabDown(this);}"
-          onchange="if(!ms.tsrBatch.${subset})ms.tsrBatch.${subset}=[{},{},{}];ms.tsrBatch.${subset}[${idx}]['${field}']=parseFloat(this.value)||null;saveDB();render()"
+          onchange="if(!ms.tsrBatch.${subset})ms.tsrBatch.${subset}=[{},{},{}];ms.tsrBatch.${subset}[${idx}]['${field}']=parseFloat(this.value)||null;saveTsrBatch();render()"
           onblur="if(!ms.tsrBatch.${subset})ms.tsrBatch.${subset}=[{},{},{}];ms.tsrBatch.${subset}[${idx}]['${field}']=parseFloat(this.value)||null">`;
       }
 
@@ -8302,18 +8302,18 @@ function renderS8TSR(){
             <div style="font-size:10px;color:#888;margin-bottom:6px;font-weight:700">QC Observations</div>
             <div class="fg" style="margin-bottom:6px"><label style="font-size:10px">Visual Damage (0–5)</label>
               <input type="number" min="0" max="5" step="1" value="${td.moistDmg!==null&&td.moistDmg!==undefined?td.moistDmg:''}" style="width:60px;text-align:center"
-                onchange="ms.tsrBatch.moistDmg=parseFloat(this.value)??null;saveDB()"></div>
+                onchange="ms.tsrBatch.moistDmg=parseFloat(this.value)??null;saveTsrBatch()"></div>
             <div class="fg" style="margin-bottom:6px"><label style="font-size:10px">Cracked Aggregate</label>
-              <select style="font-size:11px" onchange="ms.tsrBatch.cracked=this.value;saveDB()">
+              <select style="font-size:11px" onchange="ms.tsrBatch.cracked=this.value;saveTsrBatch()">
                 <option value="" ${!td.cracked?'selected':''}>—</option>
                 ${['Nil','Slight','Medium','High'].map(v=>`<option value="${v}" ${td.cracked===v?'selected':''}>${v}</option>`).join('')}
               </select></div>
             <div class="fg" style="margin-bottom:6px"><label style="font-size:10px">Technician</label>
               <input value="${td.technician||''}" style="font-size:11px"
-                onchange="ms.tsrBatch.technician=this.value;saveDB()"></div>
+                onchange="ms.tsrBatch.technician=this.value;saveTsrBatch()"></div>
             <div class="fg" style="margin:0"><label style="font-size:10px">Date Tested</label>
               <input type="date" value="${td.dateCompleted||''}" style="font-size:11px"
-                onchange="ms.tsrBatch.dateCompleted=this.value;saveDB()"></div>
+                onchange="ms.tsrBatch.dateCompleted=this.value;saveTsrBatch()"></div>
           </div>
         </div>
 
@@ -8327,11 +8327,11 @@ function renderS8TSR(){
             </label>`).join('')}
           </div>
           ${(td.astReq==='Yes')?`<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
-            <div class="fg" style="margin:0"><label>Treatment</label><input value="${td.astTreat||''}" onchange="ms.tsrBatch.astTreat=this.value;saveDB()"></div>
-            <div class="fg" style="margin:0"><label>Supplier</label><input value="${td.astSup||''}" onchange="ms.tsrBatch.astSup=this.value;saveDB()"></div>
-            <div class="fg" style="margin:0"><label>Type</label><input value="${td.astType||''}" onchange="ms.tsrBatch.astType=this.value;saveDB()"></div>
-            <div class="fg" style="margin:0"><label>Dosage</label><input value="${td.astDose||''}" onchange="ms.tsrBatch.astDose=this.value;saveDB()"></div>
-            <div class="fg" style="margin:0"><label>Notes</label><input value="${td.astNotes||''}" onchange="ms.tsrBatch.astNotes=this.value;saveDB()"></div>
+            <div class="fg" style="margin:0"><label>Treatment</label><input value="${td.astTreat||''}" onchange="ms.tsrBatch.astTreat=this.value;saveTsrBatch()"></div>
+            <div class="fg" style="margin:0"><label>Supplier</label><input value="${td.astSup||''}" onchange="ms.tsrBatch.astSup=this.value;saveTsrBatch()"></div>
+            <div class="fg" style="margin:0"><label>Type</label><input value="${td.astType||''}" onchange="ms.tsrBatch.astType=this.value;saveTsrBatch()"></div>
+            <div class="fg" style="margin:0"><label>Dosage</label><input value="${td.astDose||''}" onchange="ms.tsrBatch.astDose=this.value;saveTsrBatch()"></div>
+            <div class="fg" style="margin:0"><label>Notes</label><input value="${td.astNotes||''}" onchange="ms.tsrBatch.astNotes=this.value;saveTsrBatch()"></div>
           </div>`:'<div style="font-size:11px;color:#aaa">No AST required.</div>'}
         </div>
       </div>`;
@@ -8370,7 +8370,7 @@ function renderS9Nmax(){
     return`<div style="display:flex;justify-content:center;width:100%;height:100%"><input type="text" inputmode="decimal" value="${val||''}" data-nmaxfield="${field}"
       ${shouldFocus?'autofocus':''}
       style="width:${w}px;padding:4px 4px;border:1px solid #d0d5dd;border-radius:4px;font-size:11px;text-align:center;font-family:'Segoe UI',system-ui,sans-serif"
-      onchange="if(!ms.nmaxBatch)ms.nmaxBatch={};let v=parseFloat(this.value);ms.nmaxBatch['${field}']=v||null;if(${isHeight}&&v!=null)this.value=v.toFixed(1);saveDB();render()"
+      onchange="if(!ms.nmaxBatch)ms.nmaxBatch={};let v=parseFloat(this.value);ms.nmaxBatch['${field}']=v||null;if(${isHeight}&&v!=null)this.value=v.toFixed(1);saveNmaxBatch();render()"
       onblur="if(!ms.nmaxBatch)ms.nmaxBatch={};let v=parseFloat(this.value);ms.nmaxBatch['${field}']=v||null;if(${isHeight}&&v!=null)this.value=v.toFixed(1)"
       onkeydown="if(event.key==='Tab'){event.preventDefault();const inputs=Array.from(document.querySelectorAll('input[data-nmaxfield]'));const idx=inputs.indexOf(this);if(idx>=0){const next=inputs[(idx+1)%inputs.length];window._nmaxFocusAfterRender=next.dataset.nmaxfield;next.focus()}}"></div>`;
   }
