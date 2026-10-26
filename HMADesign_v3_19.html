@@ -1117,13 +1117,16 @@ function autoSyncActiveMix(){
     const localVolTs=new Date(lt.vol?.updatedAt||0).getTime();
     mergedTrials.push(localVolTs>=cloudVolTs?lt:ct);
   }
+  const _cm=cloudMix; // already fetched above
   const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
     slots:ms.slots,trials:mergedTrials,notes:ms.notes,
     selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
     designPb:ms.designPb,designPbAuto:ms.designPbAuto||null,
     propertyCurves:ms.propertyCurves,
-    tsrBatch:ms.tsrBatch||null,nmaxBatch:ms.nmaxBatch||null,
-    aggTesting:ms.aggTesting||null,tbaTrials:ms.tbaTrials||null,
+    tsrBatch:_mergeSectionPush(ms.tsrBatch,_cm?.tsrBatch),
+    nmaxBatch:_mergeSectionPush(ms.nmaxBatch,_cm?.nmaxBatch),
+    aggTesting:_mergeSectionPush(ms.aggTesting,_cm?.aggTesting),
+    tbaTrials:ms.tbaTrials||null,
     tbaTargets:ms.tbaTargets||null,
     createdAt:ms.createdAt||now,
     updatedAt:now};
