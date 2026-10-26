@@ -1168,9 +1168,14 @@ function showSyncBadge(msg,fade){
 }
 
 function saveDB(){
-  // Keep db.mixes current with ms so the cloud poll never replaces us with stale data
+  // Keep db.mixes current with ms for localStorage persistence.
+  // CRITICAL: preserve the existing updatedAt (last cloud-sync time) — do NOT stamp now.
+  // If we stamp now, the poll comparison cloudTs > localTs always fails and we never
+  // download other users' changes. Only autoSyncActiveMix/syncNow set a fresh updatedAt.
   if(ms&&ms.id&&view==='newmix'){
     const now=new Date().toISOString();
+    const existing=db.mixes.find(m=>m.id===ms.id);
+    const syncedTs=existing?.updatedAt||ms.createdAt||now; // keep last cloud-sync timestamp
     const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
       slots:ms.slots,trials:ms.trials,notes:ms.notes,
       selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
@@ -1178,7 +1183,7 @@ function saveDB(){
       propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch||null,
       nmaxBatch:ms.nmaxBatch||null,aggTesting:ms.aggTesting||null,
       tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
-      createdAt:ms.createdAt||now,updatedAt:now};
+      createdAt:ms.createdAt||now,updatedAt:syncedTs};
     db.mixes=db.mixes.filter(m=>m.id!==mix.id);
     db.mixes.push(mix);
   }
