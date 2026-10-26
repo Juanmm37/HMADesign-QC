@@ -1072,6 +1072,31 @@ async function syncNow(){
   }
 }
 
+// Helper: stamp _updatedAt on a section then save
+function saveTsrBatch(){
+  if(ms&&ms.tsrBatch)ms.tsrBatch._updatedAt=new Date().toISOString();
+  else if(ms&&!ms.tsrBatch)ms.tsrBatch={_updatedAt:new Date().toISOString()};
+  saveDB();
+}
+function saveNmaxBatch(){
+  if(ms&&ms.nmaxBatch)ms.nmaxBatch._updatedAt=new Date().toISOString();
+  else if(ms&&!ms.nmaxBatch)ms.nmaxBatch={_updatedAt:new Date().toISOString()};
+  saveDB();
+}
+function saveAggTesting(){
+  if(ms&&ms.aggTesting)ms.aggTesting._updatedAt=new Date().toISOString();
+  saveDB();
+}
+
+// Helper: merge a section (tsrBatch/nmaxBatch/aggTesting) preferring more recent _updatedAt
+function _mergeSectionPush(local,cloud){
+  if(!cloud)return local;
+  if(!local)return JSON.parse(JSON.stringify(cloud));
+  const cTs=new Date(cloud._updatedAt||0).getTime();
+  const lTs=new Date(local._updatedAt||0).getTime();
+  return JSON.parse(JSON.stringify(lTs>=cTs?local:cloud));
+}
+
 function autoSyncActiveMix(){
   // No view guard — push even if user navigated away during the debounce window
   if(!ms||!ms.id)return;
