@@ -1025,13 +1025,15 @@ async function syncNow(){
   const btn=document.getElementById('syncNowBtn');
   if(btn){btn.disabled=true;btn.classList.add('syncing');btn.classList.remove('done');}
   showSyncBadge('⟳ Syncing...');
-  // Step 1: Push active mix first so other users see our latest data immediately
+  if(_autoSyncTimer){clearTimeout(_autoSyncTimer);_autoSyncTimer=null;}
+  // Step 1: Pull first — get other users' latest data before we push anything
+  await cloudLoadMixes(true);
+  // Step 2: Push active mix merged with freshly-pulled cloud data
   if(view==='newmix'&&ms&&ms.id){
-    if(_autoSyncTimer){clearTimeout(_autoSyncTimer);_autoSyncTimer=null;}
     const now=new Date().toISOString();
-    // Merge trials with cloud before pushing to avoid overwriting other user's vol data
-    const _cloudMix=db.mixes.find(m=>m.id===ms.id);
-    const _cloudTr=_cloudMix?.trials||[];
+    // ms was already updated by _refreshMsFromDb inside cloudLoadMixes — now merge for push
+    const _syncCm=db.mixes.find(m=>m.id===ms.id);
+    const _cloudTr=_syncCm?.trials||[];
     const _localTr=ms.trials||[];
     const _maxLen=Math.max(_cloudTr.length,_localTr.length);
     const _mergedTr=[];
@@ -1044,7 +1046,6 @@ async function syncNow(){
       const lTs=new Date(lt.vol?.updatedAt||0).getTime();
       _mergedTr.push(lTs>=cTs?lt:ct);
     }
-    const _syncCm=db.mixes.find(m=>m.id===ms.id);
     const mix={id:ms.id,status:'In Progress',step:ms.step,...ms.info,
       slots:ms.slots,trials:_mergedTr,notes:ms.notes,
       selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,
@@ -1060,8 +1061,6 @@ async function syncNow(){
     localStorage.setItem('capmix_v4',JSON.stringify(db));
     await cloudSaveMix(mix);
   }
-  // Step 2: Pull — force refresh bypasses timestamp check so we always get other users' latest data
-  await cloudLoadMixes(true);
   // Step 3: Push local agg library for each year
   for(const yr of getLibYears()){
     await cloudSaveAggLib(yr,getLibYear(yr));
