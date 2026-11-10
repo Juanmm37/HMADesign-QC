@@ -4921,21 +4921,41 @@ function saveMix(status){
   ms={step:1,info:{},slots:{},trials:[],notes:'',innerTab:'workflow'};
   showView('records');
 }
-function saveAndExit(){
+async function saveAndExit(){
   const id=ms.id||('mix_'+Date.now());
   ms.id=id;
+  if(_autoSyncTimer){clearTimeout(_autoSyncTimer);_autoSyncTimer=null;}
+  // Pull latest from cloud first so we don't overwrite Andres's work
+  await cloudLoadMixes(true);
+  // ms is now merged with cloud data via _refreshMsFromDb; build merged mix to push
+  const now=new Date().toISOString();
+  const cloudMix=db.mixes.find(m=>m.id===id);
+  const cloudTrials=cloudMix?.trials||[];
+  const localTrials=ms.trials||[];
+  const maxLen=Math.max(cloudTrials.length,localTrials.length);
+  const mergedTrials=[];
+  for(let i=0;i<maxLen;i++){
+    const ct=i<cloudTrials.length?cloudTrials[i]:null;
+    const lt=i<localTrials.length?localTrials[i]:null;
+    if(!ct){mergedTrials.push(lt);continue;}
+    if(!lt){mergedTrials.push(ct);continue;}
+    const cTs=new Date(ct.vol?.updatedAt||0).getTime();
+    const lTs=new Date(lt.vol?.updatedAt||0).getTime();
+    mergedTrials.push(lTs>=cTs?lt:ct);
+  }
   const mix={
     id,status:'In Progress',step:ms.step,
     ...ms.info,
-    slots:ms.slots,trials:ms.trials,notes:ms.notes,
+    slots:ms.slots,trials:mergedTrials,notes:ms.notes,
     selectedTrialIdx:ms.selectedTrialIdx,
     acPoints:ms.acPoints,designPb:ms.designPb,
+    designPbAuto:ms.designPbAuto||null,
     propertyCurves:ms.propertyCurves,
-    tsrBatch:ms.tsrBatch,nmaxBatch:ms.nmaxBatch,
-    aggTesting:ms.aggTesting||null,
+    tsrBatch:_mergeSectionPush(ms.tsrBatch,cloudMix?.tsrBatch),
+    nmaxBatch:_mergeSectionPush(ms.nmaxBatch,cloudMix?.nmaxBatch),
+    aggTesting:_mergeSectionPush(ms.aggTesting,cloudMix?.aggTesting),
     tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
-    createdAt:ms.createdAt||new Date().toISOString(),
-    updatedAt:new Date().toISOString()
+    createdAt:ms.createdAt||now,updatedAt:now
   };
   const idx=db.mixes.findIndex(m=>m.id===id);
   if(idx>=0)db.mixes[idx]=mix;else db.mixes.push(mix);
@@ -4943,7 +4963,8 @@ function saveAndExit(){
     selectedTrialIdx:null,acPoints:[],designPb:null,propertyCurves:{},
     tsrBatch:null,nmaxBatch:null,aggTesting:null};
   try{localStorage.removeItem('capmix_session');}catch(_){}
-  saveDB();cloudSaveMix(mix);
+  saveDB();
+  await cloudSaveMix(mix);
   showView('dashboard');
 }
 
