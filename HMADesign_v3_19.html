@@ -2359,7 +2359,7 @@ function renderNewMix(){
   const bar=`<div class="steps-bar">${steps.map((st,i)=>{
     const n=i+1,cls=n<ms.step?'sd':n===ms.step?'sa':'sf';
     return(i>0?`<div class="sc ${n<=ms.step?'done':''}"></div>`:'')+
-      `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer" onclick="ms.step=${n};render()" title="Go to Step ${n}">
+      `<div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer" onclick="goToStep(${n})" title="Go to Step ${n}">
         <div class="step-dot ${cls}" style="cursor:pointer">${n<ms.step?'✓':n}</div>
         <div style="font-size:10px;color:${n===ms.step?'#1f3864':'#aaa'};font-weight:${n===ms.step?'700':'500'};text-align:center;max-width:80px;line-height:1.2;text-decoration:${n===ms.step?'none':'underline dotted'}">${st}</div>
       </div>`;
