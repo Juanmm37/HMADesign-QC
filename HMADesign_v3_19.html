@@ -3571,6 +3571,32 @@ function renderTBAChart(trialGrads, bands, info){
 }
 
 // Create workflow trials from selected trial blends and proceed to workflow
+// Sync blend percentages + Pb from tbaTrials into trials without touching vol measurements.
+// Called when navigating to Step 4 via the progress bar (without hitting "Export → Next").
+function syncTrialBlends(){
+  if(!ms.tbaTrials||!ms.trials||!ms.trials.length)return;
+  const selected=ms.tbaTrials.filter(t=>{
+    const total=Object.values(t.pcts||{}).reduce((sum,v)=>sum+(v||0),0);
+    return t.selected&&Math.abs(total-100)<0.01;
+  });
+  if(!selected.length)return;
+  let changed=false;
+  selected.forEach((t,idx)=>{
+    if(idx<ms.trials.length){
+      ms.trials[idx].blendPct=Object.assign({},t.pcts);
+      ms.trials[idx].Pb=t.Pb;
+      changed=true;
+    }
+  });
+  if(changed)saveDB();
+}
+
+function goToStep(n){
+  // When entering the weigh-card step (4) from the progress bar, sync blends first
+  if(n===4&&ms&&ms.tbaTrials&&ms.trials)syncTrialBlends();
+  ms.step=n;render();
+}
+
 function createTrialsFromTrials(){
   if(!ms.tbaTrials)return;
 
