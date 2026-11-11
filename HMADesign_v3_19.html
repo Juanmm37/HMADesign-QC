@@ -924,16 +924,18 @@ async function cloudLoadMixes(forceRefresh=false){
         return;
       }
       const cloudTs=new Date(row.updated_at||0).getTime();
-      // New or updated mix — forceRefresh bypasses timestamp check (used by syncNow)
+      const isActiveMix=ms&&ms.id===d.id;
+      // Always download the active mix — skip timestamp check so we never miss a collaborator's push.
+      // For other mixes use the timestamp check to avoid unnecessary writes.
       if(idx>=0){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
-        if(forceRefresh||cloudTs>localTs){
+        if(forceRefresh||isActiveMix||cloudTs>localTs){
           db.mixes[idx]=d;changed=true;
-          if(ms&&ms.id===d.id)activeMixUpdated=true;
+          if(isActiveMix&&(forceRefresh||cloudTs>localTs))activeMixUpdated=true;
         }
       }else{
         db.mixes.push(d);changed=true;
-        if(ms&&ms.id===d.id)activeMixUpdated=true;
+        if(isActiveMix)activeMixUpdated=true;
       }
     });
     if(changed)localStorage.setItem('capmix_v4',JSON.stringify(db));
