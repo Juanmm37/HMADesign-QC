@@ -1070,8 +1070,8 @@ function _refreshMsFromDb(){
 
 function initRealtime(){
   if(_pollTimer)clearInterval(_pollTimer);
-  _pollTimer=setInterval(cloudLoadMixes,10000);
-  cloudLoadMixes(true); // force on startup — always load latest regardless of local cache
+  _pollTimer=setInterval(()=>{cloudLoadMixes();_renderPresenceBanner();},10000);
+  cloudLoadMixes(true);
 }
 
 async function presencePing(){
