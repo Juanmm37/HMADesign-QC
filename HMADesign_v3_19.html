@@ -938,11 +938,12 @@ async function cloudLoadMixes(forceRefresh=false){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
         if(forceRefresh||isActiveMix||cloudTs>localTs){
           db.mixes[idx]=d;changed=true;
-          if(isActiveMix&&(forceRefresh||cloudTs>localTs))activeMixUpdated=true;
+          // Only signal ms refresh if user isn't actively typing (autoSync pending = they just typed)
+          if(isActiveMix&&(forceRefresh||cloudTs>localTs)&&!_autoSyncTimer)activeMixUpdated=true;
         }
       }else{
         db.mixes.push(d);changed=true;
-        if(isActiveMix)activeMixUpdated=true;
+        if(isActiveMix&&!_autoSyncTimer)activeMixUpdated=true;
       }
     });
     if(changed)localStorage.setItem('capmix_v4',JSON.stringify(db));
