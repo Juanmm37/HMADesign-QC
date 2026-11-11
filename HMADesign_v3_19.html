@@ -876,6 +876,8 @@ let _autoSyncTimer=null;
 let _presenceTimer=null;
 let _presenceCache={}; // { [mixId]: { [email]: { name, ts } } }
 let _isSaving=false; // true during saveAndExit/autoSync — prevents cloudLoad from overwriting ms
+let _lastPollOk=null; // timestamp of last successful cloudLoadMixes
+let _connStatusTimer=null;
 
 async function cloudSaveMix(mix){
   if(!mix||!mix.id)return;
