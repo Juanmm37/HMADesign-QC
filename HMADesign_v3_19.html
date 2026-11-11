@@ -1089,7 +1089,7 @@ async function presencePing(){
       body:JSON.stringify({id:presId,data:{type:'presence',mixId:ms.id,users:updated},
         updated_at:now,updated_by:currentUser.email})});
     _presenceCache[ms.id]=updated;
-    if(view==='newmix')render();
+    if(view==='newmix')_renderPresenceBanner();
   }catch(_){}
 }
 function startPresence(){
