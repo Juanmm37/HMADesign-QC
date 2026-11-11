@@ -913,7 +913,13 @@ async function cloudLoadMixes(forceRefresh=false){
     let changed=false;let libChanged=false;let activeMixUpdated=false;
     rows.forEach(row=>{
       const d=row.data;
-      if(!d||!d.id)return;
+      if(!d)return;
+      // Presence record — update cache and re-render banner if in newmix
+      if(d.type==='presence'){
+        if(d.mixId&&d.users){_presenceCache[d.mixId]=d.users;if(view==='newmix'&&ms&&ms.id===d.mixId){const pb=document.getElementById('presence-banner');if(pb)_renderPresenceBanner();}}
+        return;
+      }
+      if(!d.id)return;
       // Aggregate library record — merge cloud entries into local (additive only, never removes local)
       if(d.type==='agg_library'){
         if(d.year&&Array.isArray(d.entries)){
