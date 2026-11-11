@@ -931,7 +931,7 @@ async function cloudLoadMixes(forceRefresh=false){
       }
       // Presence record — update cache and re-render banner if in newmix
       if(d.type==='presence'){
-        if(d.mixId&&d.users){_presenceCache[d.mixId]=d.users;if(view==='newmix'&&ms&&ms.id===d.mixId)activeMixUpdated=true;}
+        if(d.mixId&&d.users){_presenceCache[d.mixId]=d.users;if(view==='newmix'&&ms&&ms.id===d.mixId){const pb=document.getElementById('presence-banner');if(pb)_renderPresenceBanner();}}
         return;
       }
       const idx=db.mixes.findIndex(m=>m.id===d.id);
