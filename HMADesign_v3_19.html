@@ -938,8 +938,8 @@ async function cloudLoadMixes(forceRefresh=false){
         const localTs=new Date(db.mixes[idx].updatedAt||0).getTime();
         if(forceRefresh||isActiveMix||cloudTs>localTs){
           db.mixes[idx]=d;changed=true;
-          // Only signal ms refresh if user isn't actively typing (autoSync pending = they just typed)
-          if(isActiveMix&&(forceRefresh||cloudTs>localTs)&&!_autoSyncTimer)activeMixUpdated=true;
+          // Always refresh ms when active mix is downloaded and user isn't typing
+          if(isActiveMix&&!_autoSyncTimer)activeMixUpdated=true;
         }
       }else{
         db.mixes.push(d);changed=true;
