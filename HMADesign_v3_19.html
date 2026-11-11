@@ -866,6 +866,8 @@ const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZ
 const SB_HEADERS={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'};
 let _pollTimer=null;
 let _autoSyncTimer=null;
+let _presenceTimer=null;
+let _presenceCache={}; // { [mixId]: { [email]: { name, ts } } }
 
 async function cloudSaveMix(mix){
   if(!mix||!mix.id)return;
