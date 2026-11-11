@@ -965,7 +965,27 @@ async function cloudLoadMixes(forceRefresh=false){
       _refreshMsFromDb();
       render();
     }
-  }catch(e){console.warn('Cloud load failed:',e);}
+    _lastPollOk=Date.now();
+    _updateConnStatus();
+  }catch(e){console.warn('Cloud load failed:',e);_updateConnStatus(true);}
+}
+
+function _updateConnStatus(error){
+  const dot=document.getElementById('conn-dot');
+  const label=document.getElementById('conn-label');
+  if(!dot||!label)return;
+  if(error){
+    dot.style.background='#e74c3c';
+    label.textContent='Offline';
+    label.style.color='#e74c3c';
+    return;
+  }
+  const secs=_lastPollOk?Math.round((Date.now()-_lastPollOk)/1000):null;
+  dot.style.background='#27ae60';
+  label.style.color='#555';
+  label.textContent=secs===null?'Connected':secs<5?'Just synced':secs<60?`Synced ${secs}s ago`:`Synced ${Math.round(secs/60)}m ago`;
+  clearTimeout(_connStatusTimer);
+  _connStatusTimer=setTimeout(_updateConnStatus,10000);
 }
 
 // Pull the latest data from db.mixes into the active ms session, preserving the current step.
