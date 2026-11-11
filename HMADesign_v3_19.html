@@ -871,6 +871,7 @@ let _pollTimer=null;
 let _autoSyncTimer=null;
 let _presenceTimer=null;
 let _presenceCache={}; // { [mixId]: { [email]: { name, ts } } }
+let _isSaving=false; // true during saveAndExit/autoSync — prevents cloudLoad from overwriting ms
 
 async function cloudSaveMix(mix){
   if(!mix||!mix.id)return;
