@@ -1024,6 +1024,33 @@ function initRealtime(){
   cloudLoadMixes(true); // force on startup — always load latest regardless of local cache
 }
 
+async function presencePing(){
+  if(!ms||!ms.id||!currentUser)return;
+  const presId='presence_'+ms.id;
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/hma_design_mixes?id=eq.'+encodeURIComponent(presId),
+      {headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY}});
+    if(!r.ok)return;
+    const rows=await r.json();
+    const existing=(rows[0]?.data?.users)||{};
+    const now=new Date().toISOString();
+    const updated={...existing,[currentUser.email]:{name:currentUser.name,ts:now}};
+    await fetch(SB_URL+'/rest/v1/hma_design_mixes',{method:'POST',headers:SB_HEADERS,
+      body:JSON.stringify({id:presId,data:{type:'presence',mixId:ms.id,users:updated},
+        updated_at:now,updated_by:currentUser.email})});
+    _presenceCache[ms.id]=updated;
+    if(view==='newmix')render();
+  }catch(_){}
+}
+function startPresence(){
+  stopPresence();
+  presencePing();
+  _presenceTimer=setInterval(presencePing,20000);
+}
+function stopPresence(){
+  if(_presenceTimer){clearInterval(_presenceTimer);_presenceTimer=null;}
+}
+
 async function syncNow(){
   const btn=document.getElementById('syncNowBtn');
   if(btn){btn.disabled=true;btn.classList.add('syncing');btn.classList.remove('done');}
