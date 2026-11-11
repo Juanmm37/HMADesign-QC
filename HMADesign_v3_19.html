@@ -919,6 +919,11 @@ async function cloudLoadMixes(forceRefresh=false){
         }
         return;
       }
+      // Presence record — update cache and re-render banner if in newmix
+      if(d.type==='presence'){
+        if(d.mixId&&d.users){_presenceCache[d.mixId]=d.users;if(view==='newmix'&&ms&&ms.id===d.mixId)activeMixUpdated=true;}
+        return;
+      }
       const idx=db.mixes.findIndex(m=>m.id===d.id);
       // Soft-deleted mix — remove locally if present
       if(d.deleted){
