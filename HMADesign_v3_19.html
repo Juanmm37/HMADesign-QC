@@ -7190,7 +7190,7 @@ function renderS6VolSelected(){
             <td style="${cs}">${inpV(pi,0,'hNdesB',hNdesB?hNdesB.toFixed(1):'',58,'0.1','—')}</td>
             <td style="${csAvg};font-size:11px">${avgNdes?avgNdes.toFixed(1):'—'}</td>
             `:''}
-            ${isM?`<td style="${cs};border-left:2px solid #c5d3ef">${inpV(pi,0,'Stab',v0.Stab,64,'1','—')}</td><td style="${cs}">${inpV(pi,0,'Flow',v0.Flow,52,'0.1','—')}</td>`:''}
+            ${isM?`<td style="${cs};border-left:2px solid #c5d3ef">${inpV(pi,0,'Stab',v0.Stab,64,'1','—')}</td><td style="${cs}">${inpV(pi,0,'Flow',v0.Flow,52,'0.1','—')}</td><td style="${cs}">${inpV(pi,0,'avgHeight',v0.avgHeight,58,'0.01','—')}</td>`:''}
             ${res?`
             <!-- Volumetrics -->
             <td style="${cs};border-left:2px solid #c5d3ef;font-weight:700;color:#c0392b">${res.Va.toFixed(1)}</td>
