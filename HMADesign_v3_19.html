@@ -7546,8 +7546,10 @@ function calcDesignPb(){
   }
 
   if(designPb!==null){
-    ms.designPb=Math.round(designPb*100)/100;
-    ms.designPbAuto=ms.designPb;
+    const newAuto=Math.round(designPb*100)/100;
+    const isManualOverride=ms.designPbAuto!=null&&ms.designPb!=null&&Math.abs(ms.designPb-ms.designPbAuto)>0.005;
+    ms.designPbAuto=newAuto;
+    if(!isManualOverride)ms.designPb=newAuto;
   }
 }
 
