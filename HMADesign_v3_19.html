@@ -4937,8 +4937,8 @@ async function saveAndExit(){
   const id=ms.id||('mix_'+Date.now());
   ms.id=id;
   if(_autoSyncTimer){clearTimeout(_autoSyncTimer);_autoSyncTimer=null;}
-  // Pull latest from cloud first so we don't overwrite Andres's work
-  await cloudLoadMixes(true);
+  _isSaving=true;
+  await cloudLoadMixes(true); // pull fresh cloud data into db.mixes — ms is protected by _isSaving
   // ms is now merged with cloud data via _refreshMsFromDb; build merged mix to push
   const now=new Date().toISOString();
   const cloudMix=db.mixes.find(m=>m.id===id);
