@@ -198,15 +198,18 @@ function signOut(){
 (function(){
   const ll=document.getElementById('login-logo');
   if(ll)ll.src=LOGO_SRC;
-  // Restore login session from localStorage
-  try{
-    const saved=localStorage.getItem('hmadesign_session');
-    if(saved){
-      const{email}=JSON.parse(saved);
-      const match=USERS.find(u=>u.email===email);
-      if(match)_applyLogin(match);
-    }
-  }catch(_){}
+  // Restore login session from localStorage — deferred so all const declarations
+  // (SB_URL etc.) are initialized before _applyLogin calls cloudLoadMixes
+  setTimeout(()=>{
+    try{
+      const saved=localStorage.getItem('hmadesign_session');
+      if(saved){
+        const{email}=JSON.parse(saved);
+        const match=USERS.find(u=>u.email===email);
+        if(match)_applyLogin(match);
+      }
+    }catch(_){}
+  },0);
 })();
 
 // Capture-phase: prevent ArrowUp/Down from spinning number inputs (must fire before browser handler)
