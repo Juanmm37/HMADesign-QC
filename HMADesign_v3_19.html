@@ -970,6 +970,21 @@ async function cloudLoadMixes(forceRefresh=false){
   }catch(e){console.warn('Cloud load failed:',e);_updateConnStatus(true);}
 }
 
+function _renderPresenceBanner(){
+  const el=document.getElementById('presence-banner');
+  if(!el||!ms||!ms.id)return;
+  const now120=Date.now()-120000; // 2-minute window
+  const others=Object.entries(_presenceCache[ms.id]||{})
+    .filter(([email,u])=>email!==currentUser?.email&&new Date(u.ts).getTime()>now120)
+    .map(([,u])=>u.name);
+  if(others.length){
+    el.innerHTML=`<span style="font-size:15px">👤</span><span>${others.join(' &amp; ')} ${others.length===1?'is':'are'} working on this mix right now</span>`;
+    el.style.display='flex';
+  }else{
+    el.style.display='none';
+  }
+}
+
 function _updateConnStatus(error){
   const dot=document.getElementById('conn-dot');
   const label=document.getElementById('conn-label');
