@@ -949,12 +949,11 @@ async function cloudLoadMixes(forceRefresh=false){
     if(changed)localStorage.setItem('capmix_v4',JSON.stringify(db));
     if(changed&&(view==='dashboard'||view==='records'||view==='library'))render();
     else if(libChanged&&view==='library')render();
-    // Refresh active mix session from cloud if it was updated
+    // Refresh active mix session from cloud if it was updated.
+    // activeMixUpdated is only set when !_autoSyncTimer, so render is always safe here.
     if(activeMixUpdated&&view==='newmix'&&ms&&ms.id){
       _refreshMsFromDb();
-      // Auto-render only when user isn't mid-input (to avoid wiping partial typing)
-      const ae=document.activeElement;
-      if(!ae||ae.tagName!=='INPUT'&&ae.tagName!=='TEXTAREA')render();
+      render();
     }
   }catch(e){console.warn('Cloud load failed:',e);}
 }
