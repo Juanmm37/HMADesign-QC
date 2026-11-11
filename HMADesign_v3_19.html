@@ -1454,6 +1454,7 @@ function updateVolField(ti, key, val){
 }
 
 function showView(v){
+  if(v!=='newmix')stopPresence();
   view=v;
   const views=['dashboard','library','newmix','records','specs'];
   document.querySelectorAll('.nav-btn').forEach(b=>{
@@ -1462,6 +1463,7 @@ function showView(v){
     b.classList.toggle('active',views[idx]===v);
   });
   render();
+  if(v==='newmix')startPresence();
 }
 
 // Debounce utility for display updates (allows Tab navigation while updating dynamically)
