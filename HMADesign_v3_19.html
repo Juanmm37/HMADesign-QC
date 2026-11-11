@@ -2425,14 +2425,7 @@ function renderNewMix(){
     ${i.pgac?`<span>PGAC: <strong>${i.pgac}</strong></span><span style="color:#c5d3ef">|</span>`:''}
     ${i.spec?`<span>${i.spec}</span>`:''}
   </div>`:'';
-  const now60=Date.now()-60000;
-  const otherUsers=Object.entries(_presenceCache[ms.id]||{})
-    .filter(([email,u])=>email!==currentUser?.email&&new Date(u.ts).getTime()>now60)
-    .map(([,u])=>u.name);
-  const presenceBanner=otherUsers.length?`<div class="print-hide" style="display:flex;align-items:center;gap:8px;padding:7px 14px;background:#eaf4ff;border:1.5px solid #90c3f0;border-radius:7px;margin-bottom:8px;font-size:12px;color:#1a4a7a;font-weight:600">
-    <span style="font-size:15px">👤</span>
-    <span>${otherUsers.join(' &amp; ')} ${otherUsers.length===1?'is':'are'} working on this mix right now</span>
-  </div>`:'';
+  const presenceBanner=`<div id="presence-banner" class="print-hide" style="display:none;align-items:center;gap:8px;padding:7px 14px;background:#eaf4ff;border:1.5px solid #90c3f0;border-radius:7px;margin-bottom:8px;font-size:12px;color:#1a4a7a;font-weight:600"></div>`;
   const saveExitBtn=`<div class="print-hide" style="margin-top:18px;padding:0 2px;display:flex;justify-content:flex-end">
     <button onclick="saveAndExit()" style="display:flex;align-items:center;gap:8px;padding:10px 22px;background:#fff;border:1.5px solid #1f3864;border-radius:7px;color:#1f3864;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
       <span style="font-size:16px">💾</span> Save &amp; Exit to Dashboard
