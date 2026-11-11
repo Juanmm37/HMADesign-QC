@@ -9820,6 +9820,7 @@ function renderS12Consensus(){
 }
 
 function renderS10Summary(){
+  computePropertyCurves();
   const fam=ms.info.family||'Superpave';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
   const designPb=ms.designPb,pc=ms.propertyCurves,pts=pc.pts||[];
