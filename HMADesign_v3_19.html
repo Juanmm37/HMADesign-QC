@@ -7571,6 +7571,7 @@ function rehydratePropertyCurves(){
 }
 
 function renderS7PropCurves(){
+  computePropertyCurves();
   rehydratePropertyCurves();
   const info=ms.info;
   const fam=info.family||'Superpave',pc=ms.propertyCurves||{},pts=pc.pts||[];
