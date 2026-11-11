@@ -1156,7 +1156,7 @@ function saveDB(){
   if(view==='newmix'&&ms&&ms.id){
     if(_autoSyncTimer)clearTimeout(_autoSyncTimer);
     showSyncBadge('⟳ Saving...');
-    _autoSyncTimer=setTimeout(async()=>{await cloudLoadMixes();autoSyncActiveMix();},5000);
+    _autoSyncTimer=setTimeout(async()=>{await cloudLoadMixes(true);autoSyncActiveMix();},5000);
   }
 }
 // Restore active session on page load (survives code-change refreshes)
