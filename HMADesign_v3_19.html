@@ -1174,6 +1174,7 @@ function autoSyncActiveMix(){
     aggTesting:_mergeSectionPush(ms.aggTesting,_cm?.aggTesting),
     tbaTrials:ms.tbaTrials||null,
     tbaTargets:ms.tbaTargets||null,
+    reportData:ms.reportData||{},
     createdAt:ms.createdAt||now,
     updatedAt:now};
   db.mixes=db.mixes.filter(m=>m.id!==mix.id);
