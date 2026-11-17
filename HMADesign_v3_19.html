@@ -4962,6 +4962,7 @@ function saveMix(status){
     selectedTrialIdx:ms.selectedTrialIdx,acPoints:ms.acPoints,designPb:ms.designPb,
     propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch,nmaxBatch:ms.nmaxBatch,aggTesting:ms.aggTesting||null,
     tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
+    reportData:ms.reportData||{},
     dateCompleted,
     createdAt:ms.createdAt||now.toISOString(),updatedAt:now.toISOString()};
   const idx=db.mixes.findIndex(m=>m.id===id);
