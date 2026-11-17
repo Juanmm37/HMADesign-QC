@@ -5005,6 +5005,7 @@ async function saveAndExit(){
     nmaxBatch:_mergeSectionPush(ms.nmaxBatch,cloudMix?.nmaxBatch),
     aggTesting:_mergeSectionPush(ms.aggTesting,cloudMix?.aggTesting),
     tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
+    reportData:ms.reportData||{},
     createdAt:ms.createdAt||now,updatedAt:now
   };
   const idx=db.mixes.findIndex(m=>m.id===id);
