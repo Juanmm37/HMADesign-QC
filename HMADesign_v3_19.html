@@ -10196,10 +10196,12 @@ function generateReport(mixId){
     // Volumetric results from designPb or last ac point at Va≈4
     const dp=ms.designPb||selTrial.Pb;
     const pc=ms.propertyCurves;
-    const Va_d=pc.Va?Math.round(pc.Va.predict(dp)*10)/10:4.0;
-    const VMA_d=pc.VMA?Math.round(pc.VMA.predict(dp)*10)/10:null;
-    const VFA_d=pc.VFA?Math.round(pc.VFA.predict(dp)*10)/10:null;
-    const Gmb_d=pc.Gmb?Math.round(pc.Gmb.predict(dp)*1000)/1000:null;
+    const _rt=ms.propCurvesRegType||'linear';
+    function _pcPredict(reg,x){const r=reg&&(reg[_rt]||reg.linear);return(r&&typeof r.predict==='function')?r.predict(x):null;}
+    const Va_d=pc.Va?Math.round(_pcPredict(pc.Va,dp)*10)/10:4.0;
+    const VMA_d=pc.VMA?Math.round(_pcPredict(pc.VMA,dp)*10)/10:null;
+    const VFA_d=pc.VFA?Math.round(_pcPredict(pc.VFA,dp)*10)/10:null;
+    const Gmb_d=pc.avgGmb?Math.round(_pcPredict(pc.avgGmb,dp)*1000)/1000:null;
     setCell(P1,21,5,Va_d);
     setCell(P1,22,5,VMA_d);
     setCell(P1,23,5,VFA_d);
@@ -10207,7 +10209,7 @@ function generateReport(mixId){
     if(pc.pts&&pc.pts.length){
       const pt=pc.pts.reduce((a,b)=>Math.abs(a.Pb-dp)<Math.abs(b.Pb-dp)?a:b);
       if(pt){
-        setCell(P1,28,5,pt.avgGmb?Math.round(pt.Gmm_val*1000)/1000:null);
+        setCell(P1,28,5,pt.avgGmb?Math.round(pt.Gmm*1000)/1000:null);
         setCell(P1,29,5,pt.pGmmNini?Math.round(pt.pGmmNini*10)/10:null);
         setCell(P1,30,5,pt.pGmmNdes?Math.round(pt.pGmmNdes*10)/10:null);
       }
