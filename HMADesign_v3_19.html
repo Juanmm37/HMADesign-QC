@@ -1226,6 +1226,7 @@ function saveDB(){
       propertyCurves:ms.propertyCurves,tsrBatch:ms.tsrBatch||null,
       nmaxBatch:ms.nmaxBatch||null,aggTesting:ms.aggTesting||null,
       tbaTrials:ms.tbaTrials||null,tbaTargets:ms.tbaTargets||null,
+      reportData:ms.reportData||{},
       createdAt:ms.createdAt||now,updatedAt:syncedTs};
     db.mixes=db.mixes.filter(m=>m.id!==mix.id);
     db.mixes.push(mix);
