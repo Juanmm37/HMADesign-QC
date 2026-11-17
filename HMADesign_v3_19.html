@@ -9890,6 +9890,234 @@ function renderS10Summary(){
 }
 
 // ═══════════════════════════════════════════════════════════════
+// SUPERPAVE FULL REPORT — multi-tab in-app report
+// ═══════════════════════════════════════════════════════════════
+function saveRD(key,val){if(!ms.reportData)ms.reportData={};ms.reportData[key]=val;saveDB();}
+function saveRDNested(obj,slot,val){if(!ms.reportData)ms.reportData={};if(!ms.reportData[obj])ms.reportData[obj]={};ms.reportData[obj][slot]=val;saveDB();}
+
+function spShowTab(n){
+  document.querySelectorAll('[id^="sptabcontent_"]').forEach((el,i)=>{el.style.display='none';});
+  document.querySelectorAll('.sp-tab').forEach((el,i)=>{
+    el.style.background=i===n?'#1f3864':'#eaf0fb';
+    el.style.color=i===n?'#fff':'#1f3864';
+    el.style.borderBottom=i===n?'2px solid #1f3864':'none';
+  });
+  const t=document.getElementById('sptabcontent_'+n);
+  if(t)t.style.display='block';
+}
+
+function renderSPFullReport(){
+  const info=ms.info,mt=info.mixType||'';
+  const pc=ms.propertyCurves,pts=pc.pts||[];
+  const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
+  const designPb=ms.designPb;
+  const tgt=getVolTargets(info,mt);
+  const rd=ms.reportData||{};
+  const isMUNI=(info.specType||'PROV')==='MUNI';
+  const RPT_SIEVES=['25','19','16','12.5','9.5','4.75','2.36','1.18','0.6','0.3','0.15','0.075'];
+  const bands=getBands(info);
+  const activeSlots=SLOTS.filter(s=>ms.slots[s]);
+  const regType=ms.propCurvesRegType||'linear';
+  const predAt=(prop,pb)=>{const m=pc[prop]&&(pc[prop][regType]||pc[prop].linear);return(m&&typeof m.predict==='function')?m.predict(pb):null;};
+  const Va_d=designPb?predAt('Va',designPb):null;
+  const VMA_d=designPb?predAt('VMA',designPb):null;
+  const VFA_d=designPb?predAt('VFA',designPb):null;
+  const pNini_d=designPb?predAt('pGmmNini',designPb):null;
+  const pNdes_d=designPb?predAt('pGmmNdes',designPb):null;
+  const G={'A':{Nini:7,Ndes:100,Nmax:160},'B':{Nini:8,Ndes:100,Nmax:160},'C':{Nini:8,Ndes:125,Nmax:205},'D':{Nini:8,Ndes:125,Nmax:205},'E':{Nini:9,Ndes:125,Nmax:205}};
+  const gyr=G[info.traffic]||G['B'];
+  function passGrad(sv,v){const b=bands[sv];if(!b)return null;const mn=b[0],mx=b[1];if(mn!==null&&mx!==null)return v>=mn&&v<=mx;if(mn!==null)return v>=mn;if(mx!==null)return v<=mx;return null;}
+  function passCheck(val,t){if(val===null||val===undefined||!t)return null;if(t[0]!==null&&t[1]!==null)return val>=t[0]&&val<=t[1];if(t[0]!==null)return val>=t[0];if(t[1]!==null)return val<=t[1];return null;}
+  function tgtStr(t){if(!t)return'—';if(t[0]!==null&&t[1]!==null)return t[0]+'–'+t[1];if(t[0]!==null)return'≥'+t[0];if(t[1]!==null)return'≤'+t[1];return'—';}
+  const selBlendGrad=selTrial?SIEVES.reduce((o,sv)=>{const pcts=activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};return(parseFloat(selTrial.blendPct[s])||0)*(parseFloat(g[sv])||0)/100;});o[sv]=pcts.reduce((a,b)=>a+b,0);return o;},{}):null;
+
+  const tabNames=['Design Report','Trial Blends','Aggregate Properties','Volumetric Analysis','Design Summary'];
+  const tabBar=`<div style="display:flex;gap:0;margin-bottom:0;border-bottom:2px solid #1f3864">${tabNames.map((t,i)=>`<div class="sp-tab" id="sptab_${i}" onclick="spShowTab(${i})" style="padding:7px 14px;cursor:pointer;font-size:11px;font-weight:700;background:${i===0?'#1f3864':'#eaf0fb'};color:${i===0?'#fff':'#1f3864'};border-radius:6px 6px 0 0;border:1px solid #c5d3ea;border-bottom:${i===0?'2px solid #1f3864':'none'};margin-right:2px;user-select:none">${t}</div>`).join('')}</div>`;
+
+  // ── TAB 0: Design Report ──
+  const tab0=`<div id="sptabcontent_0" style="display:block">
+    <div style="border:2px solid #1f3864;padding:10px 14px;margin-bottom:12px;background:#f7f9fd;border-radius:4px">
+      <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;align-items:start">
+        <div style="font-size:11px;color:#888">Your Organization</div>
+        <div style="text-align:center"><div style="font-size:14px;font-weight:800;color:#1f3864;text-transform:uppercase">Hot Mix Asphalt Mix Design Report</div>
+          <div style="font-size:11px;color:#555;margin-top:2px">${isMUNI?'OPSS.MUNI 1151':'OPSS.PROV 1151'} — ${mt||'—'}</div></div>
+        <div style="text-align:right;font-size:11px"><div><strong>Mix Design No.:</strong> ${info.mixNo||'—'}</div>
+          <div style="margin-top:3px"><strong>Date:</strong> <input type="date" value="${rd.dateCompleted||''}" onchange="saveRD('dateCompleted',this.value)" style="font-size:11px;border:none;border-bottom:1px solid #aaa;background:transparent"></div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+        <div class="st" style="margin-bottom:8px;font-size:12px">Project Information</div>
+        ${[['Owner / Municipality',info.muni],['Customer',info.customer],['Project Name',info.project],['Contract No.',info.contractNo],['Location / Road',info.location],['Region',info.region],['Item No.',info.itemNo]].map(([l,v])=>`<div style="display:grid;grid-template-columns:140px 1fr;padding:3px 0;border-bottom:1px solid #f0f0f0;font-size:11px"><span style="font-weight:700;color:#555;text-transform:uppercase;font-size:10px">${l}</span><span>${v||'—'}</span></div>`).join('')}
+      </div>
+      <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+        <div class="st" style="margin-bottom:8px;font-size:12px">Mix Design Information</div>
+        ${[['Mix Type',`${mt}${info.hasRAP==='Yes'?' + RAP':''}`],['Traffic Category',info.traffic],['PGAC',info.pgac],['Specification',specCite(info,'VolProps')],['N<sub>ini</sub>',gyr.Nini],['N<sub>des</sub>',gyr.Ndes],['N<sub>max</sub>',gyr.Nmax],['Date Started',info.dateStarted||'—'],['Date Collected',info.dateCollected||'—']].map(([l,v])=>`<div style="display:grid;grid-template-columns:140px 1fr;padding:3px 0;border-bottom:1px solid #f0f0f0;font-size:11px"><span style="font-weight:700;color:#555;text-transform:uppercase;font-size:10px">${l}</span><span>${v||'—'}</span></div>`).join('')}
+      </div>
+    </div>
+    <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
+      <div class="st" style="margin-bottom:8px;font-size:12px">Design Results — Design Pb = ${designPb?designPb.toFixed(1)+'%':'Not Set'}</div>
+      ${designPb&&pts.length?`<table class="agg-table" style="width:100%"><thead><tr><th>Parameter</th><th>Design Value</th><th>Specification Requirement</th><th>Status</th></tr></thead><tbody>
+        ${[['Design Pb (%)',designPb?designPb.toFixed(1):'—',null,null],['Va (%)',Va_d?Va_d.toFixed(1):'—',tgt.Va,passCheck(Va_d,tgt.Va)],['VMA (%)',VMA_d?VMA_d.toFixed(1):'—',tgt.VMA,passCheck(VMA_d,tgt.VMA)],['VFA (%)',VFA_d?VFA_d.toFixed(1):'—',tgt.VFA,passCheck(VFA_d,tgt.VFA)],['%Gmm @ N<sub>ini</sub>',pNini_d?pNini_d.toFixed(1):'—',tgt.pGmmNini,passCheck(pNini_d,tgt.pGmmNini)],['%Gmm @ N<sub>des</sub>',pNdes_d?pNdes_d.toFixed(1):'—',tgt.pGmmNdes,passCheck(pNdes_d,tgt.pGmmNdes)]].map(([lbl,val,t,p])=>`<tr><td style="font-weight:600">${lbl}</td><td style="text-align:center;font-weight:700;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${val}</td><td style="text-align:center">${tgtStr(t)}</td><td style="text-align:center">${p===null?'—':p?'<span class="pass">PASS</span>':'<span class="fail">FAIL</span>'}</td></tr>`).join('')}
+      </tbody></table>`:'<div class="wbox">Complete Property Curves to view design results.</div>'}
+    </div>
+    ${selTrial&&selBlendGrad?`<div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+      <div class="st" style="margin-bottom:8px;font-size:12px">Selected Blend Gradation — Trial ${selTrial.id} (Pb ${selTrial.Pb.toFixed(1)}%)</div>
+      <div style="overflow-x:auto"><table class="agg-table" style="width:100%"><thead><tr><th>Source</th>${RPT_SIEVES.map(sv=>`<th>${sv}</th>`).join('')}</tr></thead><tbody>
+        ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};return`<tr><td style="font-weight:600;white-space:nowrap">${s}: ${a.material||'—'} (${(parseFloat(selTrial.blendPct[s])||0).toFixed(1)}%)</td>${RPT_SIEVES.map(sv=>`<td style="text-align:center">${g[sv]!==undefined&&g[sv]!==null?parseFloat(g[sv]).toFixed(1):'—'}</td>`).join('')}</tr>`;}).join('')}
+        <tr style="background:#eaf0fb;font-weight:700"><td>Blend</td>${RPT_SIEVES.map(sv=>{const v=selBlendGrad[sv];const p=passGrad(sv,v);return`<td style="text-align:center;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${v!==undefined?v.toFixed(1):'—'}</td>`;}).join('')}</tr>
+        ${Object.keys(bands).length?`<tr style="background:#f7f9fd;font-size:10px"><td>Spec Min</td>${RPT_SIEVES.map(sv=>{const b=bands[sv];return`<td style="text-align:center">${b&&b[0]!==null?b[0]:'—'}</td>`;}).join('')}</tr><tr style="background:#f7f9fd;font-size:10px"><td>Spec Max</td>${RPT_SIEVES.map(sv=>{const b=bands[sv];return`<td style="text-align:center">${b&&b[1]!==null?b[1]:'—'}</td>`;}).join('')}</tr>`:''}
+      </tbody></table></div>
+    </div>`:'<div class="wbox">Select a trial blend (Step 6) to view gradation.</div>'}
+  </div>`;
+
+  // ── TAB 1: Trial Blends ──
+  const tab1=`<div id="sptabcontent_1" style="display:none">
+    <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+      <div class="st" style="margin-bottom:8px;font-size:12px">Trial Blend Gradations</div>
+      ${ms.trials.length?ms.trials.map((trial,ti)=>{
+        const bg=SIEVES.reduce((o,sv)=>{const pcts=activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};return(parseFloat(trial.blendPct[s])||0)*(parseFloat(g[sv])||0)/100;});o[sv]=pcts.reduce((a,b)=>a+b,0);return o;},{});
+        return`<div style="margin-bottom:14px"><div style="font-weight:700;color:#1f3864;font-size:12px;margin-bottom:4px">Trial ${trial.id||ti+1} — Pb ${trial.Pb?trial.Pb.toFixed(1):'—'}%${ms.selectedTrialIdx===ti?' <span style="background:#f0b429;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;vertical-align:middle">SELECTED</span>':''}</div>
+        <div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:10px"><thead><tr><th>Source</th>${RPT_SIEVES.map(sv=>`<th>${sv}</th>`).join('')}</tr></thead><tbody>
+          ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};const pct=parseFloat(trial.blendPct[s])||0;return`<tr><td style="white-space:nowrap">${s}: ${a.material||'—'} (${pct.toFixed(1)}%)</td>${RPT_SIEVES.map(sv=>`<td style="text-align:center">${g[sv]!==undefined&&g[sv]!==null?parseFloat(g[sv]).toFixed(1):'—'}</td>`).join('')}</tr>`;}).join('')}
+          <tr style="background:#eaf0fb;font-weight:700"><td>Blend</td>${RPT_SIEVES.map(sv=>{const v=bg[sv];const p=passGrad(sv,v);return`<td style="text-align:center;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${v!==undefined?v.toFixed(1):'—'}</td>`;}).join('')}</tr>
+        </tbody></table></div></div>`;
+      }).join(''):'<div class="wbox">No trial blends entered yet.</div>'}
+      ${Object.keys(bands).length?`<div style="margin-top:8px;border:1px solid #c5d3ea;border-radius:4px;padding:8px"><div style="font-weight:700;font-size:11px;color:#1f3864;margin-bottom:4px">Specification Bands (${mt})</div>
+      <div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:10px"><thead><tr><th>Limit</th>${RPT_SIEVES.map(sv=>`<th>${sv}</th>`).join('')}</tr></thead><tbody>
+        <tr><td>Min</td>${RPT_SIEVES.map(sv=>{const b=bands[sv];return`<td style="text-align:center">${b&&b[0]!==null?b[0]:'—'}</td>`;}).join('')}</tr>
+        <tr><td>Max</td>${RPT_SIEVES.map(sv=>{const b=bands[sv];return`<td style="text-align:center">${b&&b[1]!==null?b[1]:'—'}</td>`;}).join('')}</tr>
+      </tbody></table></div></div>`:''}
+    </div>
+  </div>`;
+
+  // ── TAB 2: Aggregate Properties ──
+  const tab2=`<div id="sptabcontent_2" style="display:none">
+    <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
+      <div class="st" style="margin-bottom:8px;font-size:12px">Aggregate Sources & Properties</div>
+      <div style="overflow-x:auto"><table class="agg-table" style="width:100%"><thead><tr><th>Slot</th><th>Material</th><th>Supplier</th><th>Source/Pit</th><th>Inv. No.</th><th>Gsb</th><th>Gsa</th><th>Abs. (%)</th><th>Blend %</th></tr></thead><tbody>
+        ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const gsb=eff(a,'Gsb'),gsa=eff(a,'Gsa'),abs=eff(a,'wa');const blendPct=selTrial?parseFloat(selTrial.blendPct[s])||0:null;
+          return`<tr><td style="font-weight:700">${s}</td><td>${a.material||'—'}</td>
+          <td><input type="text" value="${(rd.aggSupplier||{})[s]||''}" onchange="saveRDNested('aggSupplier','${s}',this.value)" style="width:90px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
+          <td><input type="text" value="${(rd.aggSource||{})[s]||''}" onchange="saveRDNested('aggSource','${s}',this.value)" style="width:80px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
+          <td><input type="text" value="${(rd.aggInvNo||{})[s]||''}" onchange="saveRDNested('aggInvNo','${s}',this.value)" style="width:70px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
+          <td style="text-align:center">${gsb?parseFloat(gsb).toFixed(3):'—'}</td>
+          <td style="text-align:center">${gsa?parseFloat(gsa).toFixed(3):'—'}</td>
+          <td style="text-align:center">${abs?parseFloat(abs).toFixed(2):'—'}</td>
+          <td style="text-align:center;font-weight:700">${blendPct!==null?blendPct.toFixed(1)+'%':'—'}</td></tr>`;}).join('')}
+      </tbody></table></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+        <div class="st" style="margin-bottom:8px;font-size:12px">Consensus & Source Properties</div>
+        ${(()=>{const agg=ms.aggTesting;const ff=agg?agg.ff:null,fe=agg?agg.fe:null,se=agg?agg.se:null;
+          return[['Fractured Faces (%)',ff?parseFloat(ff).toFixed(1):null,'<input type="text" value="'+(rd.fracturedResult||'')+'" onchange="saveRD(\'fracturedResult\',this.value)" style="width:80px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">'],
+          ['Sand Equiv. (%)',se?parseFloat(se).toFixed(1):null,'<input type="number" step="0.1" value="'+(rd.sandEq||'')+'" onchange="saveRD(\'sandEq\',parseFloat(this.value)||null)" style="width:70px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">'],
+          ['Flat & Elongated (%)',fe?parseFloat(fe).toFixed(1):null,'<input type="number" step="0.1" value="'+(rd.feResult||'')+'" onchange="saveRD(\'feResult\',parseFloat(this.value)||null)" style="width:70px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">'],
+          ].map(([lbl,auto,inp])=>`<div style="display:grid;grid-template-columns:150px 50px 1fr;gap:4px;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:11px"><span style="font-weight:600">${lbl}</span><span style="text-align:center;font-weight:700">${auto||'—'}</span>${inp}</div>`).join('');
+        })()}
+      </div>
+      <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+        <div class="st" style="margin-bottom:8px;font-size:12px">Anti-Stripping Treatment</div>
+        <div style="display:grid;grid-template-columns:120px 1fr;gap:6px;align-items:center;font-size:11px">
+          <label style="font-weight:600">Required:</label>
+          <select onchange="saveRD('astRequired',this.value);render()" style="font-size:11px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">
+            <option value="No" ${(rd.astRequired||'No')==='No'?'selected':''}>No</option>
+            <option value="Yes" ${rd.astRequired==='Yes'?'selected':''}>Yes</option>
+          </select>
+          ${rd.astRequired==='Yes'?`<label style="font-weight:600">Treatment:</label>
+          <input type="text" value="${rd.astTreatment||''}" onchange="saveRD('astTreatment',this.value)" style="font-size:11px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">
+          <label style="font-weight:600">Supplier:</label>
+          <input type="text" value="${rd.astSupplier||''}" onchange="saveRD('astSupplier',this.value)" style="font-size:11px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">
+          <label style="font-weight:600">Type:</label>
+          <input type="text" value="${rd.astType||''}" onchange="saveRD('astType',this.value)" style="font-size:11px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">
+          <label style="font-weight:600">Dosage (%):</label>
+          <input type="number" step="0.01" value="${rd.astDosage||''}" onchange="saveRD('astDosage',parseFloat(this.value)||null)" style="width:80px;font-size:11px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">`:'<span style="grid-column:1/-1;color:#888;font-size:10px">Not required</span>'}
+        </div>
+      </div>
+    </div>
+    ${ms.tsrBatch&&ms.tsrBatch.tsr!=null?`<div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px"><div class="st" style="margin-bottom:6px;font-size:12px">TSR (Moisture Susceptibility)</div>
+      <div style="font-size:12px"><strong>TSR Result:</strong> ${ms.tsrBatch.tsr.toFixed(1)}% <span style="margin-left:8px" class="${ms.tsrBatch.tsr>=70?'pass':'fail'}">${ms.tsrBatch.tsr>=70?'PASS (≥70%)':'FAIL (<70%)'}</span></div>
+    </div>`:''}
+  </div>`;
+
+  // ── TAB 3: Volumetric Analysis ──
+  const tab3=`<div id="sptabcontent_3" style="display:none">
+    <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
+      <div class="st" style="margin-bottom:8px;font-size:12px">Binder Content Selection — AC Point Results</div>
+      ${pts.length?`<div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:11px">
+        <thead><tr><th>Pb (%)</th><th>Va (%)</th><th>VMA (%)</th><th>VFA (%)</th><th>Gmb @Ndes</th><th>Gmm</th><th>Gse</th><th>%Gmm Nini</th><th>%Gmm Ndes</th><th>DP</th></tr></thead>
+        <tbody>${pts.map(p=>{const isSel=designPb&&Math.abs(p.Pb-designPb)<0.05;return`<tr ${isSel?'style="background:#fff9e6;font-weight:700"':''}>
+          <td style="font-weight:700">${p.Pb.toFixed(1)}%</td>
+          <td style="color:${passCheck(p.Va,tgt.Va)?'#1a6b1a':passCheck(p.Va,tgt.Va)===false?'#c0392b':'#333'}">${p.Va.toFixed(1)}</td>
+          <td style="color:${passCheck(p.VMA,tgt.VMA)?'#1a6b1a':passCheck(p.VMA,tgt.VMA)===false?'#c0392b':'#333'}">${p.VMA.toFixed(1)}</td>
+          <td style="color:${passCheck(p.VFA,tgt.VFA)?'#1a6b1a':passCheck(p.VFA,tgt.VFA)===false?'#c0392b':'#333'}">${p.VFA?p.VFA.toFixed(1):'—'}</td>
+          <td>${p.avgGmb.toFixed(3)}</td><td>${p.Gmm?p.Gmm.toFixed(3):'—'}</td><td>${p.Gse?p.Gse.toFixed(3):'—'}</td>
+          <td style="color:${passCheck(p.pGmmNini,tgt.pGmmNini)?'#1a6b1a':passCheck(p.pGmmNini,tgt.pGmmNini)===false?'#c0392b':'#333'}">${p.pGmmNini?p.pGmmNini.toFixed(1):'—'}</td>
+          <td style="color:${passCheck(p.pGmmNdes,tgt.pGmmNdes)?'#1a6b1a':passCheck(p.pGmmNdes,tgt.pGmmNdes)===false?'#c0392b':'#333'}">${p.pGmmNdes?p.pGmmNdes.toFixed(1):'—'}</td>
+          <td>${p.DP?p.DP.toFixed(2):'—'}</td></tr>`;}).join('')}
+        </tbody></table></div>
+      <div style="margin-top:8px;font-size:10px;color:#888">Va = 4.0% target | VMA ≥ ${tgt.VMA?tgt.VMA[0]:'—'}% | VFA ${tgtStr(tgt.VFA)} | %Gmm@Ndes ${tgtStr(tgt.pGmmNdes)} | %Gmm@Nini ${tgtStr(tgt.pGmmNini)}</div>
+      `:'<div class="wbox">No AC point data yet. Complete Step 7 (Selected Volumetrics).</div>'}
+    </div>
+    ${pts.length&&designPb?`<div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
+      <div class="st" style="margin-bottom:8px;font-size:12px">Predicted Values at Design Pb = ${designPb.toFixed(1)}%</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px">
+        ${[['Va (%)',Va_d,tgt.Va],['VMA (%)',VMA_d,tgt.VMA],['VFA (%)',VFA_d,tgt.VFA],['%Gmm Nini',pNini_d,tgt.pGmmNini],['%Gmm Ndes',pNdes_d,tgt.pGmmNdes]].map(([lbl,val,t])=>{
+          const p=passCheck(val,t);
+          return`<div class="mc" style="border-color:${p===null?'#d4dcf0':p?'#a7d9a7':'#ffc7ce'}"><div class="ml">${lbl}</div>
+            <div class="mv" style="font-size:18px;color:${p===null?'#1f3864':p?'#1a6b1a':'#c0392b'}">${val!==null?val.toFixed(1):'—'}</div>
+            ${p!==null?`<div>${p?'<span class="pass">PASS</span>':'<span class="fail">FAIL</span>'}</div>`:''}
+            ${t?`<div class="ms">Target: ${tgtStr(t)}</div>`:''}</div>`;}).join('')}
+      </div>
+    </div>`:''}
+  </div>`;
+
+  // ── TAB 4: Design Summary ──
+  const tab4=`<div id="sptabcontent_4" style="display:none">
+    <div style="border:2px solid #1f3864;border-radius:6px;padding:12px;margin-bottom:12px;background:#f7f9fd">
+      <div style="text-align:center;font-weight:800;font-size:14px;color:#1f3864;margin-bottom:12px;text-transform:uppercase">Mix Design Summary — ${info.mixNo||'—'}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          <div style="font-weight:700;font-size:12px;color:#1f3864;border-bottom:2px solid #1f3864;margin-bottom:6px;padding-bottom:3px">Mix Identification</div>
+          ${[['Mix Design No.',info.mixNo],['Mix Type',mt+(info.hasRAP==='Yes'?' + RAP':'')],['Traffic Cat.',info.traffic],['PGAC',info.pgac],['N<sub>des</sub>',gyr.Ndes],['Municipality',info.muni],['Specification',isMUNI?'OPSS.MUNI 1151':'OPSS.PROV 1151'],['Customer',info.customer],['Project',info.project]].map(([l,v])=>`<div style="display:grid;grid-template-columns:140px 1fr;padding:3px 0;border-bottom:1px solid #eee;font-size:11px"><span style="font-weight:700;color:#555;text-transform:uppercase;font-size:10px">${l}</span><span>${v||'—'}</span></div>`).join('')}
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:12px;color:#1f3864;border-bottom:2px solid #1f3864;margin-bottom:6px;padding-bottom:3px">Design Values vs. Specification</div>
+          ${designPb&&Va_d!==null?[['Design Pb (%)',designPb.toFixed(1),null,null],['Va (%)',Va_d.toFixed(1),tgt.Va,passCheck(Va_d,tgt.Va)],['VMA (%)',VMA_d?VMA_d.toFixed(1):'—',tgt.VMA,passCheck(VMA_d,tgt.VMA)],['VFA (%)',VFA_d?VFA_d.toFixed(1):'—',tgt.VFA,passCheck(VFA_d,tgt.VFA)],['%Gmm @N<sub>des</sub>',pNdes_d?pNdes_d.toFixed(1):'—',tgt.pGmmNdes,passCheck(pNdes_d,tgt.pGmmNdes)],['%Gmm @N<sub>ini</sub>',pNini_d?pNini_d.toFixed(1):'—',tgt.pGmmNini,passCheck(pNini_d,tgt.pGmmNini)]].map(([l,v,t,p])=>`<div style="display:grid;grid-template-columns:140px 50px 80px 50px;gap:4px;padding:3px 0;border-bottom:1px solid #eee;font-size:11px;align-items:center">
+            <span style="font-weight:700;color:#555;text-transform:uppercase;font-size:10px">${l}</span>
+            <span style="font-weight:700;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${v}</span>
+            <span style="font-size:10px;color:#888">${tgtStr(t)}</span>
+            <span>${p===null?'':'<span class="'+(p?'pass':'fail')+'">'+(p?'PASS':'FAIL')+'</span>'}</span>
+          </div>`).join(''):'<div class="wbox" style="margin:0">Set Design Pb and complete property curves.</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="fg" style="margin-bottom:12px">
+      <label>Design Notes</label>
+      <textarea class="notes-area" onchange="ms.notes=this.value;saveDB()" onblur="ms.notes=this.value;saveDB()" placeholder="Key decisions, special conditions, deviations from standard practice...">${ms.notes||''}</textarea>
+    </div>
+    <div class="row" style="justify-content:space-between;margin-top:4px">
+      <button class="btn" onclick="ms.step=12;render()">← Back to Consensus</button>
+      <div class="row" style="gap:8px">
+        <button class="btn" onclick="printStep('Mix Design Report')">🖨 Print Report</button>
+        <button class="btn btn-gold" onclick="saveMix('In Progress')">Save — In Progress</button>
+        <button class="btn btn-primary" onclick="saveMix('Complete')">💾 Save Complete</button>
+      </div>
+    </div>
+  </div>`;
+
+  return`<div class="card card-blue">
+    <div class="st" style="margin-bottom:4px">Mix Design Report — ${info.mixNo||'(No Mix No.)'}</div>
+    <div style="font-size:10px;color:#1f3864;font-weight:600;margin-bottom:12px;opacity:0.7">${isMUNI?'OPSS.MUNI 1151':'OPSS.PROV 1151'} — ${mt||'—'} — Traffic Category ${info.traffic||'—'}</div>
+    ${tabBar}
+    <div style="border:1px solid #c5d3ea;border-top:none;padding:14px;border-radius:0 0 6px 6px;background:#fff">
+      ${tab0}${tab1}${tab2}${tab3}${tab4}
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // REPORT GENERATION — Superpave template
 // ═══════════════════════════════════════════════════════════════
 
