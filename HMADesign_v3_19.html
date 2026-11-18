@@ -10136,6 +10136,9 @@ function generateReport(mixId){
     selectedTrialIdx:mix.selectedTrialIdx??null,acPoints:mix.acPoints||[],
     designPb:mix.designPb||null,propertyCurves:mix.propertyCurves||{}});
 
+  // Rebuild predict functions — they don't survive JSON serialization
+  computePropertyCurves();
+
   const info=ms.info;
   const fam=info.family||'Superpave';
   const selTrial=ms.selectedTrialIdx!==null?ms.trials[ms.selectedTrialIdx]:null;
