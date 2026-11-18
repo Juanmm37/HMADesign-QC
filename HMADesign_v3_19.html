@@ -9998,12 +9998,14 @@ function renderSPFullReport(){
   const tab2=`<div id="sptabcontent_2" style="display:${_spActiveTab===2?'block':'none'}">
     <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
       <div class="st" style="margin-bottom:8px;font-size:12px">Aggregate Sources & Properties</div>
-      <div style="overflow-x:auto"><table class="agg-table" style="width:100%"><thead><tr><th>Slot</th><th>Material</th><th>Supplier</th><th>Source/Pit</th><th>Inv. No.</th><th>Gsb</th><th>Gsa</th><th>Abs. (%)</th><th>Blend %</th></tr></thead><tbody>
+      <div style="overflow-x:auto"><table class="agg-table" style="width:100%"><thead><tr><th style="min-width:50px">Slot</th><th style="min-width:110px">Material</th><th style="min-width:100px">Supplier</th><th style="min-width:160px">Source / Pit</th><th style="min-width:80px">Inv. No.</th><th>Gsb</th><th>Gsa</th><th>Abs. (%)</th><th>Blend %</th></tr></thead><tbody>
         ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const gsb=eff(a,'Gsb'),gsa=eff(a,'Gsa'),abs=eff(a,'wa');const blendPct=selTrial?parseFloat(selTrial.blendPct[s])||0:null;
+          const supVal=(rd.aggSupplier||{})[s]!=null?(rd.aggSupplier||{})[s]:(a.supplier||'');
+          const srcVal=(rd.aggSource||{})[s]!=null?(rd.aggSource||{})[s]:(a.source||'');
           return`<tr><td style="font-weight:700">${s}</td><td>${a.material||'—'}</td>
-          <td><input type="text" value="${(rd.aggSupplier||{})[s]||''}" onchange="saveRDNested('aggSupplier','${s}',this.value)" style="width:90px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
-          <td><input type="text" value="${(rd.aggSource||{})[s]||''}" onchange="saveRDNested('aggSource','${s}',this.value)" style="width:80px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
-          <td><input type="text" value="${(rd.aggInvNo||{})[s]||''}" onchange="saveRDNested('aggInvNo','${s}',this.value)" style="width:70px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
+          <td><input type="text" value="${supVal.replace(/"/g,'&quot;')}" onchange="saveRDNested('aggSupplier','${s}',this.value)" style="width:95px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
+          <td><input type="text" value="${srcVal.replace(/"/g,'&quot;')}" onchange="saveRDNested('aggSource','${s}',this.value)" style="width:155px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
+          <td><input type="text" value="${(rd.aggInvNo||{})[s]||''}" onchange="saveRDNested('aggInvNo','${s}',this.value)" style="width:75px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
           <td style="text-align:center">${gsb?parseFloat(gsb).toFixed(3):'—'}</td>
           <td style="text-align:center">${gsa?parseFloat(gsa).toFixed(3):'—'}</td>
           <td style="text-align:center">${abs?parseFloat(abs).toFixed(2):'—'}</td>
@@ -10012,13 +10014,34 @@ function renderSPFullReport(){
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
       <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
-        <div class="st" style="margin-bottom:8px;font-size:12px">Consensus & Source Properties</div>
-        ${(()=>{const agg=ms.aggTesting;const ff=agg?agg.ff:null,fe=agg?agg.fe:null,se=agg?agg.se:null;
-          return[['Fractured Faces (%)',ff?parseFloat(ff).toFixed(1):null,'<input type="text" value="'+(rd.fracturedResult||'')+'" onchange="saveRD(\'fracturedResult\',this.value)" style="width:80px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">'],
-          ['Sand Equiv. (%)',se?parseFloat(se).toFixed(1):null,'<input type="number" step="0.1" value="'+(rd.sandEq||'')+'" onchange="saveRD(\'sandEq\',parseFloat(this.value)||null)" style="width:70px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">'],
-          ['Flat & Elongated (%)',fe?parseFloat(fe).toFixed(1):null,'<input type="number" step="0.1" value="'+(rd.feResult||'')+'" onchange="saveRD(\'feResult\',parseFloat(this.value)||null)" style="width:70px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px">'],
-          ].map(([lbl,auto,inp])=>`<div style="display:grid;grid-template-columns:150px 50px 1fr;gap:4px;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:11px"><span style="font-weight:600">${lbl}</span><span style="text-align:center;font-weight:700">${auto||'—'}</span>${inp}</div>`).join('');
+        <div class="st" style="margin-bottom:8px;font-size:12px">Consensus Properties (from Step 12)</div>
+        ${(()=>{const at=ms.aggTesting||{};
+          function cpRow(lbl,val,criteria,passOk){
+            const v=val!==null&&val!==undefined?parseFloat(val):null;
+            const disp=v!==null?v.toFixed(1):'<span style="color:#bbb">—</span>';
+            const badge=v!==null?(passOk?'<span class="pass">PASS</span>':'<span class="fail">FAIL</span>'):'';
+            return`<div style="display:grid;grid-template-columns:1fr 48px 80px 50px;gap:4px;align-items:center;padding:4px 0;border-bottom:1px solid #f0f0f0;font-size:11px">
+              <span style="font-weight:600">${lbl}</span>
+              <span style="text-align:center;font-weight:700">${disp}</span>
+              <span style="text-align:center;color:#666;font-size:10px">${criteria}</span>
+              <span style="text-align:center">${badge}</span></div>`;
+          }
+          const se=at.sandEq!=null?at.sandEq:null;
+          const uvc=at.uvContent!=null?at.uvContent:null;
+          const fe=at.fe!=null?at.fe:null;
+          const fp1s=at.fpSh1!=null?at.fpSh1:null;
+          const fp2s=at.fpSh2!=null?at.fpSh2:null;
+          const fp1d=at.fpDp1!=null?at.fpDp1:null;
+          const fp2d=at.fpDp2!=null?at.fpDp2:null;
+          return cpRow('Sand Equivalent (%)',se,'≥ 45%',se!==null&&se>=45)
+               + cpRow('Uncompacted Void Content (%)',uvc,'≥ 43%',uvc!==null&&uvc>=43)
+               + cpRow('Flat & Elongated (%)',fe,'≤ 10%',fe!==null&&fe<=10)
+               + cpRow('Fractured — 1-face ≤100mm (%)',fp1s,'≥ 95%',fp1s!==null&&fp1s>=95)
+               + cpRow('Fractured — 2-face ≤100mm (%)',fp2s,'≥ 90%',fp2s!==null&&fp2s>=90)
+               + cpRow('Fractured — 1-face >100mm (%)',fp1d,'≥ 80%',fp1d!==null&&fp1d>=80)
+               + cpRow('Fractured — 2-face >100mm (%)',fp2d,'≥ 75%',fp2d!==null&&fp2d>=75);
         })()}
+        <div style="margin-top:6px;font-size:10px;color:#888">Edit values in Step 12 — Consensus Properties</div>
       </div>
       <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
         <div class="st" style="margin-bottom:8px;font-size:12px">Anti-Stripping Treatment</div>
