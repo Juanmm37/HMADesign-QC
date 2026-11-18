@@ -6498,7 +6498,11 @@ function produceReportPDF(mixId){
 
   // JMF gradation row
   const selTrial=trials[selIdx]||trials[0]||null;
-  const jmfGrad=SIEVES_COVER.map(sv=>selTrial?_blendGrad(selTrial,sv):null);
+  const jmfGrad=SIEVES_COVER.map(sv=>{
+    const v=selTrial?_blendGrad(selTrial,sv):null;
+    if(v==null&&(sv==='25'||sv==='19'))return 100;
+    return v;
+  });
   const jmfRow=jmfGrad.map(v=>_td(_ed(v,1))).join('');
 
   // Blended Gsb (combined)
