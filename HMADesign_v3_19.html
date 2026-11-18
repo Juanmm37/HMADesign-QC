@@ -6953,7 +6953,7 @@ function produceReportPDF(mixId){
       ${trialGradRows}
       <tr style="background:#DCE6F1;font-weight:bold">
         ${_td('SPECIFICATION')}
-        ${SIEVES_P2.map(_=>_td('')).join('')}
+        ${(()=>{const gb=getBands(mix);return SIEVES_P2.map(sv=>{const b=gb[sv];if(!b)return _td('');const lbl=b[0]===b[1]?String(b[0]):`${b[0]} - ${b[1]}`;return _td(lbl);}).join('');})()}
       </tr>
     </table></div>
     <div style="font-size:6.5pt;font-style:italic;margin-bottom:4px">Note: Allowable range for fine graded mixes. For coarse graded mixes the allowable range for 4.75 mm is 45-55 and for the 2.36 mm is 28-58 percent passing.</div>
