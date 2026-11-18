@@ -6683,18 +6683,22 @@ function produceReportPDF(mixId){
     </div>
 
     <!-- Mix info fields -->
-    <div style="display:flex;gap:12px;margin-bottom:6px;font-family:Arial;font-size:8pt">
+    <div style="display:flex;gap:16px;margin-bottom:6px;font-family:Arial;font-size:8pt">
       <div style="flex:1">
-        <div><b>CUSTOMER:</b> ${_edStr(mix.customer||'')}</div>
-        <div><b>PROJECT:</b> ${_edStr(mix.project||'')}</div>
-        <div><b>LOCATION:</b> ${_edStr(mix.location||'')}</div>
-        <div><b>ITEM NO.:</b> ${_edStr(mix.itemNo||'')}</div>
+        <table style="border:none;border-collapse:collapse;width:100%">
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">CUSTOMER:</td><td style="border:none;vertical-align:middle">${_edStr(mix.customer||'')}</td></tr>
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">PROJECT:</td><td style="border:none;vertical-align:middle">${_edStr(mix.project||'')}</td></tr>
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">LOCATION:</td><td style="border:none;vertical-align:middle">${_edStr(mix.location||'')}</td></tr>
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">ITEM NO.:</td><td style="border:none;vertical-align:middle">${_edStr(mix.itemNo||'')}</td></tr>
+        </table>
       </div>
       <div style="flex:1">
-        <div><b>DATE SAMPLES COLLECTED:</b> ${_edStr(_fmtD(mix.dateCollected))}</div>
-        <div><b>DATE DESIGN COMPLETED:</b> ${_edStr(_fmtD(mix.dateCompleted))}</div>
-        <div><b>MIX TYPE:</b> ${_edStr(mix.mixType||'')}</div>
-        <div><b>TRAFFIC CATEGORY:</b> ${_edStr(mix.traffic||'')}</div>
+        <table style="border:none;border-collapse:collapse;width:100%">
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">DATE SAMPLES COLLECTED:</td><td style="border:none;vertical-align:middle">${_edStr(_fmtD(mix.dateCollected))}</td></tr>
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">DATE DESIGN COMPLETED:</td><td style="border:none;vertical-align:middle">${_edStr(_fmtD(mix.dateCompleted))}</td></tr>
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">MIX TYPE:</td><td style="border:none;vertical-align:middle">${_edStr(mix.mixType||'')}</td></tr>
+          <tr style="height:20px"><td style="border:none;font-weight:bold;padding:1px 6px 1px 0;white-space:nowrap;vertical-align:middle">TRAFFIC CATEGORY:</td><td style="border:none;vertical-align:middle">${_edStr(mix.traffic||'')}</td></tr>
+        </table>
       </div>
     </div>
 
