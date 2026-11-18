@@ -10078,12 +10078,12 @@ function renderSPFullReport(){
         <thead><tr><th>Pb (%)</th><th>Va (%)</th><th>VMA (%)</th><th>VFA (%)</th><th>Gmb @Ndes</th><th>Gmm</th><th>Gse</th><th>%Gmm Nini</th><th>%Gmm Ndes</th><th>DP</th></tr></thead>
         <tbody>${pts.map(p=>{const isSel=designPb&&Math.abs(p.Pb-designPb)<0.05;return`<tr ${isSel?'style="background:#fff9e6;font-weight:700"':''}>
           <td style="font-weight:700">${p.Pb.toFixed(1)}%</td>
-          <td style="color:${passCheck(p.Va,tgt.Va)?'#1a6b1a':passCheck(p.Va,tgt.Va)===false?'#c0392b':'#333'}">${p.Va.toFixed(1)}</td>
-          <td style="color:${passCheck(p.VMA,tgt.VMA)?'#1a6b1a':passCheck(p.VMA,tgt.VMA)===false?'#c0392b':'#333'}">${p.VMA.toFixed(1)}</td>
-          <td style="color:${passCheck(p.VFA,tgt.VFA)?'#1a6b1a':passCheck(p.VFA,tgt.VFA)===false?'#c0392b':'#333'}">${p.VFA?p.VFA.toFixed(1):'—'}</td>
+          <td>${p.Va.toFixed(1)}</td>
+          <td>${p.VMA.toFixed(1)}</td>
+          <td>${p.VFA?p.VFA.toFixed(1):'—'}</td>
           <td>${p.avgGmb.toFixed(3)}</td><td>${p.Gmm?p.Gmm.toFixed(3):'—'}</td><td>${p.Gse?p.Gse.toFixed(3):'—'}</td>
-          <td style="color:${passCheck(p.pGmmNini,tgt.pGmmNini)?'#1a6b1a':passCheck(p.pGmmNini,tgt.pGmmNini)===false?'#c0392b':'#333'}">${p.pGmmNini?p.pGmmNini.toFixed(1):'—'}</td>
-          <td style="color:${passCheck(p.pGmmNdes,tgt.pGmmNdes)?'#1a6b1a':passCheck(p.pGmmNdes,tgt.pGmmNdes)===false?'#c0392b':'#333'}">${p.pGmmNdes?p.pGmmNdes.toFixed(1):'—'}</td>
+          <td>${p.pGmmNini?p.pGmmNini.toFixed(1):'—'}</td>
+          <td>${p.pGmmNdes?p.pGmmNdes.toFixed(1):'—'}</td>
           <td>${p.DP?p.DP.toFixed(2):'—'}</td></tr>`;}).join('')}
         </tbody></table></div>
       <div style="margin-top:8px;font-size:10px;color:#888">Va = 4.0% target | VMA ≥ ${tgt.VMA?tgt.VMA[0]:'—'}% | VFA ${tgtStr(tgt.VFA)} | %Gmm@Ndes ${tgtStr(tgt.pGmmNdes)} | %Gmm@Nini ${tgtStr(tgt.pGmmNini)}</div>
