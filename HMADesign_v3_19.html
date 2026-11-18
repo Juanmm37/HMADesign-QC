@@ -5674,13 +5674,13 @@ async function produceReport(mixId){
     if(mix.location)xml=_xmlSetCell(xml,'Z10',mix.location,'s');
     if(mix.itemNo)xml=_xmlSetCell(xml,'D12',mix.itemNo,'s');
 
-    // ── Gyration numbers (Nini / Ndes / Nmax) based on traffic category — cells U34/U39/U44 ──
+    // ── Gyration numbers (Nini / Ndes / Nmax) based on traffic category — cells U29/U30/U31 ──
     const GYR_TC={A:[6,50,75],B:[7,75,115],C:[7,75,115],D:[8,100,160],E:[9,125,205]};
     const gyrVals=mix.traffic&&GYR_TC[mix.traffic]?GYR_TC[mix.traffic]:null;
     if(gyrVals){
-      xml=_xmlSetCell(xml,'U34',gyrVals[0],'n'); // Nini
-      xml=_xmlSetCell(xml,'U39',gyrVals[1],'n'); // Ndes
-      xml=_xmlSetCell(xml,'U44',gyrVals[2],'n'); // Nmax
+      xml=_xmlSetCell(xml,'U29',gyrVals[0],'n'); // Nini
+      xml=_xmlSetCell(xml,'U30',gyrVals[1],'n'); // Ndes
+      xml=_xmlSetCell(xml,'U31',gyrVals[2],'n'); // Nmax
     }
 
     // ── PGAC ──
