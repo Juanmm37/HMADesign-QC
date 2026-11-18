@@ -6390,6 +6390,12 @@ function produceReportPDF(mixId){
     }
     return tot>0?sum/tot:null;
   }
+  function _fmtSieve(s){
+    const n=parseFloat(s);
+    if(n<1)return n.toFixed(3);        // 0.075, 0.150, 0.300, 0.600
+    if(Number.isInteger(n))return n.toFixed(1);  // 16.0, 19.0, 25.0, 37.0
+    return String(n);                  // 9.5, 12.5, 4.75, 2.36, 1.18, 37.5
+  }
 
   // SVG chart helper
   function _svgChart(dataPts,xKey,yKey,title,yMin,yMax,specLines){
