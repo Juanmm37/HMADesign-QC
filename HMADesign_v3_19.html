@@ -9897,6 +9897,7 @@ function saveRD(key,val){if(!ms.reportData)ms.reportData={};ms.reportData[key]=v
 function saveRDNested(obj,slot,val){if(!ms.reportData)ms.reportData={};if(!ms.reportData[obj])ms.reportData[obj]={};ms.reportData[obj][slot]=val;saveDB();}
 
 function spShowTab(n){
+  _spActiveTab=n;
   document.querySelectorAll('[id^="sptabcontent_"]').forEach((el,i)=>{el.style.display='none';});
   document.querySelectorAll('.sp-tab').forEach((el,i)=>{
     el.style.background=i===n?'#1f3864':'#eaf0fb';
