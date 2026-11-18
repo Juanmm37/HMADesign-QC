@@ -9975,19 +9975,19 @@ function renderSPFullReport(){
   </div>`;
 
   // ── TAB 1: Trial Blends ──
-  const tab1=`<div id="sptabcontent_1" style="display:none">
+  const tab1=`<div id="sptabcontent_1" style="display:${_spActiveTab===1?'block':'none'}">
     <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px">
       <div class="st" style="margin-bottom:8px;font-size:12px">Trial Blend Gradations</div>
       ${ms.trials.length?ms.trials.map((trial,ti)=>{
         const bg=SIEVES.reduce((o,sv)=>{const pcts=activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};const raw=g[sv];const passing=(raw!==null&&raw!==undefined)?parseFloat(raw):100;return(parseFloat(trial.blendPct[s])||0)*passing/100;});o[sv]=pcts.reduce((a,b)=>a+b,0);return o;},{});
         return`<div style="margin-bottom:14px"><div style="font-weight:700;color:#1f3864;font-size:12px;margin-bottom:4px">Trial ${trial.id||ti+1} — Pb ${trial.Pb?trial.Pb.toFixed(1):'—'}%${ms.selectedTrialIdx===ti?' <span style="background:#f0b429;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;vertical-align:middle">SELECTED</span>':''}</div>
-        <div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:10px"><thead><tr><th style="min-width:160px">Source</th>${RPT_SIEVES.map(sv=>`<th>${sv}</th>`).join('')}</tr></thead><tbody>
-          ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};const pct=parseFloat(trial.blendPct[s])||0;return`<tr><td style="min-width:160px">${s}: ${a.material||'—'} (${pct.toFixed(1)}%)</td>${RPT_SIEVES.map(sv=>`<td style="text-align:center">${g[sv]!==undefined&&g[sv]!==null?parseFloat(g[sv]).toFixed(1):'—'}</td>`).join('')}</tr>`;}).join('')}
-          <tr style="background:#eaf0fb;font-weight:700"><td>Blend</td>${RPT_SIEVES.map(sv=>{const v=bg[sv];const p=passGrad(sv,v);return`<td style="text-align:center;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${v!==undefined?v.toFixed(1):'—'}</td>`;}).join('')}</tr>
+        <div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:10px"><thead><tr><th style="min-width:140px">Material</th><th style="min-width:90px;font-size:9px">Supplier</th><th style="min-width:36px;text-align:center">%</th>${RPT_SIEVES.map(sv=>`<th style="min-width:30px">${fmtSv(sv)}</th>`).join('')}</tr></thead><tbody>
+          ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};const pct=parseFloat(trial.blendPct[s])||0;const sup=a.supplier||'—';return`<tr><td style="min-width:140px;font-weight:600">${s}: ${a.material||'—'}</td><td style="min-width:90px;font-size:9px;color:#555">${sup}</td><td style="text-align:center;font-weight:700">${pct.toFixed(1)}</td>${RPT_SIEVES.map(sv=>`<td style="text-align:center">${g[sv]!==undefined&&g[sv]!==null?parseFloat(g[sv]).toFixed(1):'—'}</td>`).join('')}</tr>`;}).join('')}
+          <tr style="background:#eaf0fb;font-weight:700"><td>Blend</td><td></td><td style="text-align:center">100</td>${RPT_SIEVES.map(sv=>{const v=bg[sv];const p=passGrad(sv,v);return`<td style="text-align:center;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${v!==undefined?v.toFixed(1):'—'}</td>`;}).join('')}</tr>
         </tbody></table></div></div>`;
       }).join(''):'<div class="wbox">No trial blends entered yet.</div>'}
       ${Object.keys(bands).length?`<div style="margin-top:8px;border:1px solid #c5d3ea;border-radius:4px;padding:8px"><div style="font-weight:700;font-size:11px;color:#1f3864;margin-bottom:4px">Specification Bands (${mt})</div>
-      <div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:10px"><thead><tr><th>Limit</th>${RPT_SIEVES.map(sv=>`<th>${sv}</th>`).join('')}</tr></thead><tbody>
+      <div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:10px"><thead><tr><th>Limit</th>${RPT_SIEVES.map(sv=>`<th>${fmtSv(sv)}</th>`).join('')}</tr></thead><tbody>
         <tr><td>Min</td>${RPT_SIEVES.map(sv=>{const b=bands[sv];return`<td style="text-align:center">${b&&b[0]!==null?b[0]:'—'}</td>`;}).join('')}</tr>
         <tr><td>Max</td>${RPT_SIEVES.map(sv=>{const b=bands[sv];return`<td style="text-align:center">${b&&b[1]!==null?b[1]:'—'}</td>`;}).join('')}</tr>
       </tbody></table></div></div>`:''}
