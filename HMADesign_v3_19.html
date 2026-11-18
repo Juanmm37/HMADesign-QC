@@ -6562,9 +6562,9 @@ function produceReportPDF(mixId){
     </tr>`;
   }).join('');
   const aggSrcTable=`${_tbl()}
-    ${_th(['AGGREGATE TYPE','SUPPLIER','SOURCE','INV. NO.','%','G<sub>sb</sub>','BLENDED G<sub>sb</sub>','G<sub>sa</sub>','% ABS.'])}
+    ${_th(['AGGREGATE TYPE','SUPPLIER/ SOURCE','INV. NO.','%','G<sub>sb</sub>','BLENDED G<sub>sb</sub>','G<sub>sa</sub>','% ABS.'])}
     ${aggSrcRows}
-    <tr><td colspan="4" style="padding:2px 3px;border:1px solid #aaa"></td>
+    <tr><td colspan="3" style="padding:2px 3px;border:1px solid #aaa"></td>
       <td colspan="2" style="padding:2px 3px;border:1px solid #aaa;font-weight:bold;text-align:right">COMBINED G<sub>sb</sub></td>
       ${_td(_ed(combGsb,3),';font-weight:bold')}
       <td colspan="2" style="padding:2px 3px;border:1px solid #aaa"></td>
