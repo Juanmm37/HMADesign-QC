@@ -6960,18 +6960,32 @@ function produceReportPDF(mixId){
 
     <!-- Estimated initial binder + assumed values side by side -->
     <div style="display:flex;gap:8px;margin-top:4px">
-      <div style="flex:2">${_tbl()}
-        <tr style="background:#1F3864;color:white;font-weight:bold">
-          <th colspan="4" style="padding:2px 4px;border:1px solid #aaa;text-align:center">ESTIMATED INITIAL BINDER CONTENT FOR TRIAL BLENDS - AASHTO R 35-15 (APPENDIX X1)</th>
-        </tr>
-        ${_th(['TRIAL NO.','% P<sub>b</sub>','G<sub>b</sub>','% P<sub>s</sub>'],'#2E75B6')}
-        ${trials.map((t,i)=>`<tr>${_td(`TRIAL ${i+1}`,';font-weight:bold')}${_td(_ed(t.Pb,1))}${_td(_ed(mix.Gb||1.022,3))}${_td(_ed(100-(+t.Pb||0),1))}</tr>`).join('')}
-      </table>
-      <div style="font-size:6.5pt;margin-top:2px">* Determined from individual aggregate stockpile samples.</div></div>
+      <div style="flex:2">${(()=>{
+        const Pb_a=5.0,Ps_a=95.0,Gb_a=mix.Gb||1.022,Va_a=0.04;
+        const rows=trials.map((t,i)=>{
+          const gsb=_blendedGsb(t),gsa=_blendedGsa(t);
+          if(!gsb||!gsa)return `<tr>${_td(`TRIAL ${i+1}`,';font-weight:bold')}${[0,1,2,3,4,5,6].map(_=>_td('')).join('')}</tr>`;
+          const gse=gsb+0.8*(gsa-gsb);
+          const Ws=(1-Va_a)/(1/gse+(Pb_a/Ps_a)/Gb_a);
+          const Vba=Ws*(1/gsb-1/gse);
+          const Vbe=(Pb_a/Ps_a)*Ws/Gb_a-Vba;
+          const Vbt=Vba+Vbe;
+          const Pb_ini=Vbt*Gb_a/(Ws+Vbt*Gb_a)*100;
+          return `<tr>${_td(`TRIAL ${i+1}`,';font-weight:bold')}${_td(_ed(gsb,3))}${_td(_ed(gse,3))}${_td(_ed(gsa,3))}${_td(_ed(Vba,4))}${_td(_ed(Vbe,4))}${_td(_ed(Ws,3))}${_td(_ed(Pb_ini,1))}</tr>`;
+        }).join('');
+        return `${_tbl()}
+          <tr style="background:#1F3864;color:white;font-weight:bold">
+            <th colspan="8" style="padding:2px 4px;border:1px solid #aaa;text-align:center">ESTIMATED INITIAL BINDER CONTENT FOR TRIAL BLENDS - AASHTO R 35-15 (APPENDIX X1)</th>
+          </tr>
+          ${_th(['TRIAL NO.','* G<sub>sb</sub>','* G<sub>se</sub>','* G<sub>sa</sub>','V<sub>ba</sub>','V<sub>be</sub>','W<sub>s</sub>','% P<sub>b,ini</sub>'],'#2E75B6')}
+          ${rows}
+        </table>
+        <div style="font-size:6.5pt;font-style:italic;margin-top:1px">* Determined from individual aggregate stockpile samples.</div>`;
+      })()}</div>
       <div style="flex:1"><b style="font-size:7pt">ASSUMED VALUES FOR CALCULATING W<sub>s</sub></b>
       ${_tbl()}
-        <tr>${_tdL('% P<sub>b</sub>')}${_td('5')}${_tdL('G<sub>b</sub>')}${_td('1.022')}</tr>
-        <tr>${_tdL('% P<sub>s</sub>')}${_td('95')}${_tdL('V<sub>a</sub>')}${_td('0.04')}</tr>
+        <tr>${_tdL('% P<sub>b</sub>')}${_td(_ed(5.0,1))}${_tdL('G<sub>b</sub>')}${_td(_ed(mix.Gb||1.022,3))}</tr>
+        <tr>${_tdL('% P<sub>s</sub>')}${_td(_ed(95.0,1))}${_tdL('V<sub>a</sub>')}${_td(_ed(0.04,2))}</tr>
       </table></div>
     </div>
 
