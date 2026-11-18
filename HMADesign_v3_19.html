@@ -10045,7 +10045,7 @@ function renderSPFullReport(){
   </div>`;
 
   // ── TAB 3: Volumetric Analysis ──
-  const tab3=`<div id="sptabcontent_3" style="display:none">
+  const tab3=`<div id="sptabcontent_3" style="display:${_spActiveTab===3?'block':'none'}">
     <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
       <div class="st" style="margin-bottom:8px;font-size:12px">Binder Content Selection — AC Point Results</div>
       ${pts.length?`<div style="overflow-x:auto"><table class="agg-table" style="width:100%;font-size:11px">
