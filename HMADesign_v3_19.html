@@ -9928,7 +9928,7 @@ function renderSPFullReport(){
   function tgtStr(t){if(!t)return'—';if(t[0]!==null&&t[1]!==null)return t[0]+'–'+t[1];if(t[0]!==null)return'≥'+t[0];if(t[1]!==null)return'≤'+t[1];return'—';}
   const selBlendGrad=selTrial?SIEVES.reduce((o,sv)=>{const pcts=activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const g=a.grading||a.gradation||{};const raw=g[sv];const passing=(raw!==null&&raw!==undefined)?parseFloat(raw):100;return(parseFloat(selTrial.blendPct[s])||0)*passing/100;});o[sv]=pcts.reduce((a,b)=>a+b,0);return o;},{}):null;
 
-  const tabNames=['Design Report','Trial Blends','Aggregate Properties','Volumetric Analysis','Design Summary'];
+  const tabNames=['Design Report','Trial Blends','Aggregate Properties','Volumetric Analysis'];
   const tabBar=`<div style="display:flex;gap:0;margin-bottom:0;border-bottom:2px solid #1f3864">${tabNames.map((t,i)=>`<div class="sp-tab" id="sptab_${i}" onclick="spShowTab(${i})" style="padding:7px 14px;cursor:pointer;font-size:11px;font-weight:700;background:${i===_spActiveTab?'#1f3864':'#eaf0fb'};color:${i===_spActiveTab?'#fff':'#1f3864'};border-radius:6px 6px 0 0;border:1px solid #c5d3ea;border-bottom:${i===_spActiveTab?'2px solid #1f3864':'none'};margin-right:2px;user-select:none">${t}</div>`).join('')}</div>`;
   const fmtSv=sv=>Number.isInteger(parseFloat(sv))&&!sv.includes('.')?sv+'.0':sv;
 
