@@ -9999,17 +9999,20 @@ function renderSPFullReport(){
     <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
       <div class="st" style="margin-bottom:8px;font-size:12px">Aggregate Sources & Properties</div>
       <div style="overflow-x:auto"><table class="agg-table" style="width:100%"><thead><tr><th style="min-width:50px">Slot</th><th style="min-width:110px">Material</th><th style="min-width:100px">Supplier</th><th style="min-width:160px">Source / Pit</th><th style="min-width:80px">Inv. No.</th><th>Gsb</th><th>Gsa</th><th>Abs. (%)</th><th>Blend %</th></tr></thead><tbody>
-        ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const gsb=eff(a,'Gsb'),gsa=eff(a,'Gsa'),abs=eff(a,'wa');const blendPct=selTrial?parseFloat(selTrial.blendPct[s])||0:null;
+        ${activeSlots.map(s=>{const a=getAgg(ms.slots[s]);const gsb=eff(a,'Gsb'),gsa=eff(a,'Gsa'),abs=eff(a,'WA');const blendPct=selTrial?parseFloat(selTrial.blendPct[s])||0:null;
           const supVal=(rd.aggSupplier||{})[s]!=null?(rd.aggSupplier||{})[s]:(a.supplier||'');
-          const srcVal=(rd.aggSource||{})[s]!=null?(rd.aggSource||{})[s]:(a.source||'');
-          return`<tr><td style="font-weight:700">${s}</td><td>${a.material||'—'}</td>
-          <td><input type="text" value="${supVal.replace(/"/g,'&quot;')}" onchange="saveRDNested('aggSupplier','${s}',this.value)" style="width:95px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
-          <td><input type="text" value="${srcVal.replace(/"/g,'&quot;')}" onchange="saveRDNested('aggSource','${s}',this.value)" style="width:155px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
-          <td><input type="text" value="${(rd.aggInvNo||{})[s]||''}" onchange="saveRDNested('aggInvNo','${s}',this.value)" style="width:75px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px"></td>
-          <td style="text-align:center">${gsb?parseFloat(gsb).toFixed(3):'—'}</td>
-          <td style="text-align:center">${gsa?parseFloat(gsa).toFixed(3):'—'}</td>
-          <td style="text-align:center">${abs?parseFloat(abs).toFixed(2):'—'}</td>
-          <td style="text-align:center;font-weight:700">${blendPct!==null?blendPct.toFixed(1)+'%':'—'}</td></tr>`;}).join('')}
+          const rawSrc=(rd.aggSource||{})[s]!=null?(rd.aggSource||{})[s]:(a.source||'');
+          const sup=supVal.trim();
+          const srcVal=sup&&rawSrc.startsWith(sup+' - ')?rawSrc.slice(sup.length+3):rawSrc;
+          const tc='text-align:center';
+          return`<tr><td style="font-weight:700;${tc}">${s}</td><td style="${tc}">${a.material||'—'}</td>
+          <td style="${tc}"><input type="text" value="${supVal.replace(/"/g,'&quot;')}" onchange="saveRDNested('aggSupplier','${s}',this.value)" style="width:90px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px;text-align:center"></td>
+          <td style="${tc}"><input type="text" value="${srcVal.replace(/"/g,'&quot;')}" onchange="saveRDNested('aggSource','${s}',this.value)" style="width:150px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px;text-align:center"></td>
+          <td style="${tc}"><input type="text" value="${(rd.aggInvNo||{})[s]||''}" onchange="saveRDNested('aggInvNo','${s}',this.value)" style="width:72px;font-size:10px;padding:2px 4px;border:1px solid #d0d5dd;border-radius:3px;text-align:center"></td>
+          <td style="${tc}">${gsb!=null?parseFloat(gsb).toFixed(3):'—'}</td>
+          <td style="${tc}">${gsa!=null?parseFloat(gsa).toFixed(3):'—'}</td>
+          <td style="${tc}">${abs!=null?parseFloat(abs).toFixed(2):'—'}</td>
+          <td style="${tc};font-weight:700">${blendPct!==null?blendPct.toFixed(1)+'%':'—'}</td></tr>`;}).join('')}
       </tbody></table></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
