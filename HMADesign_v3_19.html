@@ -6350,12 +6350,16 @@ function produceReportPDF(mixId){
     }
     return null;
   }
-  function _slotGsb(s){return s.Gsb_mod!=null?s.Gsb_mod:s.Gsb_m;}
-  function _slotGsa(s){return s.Gsa_mod!=null?s.Gsa_mod:s.Gsa_m;}
-  function _slotWA(s){return s.WA_mod!=null?s.WA_mod:s.WA_m;}
+  function _slotGsb(s){const r=getAgg(s);return r.Gsb_mod!=null?r.Gsb_mod:r.Gsb_m;}
+  function _slotGsa(s){const r=getAgg(s);return r.Gsa_mod!=null?r.Gsa_mod:r.Gsa_m;}
+  function _slotWA(s){const r=getAgg(s);return r.WA_mod!=null?r.WA_mod:r.WA_m;}
   function _slotGrad(s,sv){
-    const g=s.gradation_mod||s.gradation||{};
-    return g[sv]!=null?g[sv]:null;
+    const r=getAgg(s);
+    const gMod=(r.gradation_mod||{})[sv];
+    const gMeas=(r.gradation||{})[sv];
+    if(gMod!==null&&gMod!==undefined)return gMod;
+    if(gMeas!==null&&gMeas!==undefined)return gMeas;
+    return null;
   }
   function _blendGrad(trial,sv){
     const bp=trial.blendPct||{};
@@ -6363,8 +6367,12 @@ function produceReportPDF(mixId){
     for(const k of SLOT_KEYS){
       const pct=bp[k];if(pct==null||pct===0)continue;
       const sl=slots[k];if(!sl)continue;
-      const val=_slotGrad(sl,sv);
-      if(val!=null){sum+=pct*val;tot+=pct;}
+      const r=getAgg(sl);
+      const gMod=(r.gradation_mod||{})[sv];
+      const gMeas=(r.gradation||{})[sv];
+      // null means all particles pass that sieve (coarser than top size) → treat as 100
+      const val=(gMod!==null&&gMod!==undefined)?gMod:(gMeas!==null&&gMeas!==undefined)?gMeas:100;
+      sum+=pct*val;tot+=pct;
     }
     return tot>0?sum/tot:null;
   }
