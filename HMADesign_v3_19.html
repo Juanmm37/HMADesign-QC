@@ -6547,10 +6547,12 @@ function produceReportPDF(mixId){
     else if(isFirstR) blendCell=`<td rowspan="${rapActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(rapGsb,3)}</td>`;
     else if((inC&&!isFirstC)||(inF&&!isFirstF)||(inR&&!isFirstR)) blendCell=''; // merged
     else blendCell=_td(''); // standalone slot
+    const supSrc=k==='BHF'
+      ?_edStr(s.supplier&&s.source?s.supplier+' / '+s.source:s.supplier||s.source||'Refer to Note 3.')
+      :_edStr(s.supplier&&s.source?s.supplier+' / '+s.source:s.supplier||s.source||'');
     return `<tr style="height:14px">
       ${_tdL(`<b>${k}</b>`)}
-      ${_tdL(_edStr(s.supplier||''))}
-      ${_tdL(_edStr(s.source||''))}
+      ${_tdL(supSrc)}
       ${_td(_edStr(s.invNo||''))}
       ${_td(_ed(bp,1))}
       ${_td(_ed(gsb,3))}
