@@ -10097,46 +10097,21 @@ function renderSPFullReport(){
     </div>`:''}
   </div>`;
 
-  // ── TAB 4: Design Summary ──
-  const tab4=`<div id="sptabcontent_4" style="display:${_spActiveTab===4?'block':'none'}">
-    <div style="border:2px solid #1f3864;border-radius:6px;padding:12px;margin-bottom:12px;background:#f7f9fd">
-      <div style="text-align:center;font-weight:800;font-size:14px;color:#1f3864;margin-bottom:12px;text-transform:uppercase">Mix Design Summary — ${info.mixNo||'—'}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div>
-          <div style="font-weight:700;font-size:12px;color:#1f3864;border-bottom:2px solid #1f3864;margin-bottom:6px;padding-bottom:3px">Mix Identification</div>
-          ${[['Mix Design No.',info.mixNo],['Mix Type',mt+(info.hasRAP==='Yes'?' + RAP':'')],['Traffic Cat.',info.traffic],['PGAC',info.pgac],['N<sub>des</sub>',gyr.Ndes],['Municipality',info.muni],['Specification',isMUNI?'OPSS.MUNI 1151':'OPSS.PROV 1151'],['Customer',info.customer],['Project',info.project]].map(([l,v])=>`<div style="display:grid;grid-template-columns:140px 1fr;padding:3px 0;border-bottom:1px solid #eee;font-size:11px"><span style="font-weight:700;color:#555;text-transform:uppercase;font-size:10px">${l}</span><span>${v||'—'}</span></div>`).join('')}
-        </div>
-        <div>
-          <div style="font-weight:700;font-size:12px;color:#1f3864;border-bottom:2px solid #1f3864;margin-bottom:6px;padding-bottom:3px">Design Values vs. Specification</div>
-          ${designPb&&Va_d!==null?[['Design Pb (%)',designPb.toFixed(1),null,null],['Va (%)',Va_d.toFixed(1),tgt.Va,passCheck(Va_d,tgt.Va)],['VMA (%)',VMA_d?VMA_d.toFixed(1):'—',tgt.VMA,passCheck(VMA_d,tgt.VMA)],['VFA (%)',VFA_d?VFA_d.toFixed(1):'—',tgt.VFA,passCheck(VFA_d,tgt.VFA)],['%Gmm @N<sub>des</sub>',pNdes_d?pNdes_d.toFixed(1):'—',tgt.pGmmNdes,passCheck(pNdes_d,tgt.pGmmNdes)],['%Gmm @N<sub>ini</sub>',pNini_d?pNini_d.toFixed(1):'—',tgt.pGmmNini,passCheck(pNini_d,tgt.pGmmNini)]].map(([l,v,t,p])=>`<div style="display:grid;grid-template-columns:140px 50px 80px 50px;gap:4px;padding:3px 0;border-bottom:1px solid #eee;font-size:11px;align-items:center">
-            <span style="font-weight:700;color:#555;text-transform:uppercase;font-size:10px">${l}</span>
-            <span style="font-weight:700;color:${p===null?'#333':p?'#1a6b1a':'#c0392b'}">${v}</span>
-            <span style="font-size:10px;color:#888">${tgtStr(t)}</span>
-            <span>${p===null?'':'<span class="'+(p?'pass':'fail')+'">'+(p?'PASS':'FAIL')+'</span>'}</span>
-          </div>`).join(''):'<div class="wbox" style="margin:0">Set Design Pb and complete property curves.</div>'}
-        </div>
-      </div>
-    </div>
-    <div class="fg" style="margin-bottom:12px">
-      <label>Design Notes</label>
-      <textarea class="notes-area" onchange="ms.notes=this.value;saveDB()" onblur="ms.notes=this.value;saveDB()" placeholder="Key decisions, special conditions, deviations from standard practice...">${ms.notes||''}</textarea>
-    </div>
-    <div class="row" style="justify-content:space-between;margin-top:4px">
-      <button class="btn" onclick="ms.step=12;render()">← Back to Consensus</button>
-      <div class="row" style="gap:8px">
-        <button class="btn" onclick="printStep('Mix Design Report')">🖨 Print Report</button>
-        <button class="btn btn-gold" onclick="saveMix('In Progress')">Save — In Progress</button>
-        <button class="btn btn-primary" onclick="saveMix('Complete')">💾 Save Complete</button>
-      </div>
-    </div>
-  </div>`;
-
   return`<div class="card card-blue">
     <div class="st" style="margin-bottom:4px">Mix Design Report — ${info.mixNo||'(No Mix No.)'}</div>
     <div style="font-size:10px;color:#1f3864;font-weight:600;margin-bottom:12px;opacity:0.7">${isMUNI?'OPSS.MUNI 1151':'OPSS.PROV 1151'} — ${mt||'—'} — Traffic Category ${info.traffic||'—'}</div>
     ${tabBar}
     <div style="border:1px solid #c5d3ea;border-top:none;padding:14px;border-radius:0 0 6px 6px;background:#fff">
-      ${tab0}${tab1}${tab2}${tab3}${tab4}
+      ${tab0}${tab1}${tab2}${tab3}
+    </div>
+    <div class="fg" style="margin-top:12px;margin-bottom:4px">
+      <label style="font-size:11px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:0.04em">Design Notes</label>
+      <textarea class="notes-area" onchange="ms.notes=this.value;saveDB()" onblur="ms.notes=this.value;saveDB()" placeholder="Key decisions, special conditions, deviations from standard practice...">${ms.notes||''}</textarea>
+    </div>
+    <div class="row print-hide" style="justify-content:flex-end;margin-top:12px;gap:8px">
+      <button class="btn" onclick="generateReport(ms.id)" style="display:flex;align-items:center;gap:6px">📊 Export Excel</button>
+      <button class="btn btn-gold" onclick="saveMix('In Progress')">Save — In Progress</button>
+      <button class="btn btn-primary" onclick="saveMix('Complete')">💾 Save Complete</button>
     </div>
   </div>`;
 }
