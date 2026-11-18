@@ -6789,12 +6789,12 @@ function produceReportPDF(mixId){
     <div style="margin-top:2px">
       ${_tbl()}
         <tr style="background:#1F3864;color:white;font-weight:bold">
-          <th colspan="9" style="padding:2px 4px;border:1px solid #aaa;text-align:center">AGGREGATE SOURCE DATA</th>
+          <th colspan="8" style="padding:2px 4px;border:1px solid #aaa;text-align:center">AGGREGATE SOURCE DATA</th>
         </tr>
-        ${_th(['AGGREGATE TYPE','SUPPLIER','SOURCE','INV. NO.','%','G<sub>sb</sub>','BLENDED G<sub>sb</sub>','G<sub>sa</sub>','% ABS.'],'#2E75B6')}
+        ${_th(['AGGREGATE TYPE','SUPPLIER/ SOURCE','INV. NO.','%','G<sub>sb</sub>','BLENDED G<sub>sb</sub>','G<sub>sa</sub>','% ABS.'],'#2E75B6')}
         ${aggSrcRows}
         <tr>
-          <td colspan="4" style="padding:2px 3px;border:1px solid #aaa"></td>
+          <td colspan="3" style="padding:2px 3px;border:1px solid #aaa"></td>
           <td colspan="2" style="padding:2px 3px;border:1px solid #aaa;font-weight:bold;text-align:right;font-family:Arial">COMBINED G<sub>sb</sub></td>
           ${_td(_ed(combGsb,3),';font-weight:bold')}
           <td colspan="2" style="padding:2px 3px;border:1px solid #aaa"></td>
