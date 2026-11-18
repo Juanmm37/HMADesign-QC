@@ -6842,13 +6842,16 @@ function produceReportPDF(mixId){
 
     <!-- Signature + CCIL -->
     <div style="margin-top:2px;display:flex;justify-content:space-between;align-items:flex-end;font-family:Arial;font-size:8pt">
-      <div style="display:flex;align-items:flex-end;gap:8px">
-        <span style="font-weight:bold;white-space:nowrap;padding-bottom:2px">TEST DATA CERTIFIED BY:</span>
-        <div>
-          <div style="border-bottom:1px solid #000;width:210px;margin-bottom:2px">&nbsp;</div>
-          <div style="text-align:center;font-size:7.5pt">Mark Latyn, Capital Paving Inc.</div>
-        </div>
-      </div>
+      <table style="border:none;border-collapse:collapse">
+        <tr>
+          <td style="border:none;font-weight:bold;white-space:nowrap;vertical-align:bottom;padding:0 8px 0 0">TEST DATA CERTIFIED BY:</td>
+          <td style="border:none;border-bottom:1px solid #000;width:220px;vertical-align:bottom;padding:0">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="border:none;padding:0"></td>
+          <td style="border:none;padding:3px 0 0 0;text-align:center;font-size:7.5pt">Mark Latyn, Capital Paving Inc.</td>
+        </tr>
+      </table>
       <div><img src="${LOGO_CCIL}" height="48"></div>
     </div>
   </div>`;
