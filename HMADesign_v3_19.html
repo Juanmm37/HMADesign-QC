@@ -6926,7 +6926,12 @@ function produceReportPDF(mixId){
     ${_pageHdr(2)}
     ${_secTitle('SUPERPAVE DESIGN AGGREGATE STRUCTURE')}
 
-    ${_tbl()}
+    <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+      <colgroup>
+        <col style="width:10%">
+        <col style="width:18%">
+        ${Array(3+trials.length).fill(`<col style="width:${(72/(3+trials.length)).toFixed(2)}%">`).join('')}
+      </colgroup>
       <tr style="background:#1F3864;color:white;font-weight:bold">
         <th colspan="${5+trials.length}" style="padding:2px 4px;border:1px solid #aaa;text-align:center">TRIAL BLEND DATA</th>
       </tr>
