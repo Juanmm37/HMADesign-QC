@@ -9995,7 +9995,7 @@ function renderSPFullReport(){
   </div>`;
 
   // ── TAB 2: Aggregate Properties ──
-  const tab2=`<div id="sptabcontent_2" style="display:none">
+  const tab2=`<div id="sptabcontent_2" style="display:${_spActiveTab===2?'block':'none'}">
     <div style="border:1px solid #c5d3ea;border-radius:6px;padding:10px;margin-bottom:12px">
       <div class="st" style="margin-bottom:8px;font-size:12px">Aggregate Sources & Properties</div>
       <div style="overflow-x:auto"><table class="agg-table" style="width:100%"><thead><tr><th>Slot</th><th>Material</th><th>Supplier</th><th>Source/Pit</th><th>Inv. No.</th><th>Gsb</th><th>Gsa</th><th>Abs. (%)</th><th>Blend %</th></tr></thead><tbody>
