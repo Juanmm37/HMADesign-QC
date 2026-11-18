@@ -6508,13 +6508,45 @@ function produceReportPDF(mixId){
   // Blended Gsb (combined)
   const combGsb=selTrial?_blendedGsb(selTrial):null;
 
-  // Aggregate source data rows
+  // Group active slots for blended Gsb per group
+  const coarseActive=['CA1','CA2','CA3'].filter(k=>activeSlots.includes(k));
+  const fineActive=['FA1','FA2','BHF'].filter(k=>activeSlots.includes(k));
+  const rapActive=['RAP1','RAP2'].filter(k=>activeSlots.includes(k));
+  function _groupGsb(keys){
+    const bp=selTrial&&selTrial.blendPct?selTrial.blendPct:{};
+    let num=0,den=0;
+    for(const k of keys){
+      const pct=bp[k];if(!pct||pct===0)continue;
+      const sl=slots[k];if(!sl)continue;
+      const gsb=_slotGsb(sl);
+      if(gsb&&gsb>0){num+=pct;den+=pct/gsb;}
+    }
+    return den>0?num/den:null;
+  }
+  const coarseGsb=_groupGsb(coarseActive);
+  const fineGsb=_groupGsb(fineActive);
+  const rapGsb=_groupGsb(rapActive);
+
+  // Aggregate source data rows with merged blended Gsb per group
   const aggSrcRows=activeSlots.map(k=>{
     const s=slots[k];
     const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
     const gsb=_slotGsb(s);
     const gsa=_slotGsa(s);
     const wa=_slotWA(s);
+    // Determine merged blended Gsb cell
+    let blendCell='';
+    const isFirstC=coarseActive.length>0&&k===coarseActive[0];
+    const isFirstF=fineActive.length>0&&k===fineActive[0];
+    const isFirstR=rapActive.length>0&&k===rapActive[0];
+    const inC=coarseActive.includes(k);
+    const inF=fineActive.includes(k);
+    const inR=rapActive.includes(k);
+    if(isFirstC) blendCell=`<td rowspan="${coarseActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(coarseGsb,3)}</td>`;
+    else if(isFirstF) blendCell=`<td rowspan="${fineActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(fineGsb,3)}</td>`;
+    else if(isFirstR) blendCell=`<td rowspan="${rapActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(rapGsb,3)}</td>`;
+    else if((inC&&!isFirstC)||(inF&&!isFirstF)||(inR&&!isFirstR)) blendCell=''; // merged
+    else blendCell=_td(''); // standalone slot
     return `<tr style="height:18px">
       ${_tdL(`<b>${k}</b>`)}
       ${_tdL(_edStr(s.supplier||''))}
@@ -6522,7 +6554,7 @@ function produceReportPDF(mixId){
       ${_td(_edStr(s.invNo||''))}
       ${_td(_ed(bp,1))}
       ${_td(_ed(gsb,3))}
-      ${_td(_ed(combGsb,3),'color:#999')}
+      ${blendCell}
       ${_td(_ed(gsa,3))}
       ${_td(_ed(wa,1))}
     </tr>`;
