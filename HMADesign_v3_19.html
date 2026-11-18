@@ -10375,7 +10375,7 @@ function generateReport(mixId){
 
   // Download
   const filename=`MixDesign_Report_${info.mixNo||mix.id}_${fam}.xlsx`;
-  XLSX.writeFile(wb,filename);
+  XLSX.writeFile(wb,filename,{cellStyles:true});
 }
 
 render();
