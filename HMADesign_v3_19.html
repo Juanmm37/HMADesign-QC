@@ -10161,12 +10161,13 @@ function generateReport(mixId){
     const addr=XLSX.utils.encode_cell({r:row-1,c:col-1});
     if(val===null||val===undefined)return;
     const existing=ws[addr];
-    ws[addr]=Object.assign({},(existing||{}),{
+    const cell=Object.assign({},(existing||{}),{
       v:val,
       t:typeof val==='number'?'n':typeof val==='boolean'?'b':'s',
-      w:typeof val==='number'?String(val):val,
-      f:undefined  // clear any formula
+      w:typeof val==='number'?String(val):val
     });
+    delete cell.f;
+    ws[addr]=cell;
   }
 
   const P1='Report_MUNI (PG58H-28)';
