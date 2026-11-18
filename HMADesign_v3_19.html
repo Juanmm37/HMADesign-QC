@@ -363,10 +363,10 @@ const SP_VOL={
     'D':{'SP 9.5':[73,76],'SP 4.75':[75,78],'SP 37.5':[64,75],'default':[65,75]},
     'E':{'SP 9.5':[73,76],'SP 4.75':[75,78],'SP 37.5':[64,75],'default':[65,75]},
   },
-  '%GmmNini':{'A':91.5,'B':90.5,'C':89.0,'D':89.0,'E':89.0},
+  '%GmmNini':{'A':91.5,'B':90.5,'C':89.5,'D':89.5,'E':89.5}, // OPSS PROV 1151 Table 3 Note 5: ≤89.5 permitted at contractor's option
 };
-// MUNI 1151 Table 5: Cat D %GmmNini max is 89.5 (vs 89.0 in PROV 1151 Table 3)
-const SP_GMMNINI_MUNI={'A':91.5,'B':90.5,'C':89.0,'D':89.5,'E':89.0};
+// MUNI 1151 / PROV 1151 Table 3 Note 5: %GmmNini ≤89.5 permitted at contractor's option for C/D/E
+const SP_GMMNINI_MUNI={'A':91.5,'B':90.5,'C':89.5,'D':89.5,'E':89.5};
 const SP_PCS={
   'SP 4.75':null,
   'SP 9.5':{sieve:'2.36',pct:47},
