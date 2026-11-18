@@ -6982,10 +6982,14 @@ function produceReportPDF(mixId){
         </table>
         <div style="font-size:6.5pt;font-style:italic;margin-top:1px">* Determined from individual aggregate stockpile samples.</div>`;
       })()}</div>
-      <div style="flex:1"><b style="font-size:7pt">ASSUMED VALUES FOR CALCULATING W<sub>s</sub></b>
-      ${_tbl()}
-        <tr>${_tdL('% P<sub>b</sub>')}${_td(_ed(5.0,1))}${_tdL('G<sub>b</sub>')}${_td(_ed(mix.Gb||1.022,3))}</tr>
-        <tr>${_tdL('% P<sub>s</sub>')}${_td(_ed(95.0,1))}${_tdL('V<sub>a</sub>')}${_td(_ed(0.04,2))}</tr>
+      <div style="flex:1">${_tbl()}
+        <tr style="background:#1F3864;color:white;font-weight:bold">
+          <th colspan="4" style="padding:2px 4px;border:1px solid #aaa;text-align:center">ASSUMED VALUES FOR CALCULATING W<sub>s</sub></th>
+        </tr>
+        ${_th(['% P<sub>b</sub>','','G<sub>b</sub>',''],'#2E75B6')}
+        <tr>${_td(_ed(5.0,1))}${_td('')}${_td(_ed(mix.Gb||1.022,3))}${_td('')}</tr>
+        ${_th(['% P<sub>s</sub>','','V<sub>a</sub>',''],'#2E75B6')}
+        <tr>${_td(_ed(95.0,1))}${_td('')}${_td(_ed(0.04,2))}${_td('')}</tr>
       </table></div>
     </div>
 
