@@ -6708,16 +6708,16 @@ function produceReportPDF(mixId){
         <th colspan="${2+SIEVES_COVER.length}" style="padding:2px 4px;border:1px solid #aaa;text-align:center">JOB MIX FORMULA (JMF) - GRADATION PERCENT PASSING</th>
       </tr>
       <tr style="background:#2E75B6;color:white;font-weight:bold">
-        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">% AC</th>
-        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">%<br>AC<sub>new</sub></th>
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">% AC</th>
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">% AC<sub>new</sub></th>
         <th colspan="${SIEVES_COVER.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center">SIEVE SIZE (mm)</th>
       </tr>
       <tr style="background:#2E75B6;color:white;font-weight:bold">
         <th style="padding:2px 3px;border:1px solid #aaa"></th>
         <th style="padding:2px 3px;border:1px solid #aaa"></th>
-        ${SIEVES_COVER.map(s=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center">${s}</th>`).join('')}
+        ${SIEVES_COVER.map(s=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">${_fmtSieve(s)}</th>`).join('')}
       </tr>
-      <tr>
+      <tr style="height:18px">
         ${_td(_ed(designPb,1))}
         ${_td(_ed(null,1))}
         ${jmfRow}
