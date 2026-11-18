@@ -10111,7 +10111,7 @@ function renderSPFullReport(){
       <textarea class="notes-area" onchange="ms.notes=this.value;saveDB()" onblur="ms.notes=this.value;saveDB()" placeholder="Key decisions, special conditions, deviations from standard practice...">${ms.notes||''}</textarea>
     </div>
     <div class="row print-hide" style="justify-content:flex-end;margin-top:12px;gap:8px">
-      <button class="btn" onclick="generateReport(ms.id)" style="display:flex;align-items:center;gap:6px">📊 Export Excel</button>
+      <button class="btn" onclick="produceReport(ms.id)" style="display:flex;align-items:center;gap:6px">📊 Export Excel</button>
       <button class="btn btn-gold" onclick="saveMix('In Progress')">Save — In Progress</button>
       <button class="btn btn-primary" onclick="saveMix('Complete')">💾 Save Complete</button>
     </div>
