@@ -6604,21 +6604,25 @@ function produceReportPDF(mixId){
   const Gmm_d=designPb?_interp(pts,'Pb','Gmm',designPb):null;
   const TSR_v=mix.tsrBatch?mix.tsrBatch.tsrResult:null;
 
+  const _th4=(a,bg)=>`<tr style="background:${bg||'#1F3864'};color:white;font-weight:bold">${a.map(c=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center">${c}</th>`).join('')}</tr>`;
+  const _tdN=(v)=>`<td style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-weight:bold;width:28px">${v!=null?v:''}</td>`;
   const volProps=`${_tbl()}
-    ${_th(['PROPERTY','SELECTED','CRITERIA'])}
-    <tr style="height:18px">${_tdL('Air Voids (%)')}${_td(_ed(Va_d,1))}${_td('4')}</tr>
-    <tr style="height:18px">${_tdL('VMA (%)')}${_td(_ed(VMA_d,1))}${_td('14.0 min.')}</tr>
-    <tr style="height:18px">${_tdL('VFA (%)')}${_td(_ed(VFA_d,1))}${_td('65 - 75')}</tr>
-    <tr style="height:18px">${_tdL('DP')}${_td(_ed(DP_d,2))}${_td('0.6 - 1.2')}</tr>
-    <tr style="height:18px">${_tdL('Asphalt Film Thickness (T<sub>f</sub>)')}${_td(_ed(null,2))}${_td('Info. only')}</tr>
-    <tr style="height:4px"><td colspan="3" style="padding:0;border:1px solid #aaa"></td></tr>
-    <tr style="height:18px">${_tdL('TSR (%)')}${_td(_ed(TSR_v,1))}${_td('80 min.')}</tr>
-    <tr style="height:18px">${_tdL('G<sub>mb</sub> @ N<sub>des</sub> (BRD)')}${_td(_ed(Gmb_d,3))}${_td('')}</tr>
-    <tr style="height:18px">${_tdL('G<sub>mm</sub> (MRD)')}${_td(_ed(Gmm_d,4))}${_td('')}</tr>
-    <tr style="height:18px">${_tdL('% G<sub>mm</sub> @ N<sub>ini</sub>')}${_td(_ed(pGmmNini_d,1))}${_td('≤ 89.5')}</tr>
-    <tr style="height:18px">${_tdL('% G<sub>mm</sub> @ N<sub>des</sub>')}${_td(_ed(pGmmNdes_d,1))}${_td('96')}</tr>
-    <tr style="height:18px">${_tdL('% G<sub>mm</sub> @ N<sub>max</sub>')}${_td(_ed(pGmmNmax_d,1))}${_td('≤ 98.0')}</tr>
-  </table>`;
+    <tr style="background:#1F3864;color:white;font-weight:bold"><th colspan="4" style="padding:2px 4px;border:1px solid #aaa;text-align:center">VOLUMETRIC PROPERTIES</th></tr>
+    ${_th4(['PROPERTY','','SELECTED','CRITERIA'],'#2E75B6')}
+    <tr style="height:18px">${_tdL('Air Voids (%)')}${_tdN('')}${_td(_ed(Va_d,1))}${_td('4')}</tr>
+    <tr style="height:18px">${_tdL('VMA (%)')}${_tdN('')}${_td(_ed(VMA_d,1))}${_td('14.0 min.')}</tr>
+    <tr style="height:18px">${_tdL('VFA (%)')}${_tdN('')}${_td(_ed(VFA_d,1))}${_td('65 - 75')}</tr>
+    <tr style="height:18px">${_tdL('DP')}${_tdN('')}${_td(_ed(DP_d,2))}${_td('0.6 - 1.2')}</tr>
+    <tr style="height:18px">${_tdL('Asphalt Film Thickness (T<sub>f</sub>)')}${_tdN('')}${_td(_ed(null,2))}${_td('Info. only')}</tr>
+    <tr style="height:4px"><td colspan="4" style="padding:0;border:1px solid #aaa"></td></tr>
+    <tr style="height:18px">${_tdL('TSR (%)')}${_tdN('')}${_td(_ed(TSR_v,1))}${_td('80 min.')}</tr>
+    <tr style="height:18px">${_tdL('G<sub>mb</sub> @ N<sub>des</sub> (BRD)')}${_tdN('')}${_td(_ed(Gmb_d,3))}${_td('')}</tr>
+    <tr style="height:18px">${_tdL('G<sub>mm</sub> (MRD)')}${_tdN('')}${_td(_ed(Gmm_d,4))}${_td('')}</tr>
+    <tr style="height:18px">${_tdL('% G<sub>mm</sub> @ N<sub>ini</sub>')}${_tdN(gyr[0])}${_td(_ed(pGmmNini_d,1))}${_td('** ≤ 89.5')}</tr>
+    <tr style="height:18px">${_tdL('% G<sub>mm</sub> @ N<sub>des</sub>')}${_tdN(gyr[1])}${_td(_ed(pGmmNdes_d,1))}${_td('96')}</tr>
+    <tr style="height:18px">${_tdL('% G<sub>mm</sub> @ N<sub>max</sub>')}${_tdN(gyr[2])}${_td(_ed(pGmmNmax_d,1))}${_td('≤ 98.0')}</tr>
+  </table>
+  <div style="font-size:6pt;font-style:italic;margin-top:1px">** ≤89.5 permitted at the Contractor's option.</div>`;
 
   const acTable=`${_tbl()}
     <tr style="background:#1F3864;color:white;font-weight:bold">
