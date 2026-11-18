@@ -2431,12 +2431,7 @@ function renderNewMix(){
     ${i.spec?`<span>${i.spec}</span>`:''}
   </div>`:'';
   const presenceBanner=`<div id="presence-banner" class="print-hide" style="display:none;align-items:center;gap:8px;padding:7px 14px;background:#eaf4ff;border:1.5px solid #90c3f0;border-radius:7px;margin-bottom:8px;font-size:12px;color:#1a4a7a;font-weight:600"></div>`;
-  const saveExitBtn=`<div class="print-hide" style="margin-top:18px;padding:0 2px;display:flex;justify-content:flex-end">
-    <button onclick="saveAndExit()" style="display:flex;align-items:center;gap:8px;padding:10px 22px;background:#fff;border:1.5px solid #1f3864;border-radius:7px;color:#1f3864;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">
-      <span style="font-size:16px">💾</span> Save &amp; Exit to Dashboard
-    </button>
-  </div>`;
-  return bar+presenceBanner+mixInfoBar+stepContent+saveExitBtn;
+  return bar+presenceBanner+mixInfoBar+stepContent;
 }
 
 // ── STEP 1 ──
