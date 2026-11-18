@@ -6484,7 +6484,13 @@ function produceReportPDF(mixId){
 
   // ─────────────────────────────────────────────
   // Active slots
-  const activeSlots=SLOT_KEYS.filter(k=>slots[k]&&(slots[k].material||_slotGsb(slots[k])));
+  const activeSlots=SLOT_KEYS.filter(k=>{
+    const s=slots[k];if(!s)return false;
+    if(s.material||_slotGsb(s))return true;
+    if(trials.some(t=>t.blendPct&&t.blendPct[k]>0))return true;
+    const g=s.gradation_mod||s.gradation||{};
+    return Object.keys(g).length>0;
+  });
 
   // ─────────────────────────────────────────────
   // PAGE 1 — COVER
