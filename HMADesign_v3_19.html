@@ -5652,15 +5652,15 @@ async function produceReport(mixId){
 
     // ── Header info ──
     if(mix.mixNo)xml=_xmlSetCell(xml,'R7',mix.mixNo,'s');
-    if(mix.traffic)xml=_xmlSetCell(xml,'Q12','Category '+mix.traffic,'s');
+    if(mix.traffic)xml=_xmlSetCell(xml,'Q12',mix.traffic,'s');
     if(mix.mixType)xml=_xmlSetCell(xml,'R11',mix.mixType,'s');
     // Project info fields (new)
     if(mix.customer)xml=_xmlSetCell(xml,'D9',mix.customer,'s');
-    if(mix.dateCollected)xml=_xmlSetCell(xml,'Q9',mix.dateCollected,'s');
+    if(mix.dateCollected)xml=_xmlSetCell(xml,'Q9',_fmtDateLong(mix.dateCollected),'s');
     if(mix.contractNo)xml=_xmlSetCell(xml,'X9',mix.contractNo,'s');
     if(mix.region)xml=_xmlSetCell(xml,'Z9',mix.region,'s');
     if(mix.project)xml=_xmlSetCell(xml,'D10',mix.project,'s');
-    if(mix.dateCompleted)xml=_xmlSetCell(xml,'Q10',mix.dateCompleted,'s');
+    if(mix.dateCompleted)xml=_xmlSetCell(xml,'Q10',_fmtDateLong(mix.dateCompleted),'s');
     if(mix.customer)xml=_xmlSetCell(xml,'X10',mix.customer,'s');
     if(mix.location)xml=_xmlSetCell(xml,'D11',mix.location,'s');
     if(mix.location)xml=_xmlSetCell(xml,'Z10',mix.location,'s');
