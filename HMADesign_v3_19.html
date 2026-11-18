@@ -10077,7 +10077,7 @@ function renderSPFullReport(){
   </div>`;
 
   // ── TAB 4: Design Summary ──
-  const tab4=`<div id="sptabcontent_4" style="display:none">
+  const tab4=`<div id="sptabcontent_4" style="display:${_spActiveTab===4?'block':'none'}">
     <div style="border:2px solid #1f3864;border-radius:6px;padding:12px;margin-bottom:12px;background:#f7f9fd">
       <div style="text-align:center;font-weight:800;font-size:14px;color:#1f3864;margin-bottom:12px;text-transform:uppercase">Mix Design Summary — ${info.mixNo||'—'}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
