@@ -6639,21 +6639,21 @@ function produceReportPDF(mixId){
   </table>
   <div style="font-size:6pt;font-style:italic;margin-top:1px">** ≤89.5 permitted at the Contractor's option.</div>`;
 
-  const acTable=`${_tbl()}
+  const acTable=`${_tbl('table-layout:fixed')}
     <tr style="background:#1F3864;color:white;font-weight:bold">
-      <th style="padding:2px 3px;border:1px solid #aaa">SUPPLIER</th>
-      <th style="padding:2px 3px;border:1px solid #aaa">PGAC GRADE</th>
+      <th style="padding:2px 3px;border:1px solid #aaa;width:38%;text-align:center">SUPPLIER</th>
+      <th style="padding:2px 3px;border:1px solid #aaa;width:22%;text-align:center">PGAC GRADE</th>
       <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">* DESIGN TEMPERATURES</th>
     </tr>
     <tr style="background:#2E75B6;color:white;font-weight:bold">
       <th style="padding:2px 3px;border:1px solid #aaa"></th>
       <th style="padding:2px 3px;border:1px solid #aaa"></th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">MIXING</th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">COMPACTION</th>
+      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;width:20%">MIXING</th>
+      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;width:20%">COMPACTION</th>
     </tr>
     <tr>
-      ${_tdL(_edStr(mix.pgacSup||''))}
-      ${_tdL(_edStr(mix.pgac||''))}
+      ${_td(_edStr(mix.pgacSup||''))}
+      ${_td(_edStr(mix.pgac||''))}
       ${_td(_ed(mix.tMix,0)+'°C')}
       ${_td(_ed(mix.tComp,0)+'°C')}
     </tr>
