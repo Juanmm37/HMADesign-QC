@@ -7019,10 +7019,10 @@ function produceReportPDF(mixId){
     const gsb=_slotGsb(s);
     const gsa=_slotGsa(s);
     const wa=_slotWA(s);
+    const ss3=k==='BHF'?_edStr(s.supplier&&s.source?s.supplier+' / '+s.source:s.supplier||s.source||'Refer to Note 3.'):_edStr(s.supplier&&s.source?s.supplier+' / '+s.source:s.supplier||s.source||'');
     return `<tr>
       ${_tdL(`<b>${k}</b>`)}
-      ${_tdL(_edStr(s.supplier||''))}
-      ${_tdL(_edStr(s.source||''))}
+      ${_tdL(ss3)}
       ${_td(_ed(bp,1))}
       ${_td(_ed(bp,1))}
       ${_td(_ed(gsb,3))}
