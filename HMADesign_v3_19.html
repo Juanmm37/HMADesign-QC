@@ -6543,9 +6543,11 @@ function produceReportPDF(mixId){
     const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
     const gradCells=SIEVES_COVER.map(sv=>{
       const g=s.gradation_mod||s.gradation||{};
-      return _td(_ed(g[sv],1));
+      let v=g[sv]!=null?g[sv]:null;
+      if(v==null&&(sv==='25'||sv==='19'))v=100;
+      return _td(_ed(v,1));
     }).join('');
-    return `<tr>${_tdL(`<b>${k}</b>`)}${_td(_ed(bp,1))}${gradCells}</tr>`;
+    return `<tr style="height:18px">${_tdL(`<b>${k}</b>`)}${_td(_ed(bp,1))}${gradCells}</tr>`;
   }).join('');
   const aggGradTable=`${_tbl()}
     <tr style="background:#1F3864;color:white;font-weight:bold">
