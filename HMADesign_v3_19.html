@@ -6822,7 +6822,7 @@ function produceReportPDF(mixId){
       const v=_blendGrad(t,sv);
       return _td(_ed(v,1));
     }).join('');
-    return `<tr>${_td(`TRIAL ${i+1}`,';font-weight:bold')}${gradCells}</tr>`;
+    return `<tr style="height:18px">${_td(`TRIAL ${i+1}`,';font-weight:bold')}${gradCells}</tr>`;
   }).join('');
 
   const volTrialRows=trials.map((t,i)=>{
