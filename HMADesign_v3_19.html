@@ -6583,11 +6583,7 @@ function produceReportPDF(mixId){
   const aggGradRows=activeSlots.map(k=>{
     const s=slots[k];
     const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
-    const gradCells=SIEVES_COVER.map(sv=>{
-      const g=s.gradation_mod||s.gradation||{};
-      const v=g[sv]!=null?g[sv]:null;
-      return _td(_ed(v,1));
-    }).join('');
+    const gradCells=SIEVES_COVER.map(sv=>_td(_ed(_slotGrad(s,sv),1))).join('');
     return `<tr style="height:14px">${_tdL(`<b>${k}</b>`)}${_td(_ed(bp,1))}${gradCells}</tr>`;
   }).join('');
   const aggGradTable=`${_tbl()}
