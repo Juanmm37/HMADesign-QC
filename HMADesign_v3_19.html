@@ -9938,7 +9938,7 @@ function renderSPFullReport(){
   const fmtSv=sv=>Number.isInteger(parseFloat(sv))&&!sv.includes('.')?sv+'.0':sv;
 
   // ── TAB 0: Design Report ──
-  const tab0=`<div id="sptabcontent_0" style="display:block">
+  const tab0=`<div id="sptabcontent_0" style="display:${_spActiveTab===0?'block':'none'}">
     <div style="border:2px solid #1f3864;padding:10px 14px;margin-bottom:12px;background:#f7f9fd;border-radius:4px">
       <div style="display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px;align-items:start">
         <div style="font-size:11px;color:#888">Your Organization</div>
