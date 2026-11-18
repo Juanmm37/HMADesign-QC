@@ -6515,7 +6515,7 @@ function produceReportPDF(mixId){
     const gsb=_slotGsb(s);
     const gsa=_slotGsa(s);
     const wa=_slotWA(s);
-    return `<tr>
+    return `<tr style="height:18px">
       ${_tdL(`<b>${k}</b>`)}
       ${_tdL(_edStr(s.supplier||''))}
       ${_tdL(_edStr(s.source||''))}
