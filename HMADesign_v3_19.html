@@ -6653,54 +6653,56 @@ function produceReportPDF(mixId){
     <tr style="height:18px"><td style="padding:2px 3px;border:1px solid #aaa;text-align:center">${_ed(mix.binderReplacement,1)}</td></tr>
   </table></div>`;
 
-  // Consensus properties
+  // Consensus properties — 11-column layout matching original Excel
+  const _CONS_CRIT={
+    A:{se:'35',uvcLT:'38',uvcGT:'38',fe:'10',fpLT:'85/80',fpGT:'70/65'},
+    B:{se:'40',uvcLT:'40',uvcGT:'40',fe:'10',fpLT:'85/80',fpGT:'70/65'},
+    C:{se:'45',uvcLT:'40',uvcGT:'40',fe:'10',fpLT:'95/90',fpGT:'80/75'},
+    D:{se:'45',uvcLT:'45 (Note 1)',uvcGT:'40',fe:'10',fpLT:'100/90',fpGT:'100/90'},
+    E:{se:'50',uvcLT:'45 (Note 1)',uvcGT:'45 (Note 1)',fe:'10',fpLT:'100/100',fpGT:'100/100'},
+  };
+  const _cAt=mix.aggTesting||{};
+  const _cCr=_CONS_CRIT[(mix.traffic||'').toUpperCase()]||{se:'',uvcLT:'',uvcGT:'',fe:'',fpLT:'',fpGT:''};
+  const _fpRes=(_cAt.fpSh1!=null&&_cAt.fpSh2!=null)?`${Math.round(_cAt.fpSh1)}/${Math.round(_cAt.fpSh2)}`:(_cAt.fpSh1!=null?String(_cAt.fpSh1):'');
+  const _cTH='padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle';
   const consensusTable=`${_tbl()}
     <tr style="background:#1F3864;color:white;font-weight:bold">
-      <th rowspan="3" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">TRAFFIC CAT.</th>
-      <th rowspan="3" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">SAND EQUIVALENT</th>
-      <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">UNCOMPACTED VOID CONTENT</th>
-      <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">FLAT &amp; ELONGATED PARTICLES</th>
-      <th colspan="3" style="padding:2px 3px;border:1px solid #aaa;text-align:center">FRACTURED PARTICLES IN CA</th>
+      <th rowspan="3" style="${_cTH}">TRAFFIC<br>CAT.</th>
+      <th colspan="2" rowspan="2" style="${_cTH}">SAND<br>EQUIVALENT</th>
+      <th colspan="3" style="${_cTH}">UNCOMPACTED VOID CONTENT</th>
+      <th colspan="2" rowspan="2" style="${_cTH}">FLAT &amp; ELONGATED<br>PARTICLES</th>
+      <th colspan="3" style="${_cTH}">FRACTURED PARTICLES IN CA</th>
     </tr>
     <tr style="background:#1F3864;color:white;font-weight:bold">
-      <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">PAVEMENT DEPTH (Note 2)</th>
-      <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center">RESULT</th>
-      <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center">MAX.</th>
-      <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">PAVEMENT DEPTH (Note 2)</th>
-      <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center">RESULT</th>
+      <th rowspan="2" style="${_cTH}">RESULT</th>
+      <th colspan="2" style="${_cTH}">PAVEMENT DEPTH (Note 2)</th>
+      <th rowspan="2" style="${_cTH}">RESULT</th>
+      <th colspan="2" style="${_cTH}">PAVEMENT DEPTH (Note 2)</th>
     </tr>
     <tr style="background:#2E75B6;color:white;font-weight:bold">
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">RESULT</th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">MIN.</th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">≤ 100 mm</th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">&gt; 100 mm</th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">≤ 100 mm</th>
-      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">&gt; 100 mm</th>
+      <th style="${_cTH}">RESULT</th><th style="${_cTH}">MIN.</th>
+      <th style="${_cTH}">≤ 100 mm<br><span style="font-weight:normal;font-size:5.5pt">MINIMUM</span></th>
+      <th style="${_cTH}">&gt; 100 mm<br><span style="font-weight:normal;font-size:5.5pt">MINIMUM</span></th>
+      <th style="${_cTH}">RESULT</th><th style="${_cTH}">MAX.</th>
+      <th style="${_cTH}">≤ 100 mm<br><span style="font-weight:normal;font-size:5.5pt">MINIMUM</span></th>
+      <th style="${_cTH}">&gt; 100 mm<br><span style="font-weight:normal;font-size:5.5pt">MINIMUM</span></th>
     </tr>
-    <tr style="background:#DCE6F1;font-size:6.5pt;text-align:center">
-      <td style="padding:2px 3px;border:1px solid #aaa"></td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">MINIMUM</td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">45 (Note 1)</td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">40</td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">10</td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">MAX.</td>
-      <td colspan="2" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">MINIMUM</td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">95/90</td>
-      <td colspan="1" style="padding:2px 3px;border:1px solid #aaa;font-size:6pt">80/75</td>
-    </tr>
-    <tr>
+    <tr style="text-align:center;height:18px">
       ${_td(_edStr(mix.traffic||''))}
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.sandEq:null,1))}
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.uvContent:null,1))}
-      <td style="padding:2px 3px;border:1px solid #aaa;text-align:center"></td>
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.fe:null,1))}
-      <td style="padding:2px 3px;border:1px solid #aaa;text-align:center"></td>
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.fpSh1:null,1))}
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.fpSh2:null,1))}
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.fpDp1:null,1))}
-      ${_td(_ed(mix.aggTesting?mix.aggTesting.fpDp2:null,1))}
+      ${_td(_ed(_cAt.sandEq,1))}
+      ${_td(_edStr(_cCr.se))}
+      ${_td(_ed(_cAt.uvContent,1))}
+      ${_td(_edStr(_cCr.uvcLT))}
+      ${_td(_edStr(_cCr.uvcGT))}
+      ${_td(_ed(_cAt.fe,1))}
+      ${_td(_edStr(_cCr.fe))}
+      ${_td(_edStr(_fpRes))}
+      ${_td(_edStr(_cCr.fpLT))}
+      ${_td(_edStr(_cCr.fpGT))}
     </tr>
-  </table>`;
+  </table>
+  <div style="font-size:6pt;font-style:italic;margin-top:1px">Note 1: An uncompacted void content of 43% is acceptable, provided specified mix volumetrics are satisfied.</div>
+  <div style="font-size:6pt;font-style:italic">Note 2: Depth of pavement layer below finished surface.</div>`;
 
   const p1=`<div class="page">
     <!-- COVER HEADER -->
