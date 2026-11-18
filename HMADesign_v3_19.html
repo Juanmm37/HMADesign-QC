@@ -6234,6 +6234,8 @@ async function produceReport(mixId){
     }
 
     // ── Generate the xlsx file and trigger download ──
+    // Remove calcChain — Excel rebuilds it; stale entries cause "Removed Records" repair dialog
+    zip.remove('xl/calcChain.xml');
     const blob=await zip.generateAsync({type:'blob',compression:'DEFLATE',
       mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const fileName=(mix.mixNo||'MixDesign').replace(/[\\/:*?"<>|]/g,'_')+'_Report.xlsx';
