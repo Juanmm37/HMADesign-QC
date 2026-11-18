@@ -5594,6 +5594,14 @@ function _xmlEscape(s){
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
 }
 
+// Format ISO date string (YYYY-MM-DD) as "Month Day, Year" (e.g. "August 9, 2024")
+function _fmtDateLong(iso){
+  if(!iso)return iso;
+  const d=new Date(iso+'T00:00:00');
+  if(isNaN(d))return iso;
+  return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+}
+
 // Update or insert a cell value in a worksheet XML string, preserving its style attribute.
 // type: 'n' = number, 's' = string (inline)
 function _xmlSetCell(xml,ref,value,type){
