@@ -6814,7 +6814,7 @@ function produceReportPDF(mixId){
       const bp=t.blendPct&&t.blendPct[k]!=null?t.blendPct[k]:null;
       return _td(_ed(bp,1));
     }).join('');
-    return `<tr>${_tdL(`<b>${k}</b>`)}${_tdL(_edStr(s.supplier||''))}${_tdL(_edStr(s.source||''))}${_td(_ed(gsb,3))}${_td(_ed(gsa,3))}${_td(_ed(wa,1))}${trialPcts}</tr>`;
+    return `<tr style="height:18px">${_tdL(`<b>${k}</b>`)}${_tdL(_edStr(s.supplier||''))}${_tdL(_edStr(s.source||''))}${_td(_ed(gsb,3))}${_td(_ed(gsa,3))}${_td(_ed(wa,1))}${trialPcts}</tr>`;
   }).join('');
 
   const trialGradRows=trials.map((t,i)=>{
