@@ -6580,7 +6580,7 @@ function _produceReportPDFInner(mixId){
     const mat=getAgg(s).material||'';
     return `<tr>
       ${_tdL(`<b>${k}</b>`)}
-      ${_tdL(mat)}
+      ${_tdL(_edStr(mat))}
       ${_tdL(supSrc)}
       ${_td(_edStr(s.invNo||''))}
       ${_td(_ed(bp,1))}
