@@ -7174,7 +7174,7 @@ function _produceReportPDFInner(mixId){
       else if(fa3K.length>0&&k===fa3K[0]) sg=tdM(faB3.gsb,fa3K.length,3)+tdM(faB3.gsa,fa3K.length,3)+tdM(faB3.wa,fa3K.length,2);
       else if(ca3K.includes(k)||fa3K.includes(k)) sg='';
       else{const gsb=_slotGsb(s),gsa=_slotGsa(s),wa=_slotWA(s);sg=_td(_ed(gsb,3))+_td(_ed(gsa,3))+_td(_ed(wa,2));}
-      html+=`<tr>${_tdL(`<b>${k}</b>`)}${_tdL(mat3)}${_tdL(ss3)}${_td(_ed(bp,1))}${_td(_ed(sp,1))}${sg}</tr>`;
+      html+=`<tr>${_tdL(`<b>${k}</b>`)}${_tdL(_edStr(mat3))}${_tdL(ss3)}${_td(_ed(bp,1))}${_td(_ed(sp,1))}${sg}</tr>`;
     }
     return html;
   })();
