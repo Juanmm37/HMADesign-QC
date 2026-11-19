@@ -7121,26 +7121,41 @@ function _produceReportPDFInner(mixId){
   // ─────────────────────────────────────────────
 
   const selStockPcts=selTrial?calcStockpilePercentages(selTrial):{};
-  const selAggrRows=activeSlots.map(k=>{
-    const s=slots[k];
-    const bp=selTrial&&selTrial.blendPct?+(selTrial.blendPct[k]||0):null;
-    const sp=selStockPcts[k]!=null?+selStockPcts[k]:bp;
-    const gsb=_slotGsb(s);
-    const gsa=_slotGsa(s);
-    const wa=_slotWA(s);
-    const ss3=k==='BHF'?_edStr(s.source||s.supplier||'Refer to Note 3.'):_edStr(s.source||s.supplier||'');
-    const mat3=getAgg(s).material||'';
-    return `<tr>
-      ${_tdL(`<b>${k}</b>`)}
-      ${_tdL(mat3)}
-      ${_tdL(ss3)}
-      ${_td(_ed(bp,1))}
-      ${_td(_ed(sp,1))}
-      ${_td(_ed(gsb,3))}
-      ${_td(_ed(gsa,3))}
-      ${_td(_ed(wa,1))}
-    </tr>`;
-  }).join('');
+  const selCombGsa=selTrial?_blendedGsa(selTrial):null;
+  const selCombWA=(()=>{
+    if(!selTrial)return null;
+    const bp=selTrial.blendPct||{};
+    let sum=0,tot=0;
+    for(const k of SLOT_KEYS){const pct=+(bp[k]||0);if(!pct)continue;const sl=slots[k];if(!sl)continue;const wa=_slotWA(sl);if(wa!=null){sum+=pct*wa;tot+=pct;}}
+    return tot>0?sum/tot:null;
+  })();
+  function _grpBlend3(keys){
+    const bp=selTrial&&selTrial.blendPct?selTrial.blendPct:{};
+    let nG=0,dG=0,nA=0,dA=0,nW=0,dW=0;
+    for(const k of keys){const pct=+(bp[k]||0);if(!pct)continue;const sl=slots[k];if(!sl)continue;const gsb=_slotGsb(sl),gsa=_slotGsa(sl),wa=_slotWA(sl);if(gsb&&gsb>0){nG+=pct;dG+=pct/gsb;}if(gsa!=null){nA+=pct*gsa;dA+=pct;}if(wa!=null){nW+=pct*wa;dW+=pct;}}
+    return{gsb:dG>0?nG/dG:null,gsa:dA>0?nA/dA:null,wa:dW>0?nW/dW:null};
+  }
+  const ca3K=['CA1','CA2','CA3'].filter(k=>activeSlots.includes(k));
+  const fa3K=['FA1','FA2','BHF'].filter(k=>activeSlots.includes(k));
+  const caB3=_grpBlend3(ca3K),faB3=_grpBlend3(fa3K);
+  const selAggrRows=(()=>{
+    const tdM=(v,rs,dp)=>`<td rowspan="${rs}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${v!=null?v.toFixed(dp):''}</td>`;
+    let html='';
+    for(const k of activeSlots){
+      const s=slots[k];
+      const bp=selTrial&&selTrial.blendPct?+(selTrial.blendPct[k]||0):null;
+      const sp=selStockPcts[k]!=null?+selStockPcts[k]:bp;
+      const ss3=k==='BHF'?_edStr(s.source||s.supplier||'Refer to Note 3.'):_edStr(s.source||s.supplier||'');
+      const mat3=getAgg(s).material||'';
+      let sg='';
+      if(ca3K.length>0&&k===ca3K[0]) sg=tdM(caB3.gsb,ca3K.length,3)+tdM(caB3.gsa,ca3K.length,3)+tdM(caB3.wa,ca3K.length,2);
+      else if(fa3K.length>0&&k===fa3K[0]) sg=tdM(faB3.gsb,fa3K.length,3)+tdM(faB3.gsa,fa3K.length,3)+tdM(faB3.wa,fa3K.length,2);
+      else if(ca3K.includes(k)||fa3K.includes(k)) sg='';
+      else{const gsb=_slotGsb(s),gsa=_slotGsa(s),wa=_slotWA(s);sg=_td(_ed(gsb,3))+_td(_ed(gsa,3))+_td(_ed(wa,2));}
+      html+=`<tr>${_tdL(`<b>${k}</b>`)}${_tdL(mat3)}${_tdL(ss3)}${_td(_ed(bp,1))}${_td(_ed(sp,1))}${sg}</tr>`;
+    }
+    return html;
+  })();
 
   const acPts=mix.acPoints||[];
   const volDesignRows=acPts.map((pt,i)=>{
