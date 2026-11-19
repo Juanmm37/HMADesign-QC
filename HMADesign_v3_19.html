@@ -6963,14 +6963,22 @@ function produceReportPDF(mixId){
 
     <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
       <colgroup>
-        <col style="width:10%">
-        <col style="width:18%">
-        ${Array(3+trials.length).fill(`<col style="width:${(72/(3+trials.length)).toFixed(2)}%">`).join('')}
+        <col style="width:7%">
+        <col style="width:14%">
+        <col style="width:14%">
+        ${Array(3+trials.length).fill(`<col style="width:${(65/(3+trials.length)).toFixed(2)}%">`).join('')}
       </colgroup>
       <tr style="background:#1F3864;color:white;font-weight:bold">
-        <th colspan="${5+trials.length}" style="padding:2px 4px;border:1px solid #aaa;text-align:center">TRIAL BLEND DATA</th>
+        <th colspan="${6+trials.length}" style="padding:2px 4px;border:1px solid #aaa;text-align:center">TRIAL BLEND DATA</th>
       </tr>
-      ${_th(['AGGREGATE TYPE','SUPPLIER/ SOURCE','G<sub>sb</sub>','G<sub>sa</sub>','% ABS.',...trialCols],'#2E75B6')}
+      <tr style="background:#2E75B6;color:white;font-weight:bold">
+        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">AGGREGATE TYPE</th>
+        <th style="padding:2px 3px;border:1px solid #aaa">SUPPLIER/ SOURCE</th>
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>sb</sub></th>
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>sa</sub></th>
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">% ABS.</th>
+        ${trialCols.map(c=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center">${c}</th>`).join('')}
+      </tr>
       ${trialBlendRows}
     </table>
 
