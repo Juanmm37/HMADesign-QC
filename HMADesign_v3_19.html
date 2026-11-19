@@ -6410,7 +6410,7 @@ function _produceReportPDFInner(mixId){
 
   // SVG chart helper
   function _svgChart(dataPts,xKey,yKey,title,yMin,yMax,specLines){
-    const W=280,H=170,ml=38,mr=10,mt=18,mb=28;
+    const W=300,H=190,ml=44,mr=14,mt=20,mb=36;
     const pw=W-ml-mr,ph=H-mt-mb;
     const valid=dataPts.filter(p=>p[xKey]!=null&&p[yKey]!=null&&isFinite(p[xKey])&&isFinite(p[yKey]));
     const xs=valid.map(p=>+p[xKey]);
