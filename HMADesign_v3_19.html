@@ -7278,11 +7278,25 @@ function _produceReportPDFInner(mixId){
     </table></div>
 
     <div style="margin-top:6px;display:flex;gap:4px">
-      <div style="flex:1">${_tbl()}
+      <div style="flex:1"><table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+        <colgroup>
+          <col style="width:14%"><col style="width:10%"><col style="width:10%"><col style="width:10%">
+          <col style="width:10%"><col style="width:14%"><col style="width:12%"><col style="width:10%"><col style="width:10%">
+        </colgroup>
         <tr style="background:#1F3864;color:white;font-weight:bold">
           <th colspan="9" style="padding:2px 4px;border:1px solid #aaa;text-align:center">VOLUMETRIC PROPERTIES @ SELECTED AGGREGATE STRUCTURE</th>
         </tr>
-        ${_th(['SPECIMEN NO.','% P<sub>b</sub>','% V<sub>a</sub>','% VMA','% VFA','% G<sub>mm</sub>@N<sub>ini</sub>','G<sub>mb</sub>@N<sub>des</sub>','% P<sub>be</sub>','DP'],'#2E75B6')}
+        <tr style="background:#2E75B6;color:white;font-weight:bold">
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">SPECIMEN NO.</th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% P<sub>b</sub></th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% V<sub>a</sub></th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% VMA</th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% VFA</th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle;font-size:6.5pt">% G<sub>mm</sub>@N<sub>ini</sub></th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle;font-size:6.5pt">G<sub>mb</sub>@N<sub>des</sub></th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% P<sub>be</sub></th>
+          <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">DP</th>
+        </tr>
         ${volPropP3Rows}
         <tr style="background:#DCE6F1;font-weight:bold">
           ${_td('*SPECIFICATION')}${_td('')}${_td('4')}${_td('14.0 min')}${_td('65 - 75')}${_td('≤ 89.5')}${_td('')}${_td('')}${_td('0.6-1.2')}
