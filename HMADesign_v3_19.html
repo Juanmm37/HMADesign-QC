@@ -7340,8 +7340,12 @@ function _produceReportPDFInner(mixId){
     let yMin=c.yMin,yMax=c.yMax;
     if(yMin===null){
       const vals=pts.map(p=>p[c.yKey]).filter(v=>v!=null&&isFinite(v));
-      if(vals.length>0){yMin=Math.min(...vals)-0.05;yMax=Math.max(...vals)+0.05;}
-      else{yMin=2.3;yMax=2.6;}
+      const allVals=[...vals,...(c.spec||[])];
+      if(allVals.length>0){
+        const pad=Math.max((Math.max(...allVals)-Math.min(...allVals))*0.12,0.1);
+        yMin=Math.min(...allVals)-pad;
+        yMax=Math.max(...allVals)+pad;
+      }else{yMin=2.3;yMax=2.6;}
     }
     return _svgChart(pts,c.xKey,c.yKey,c.title,yMin,yMax,c.spec);
   });
