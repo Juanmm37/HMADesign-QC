@@ -7263,9 +7263,10 @@ function _produceReportPDFInner(mixId){
       ${selAggrRows}
       <tr>
         <td colspan="4" style="padding:2px 3px;border:1px solid #aaa"></td>
-        <td style="padding:2px 3px;border:1px solid #aaa;font-weight:bold;text-align:right">COMBINED BLENDED G<sub>sb</sub></td>
+        <td style="padding:2px 3px;border:1px solid #aaa;font-weight:bold;text-align:right">COMBINED BLENDED</td>
         ${_td(_ed(combGsb,3),';font-weight:bold')}
-        ${_td('')}${_td('')}
+        ${_td(_ed(selCombGsa,3),';font-weight:bold')}
+        ${_td(_ed(selCombWA,2),';font-weight:bold')}
       </tr>
     </table>
     <div style="font-size:6.5pt;margin-bottom:4px">* % Stockpile to be used when determining combined gradations for batching RAP, and for calculating consensus properties and combined specific gravity.</div>
