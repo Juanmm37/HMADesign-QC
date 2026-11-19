@@ -7130,46 +7130,71 @@ function produceReportPDF(mixId){
     </tr>`;
   }).join('');
 
-  const volDesignRows=Array.from({length:4},(_,i)=>{
-    const t=trials[i]||null;
-    const vol=t?t.vol||{}:{};
+  const acPts=mix.acPoints||[];
+  const volDesignRows=acPts.map((pt,i)=>{
+    const v0=pt.vols[0]||{},v1=pt.vols[1]||{};
+    const GmbA=v0.Gmb!=null?+v0.Gmb:null;
+    const GmbB=v1.Gmb!=null?+v1.Gmb:null;
+    const GmmA=v0.GmmA!=null?+v0.GmmA:null;
+    const GmmB=v0.GmmB!=null?+v0.GmmB:null;
+    const hNiniA=v0.hNiniA!=null?+v0.hNiniA:null;
+    const hNiniB=v0.hNiniB!=null?+v0.hNiniB:null;
+    const hNdesA=v0.hNdesA!=null?+v0.hNdesA:null;
+    const hNdesB=v0.hNdesB!=null?+v0.hNdesB:null;
+    const res=calcVolSelected(pt,mix.info,combGsb||2.7,null);
+    const GmbAvg=res?res.avgGmb:null;
+    const GmmAvg=res?res.Gmm:null;
+    const Va=res?res.Va:null;
+    const VMA=res?res.VMA:null;
+    const pNA=res?res.pGmmNiniA:null,pNB=res?res.pGmmNiniB:null,pNAvg=res?res.pGmmNini:null;
+    const pDA=res?res.pGmmNdesA:null,pDB=res?res.pGmmNdesB:null,pDAvg=res?res.pGmmNdes:null;
+    const GseA=res?res.GseA:null,GseB=res?res.GseB:null,GseAvg=res?res.avgGse:null;
+    const tdS='padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle';
+    const td2=(v,st)=>`<td rowspan="2" style="${tdS};${st||''}">${v!=null&&v!==''?v:''}</td>`;
     const rA=`<tr>
-      ${_td(i+1,'rowspan="2";vertical-align:middle;font-weight:bold')}
+      <td rowspan="2" style="${tdS};font-weight:bold">${i+1}</td>
       ${_td('A')}
-      ${_td(_ed(t?t.Pb:null,1))}
-      ${_td(_ed(vol.GmbA,3))}
-      ${_td('','rowspan="2";vertical-align:middle')}
-      ${_td(_ed(vol.GmmA,4))}
-      ${_td('','rowspan="2";vertical-align:middle')}
-      ${_td('')}${_td('')}${_td(_ed(vol.hNiniA,1))}${_td(_ed(vol.hNdesA,1))}
-      ${_td('')}${_td('','rowspan="2";vertical-align:middle')}
-      ${_td('')}${_td('','rowspan="2";vertical-align:middle')}
-      ${_td('')}${_td('','rowspan="2";vertical-align:middle')}
+      ${td2(_ed(pt.Pb,1))}
+      ${_td(_ed(GmbA,3))}
+      ${td2(_ed(GmbAvg,3))}
+      ${_td(_ed(GmmA,3))}
+      ${td2(_ed(GmmAvg,3))}
+      ${td2(_ed(Va,1))}
+      ${td2(_ed(VMA,1))}
+      ${_td(_ed(hNiniA,1))}
+      ${_td(_ed(hNdesA,1))}
+      ${_td(_ed(pNA,1))}
+      ${td2(_ed(pNAvg,1))}
+      ${_td(_ed(pDA,1))}
+      ${td2(_ed(pDAvg,1))}
+      ${_td(_ed(GseA,3))}
+      ${td2(_ed(GseAvg,3))}
     </tr>`;
     const rB=`<tr>
       ${_td('B')}
-      ${_td(_ed(t?t.Pb:null,1))}
-      ${_td(_ed(vol.GmbB,3))}
-      ${_td(_ed(vol.GmmB,4))}
-      ${_td('')}${_td('')}${_td(_ed(vol.hNiniB,1))}${_td(_ed(vol.hNdesB,1))}
-      ${_td('')}${_td('')}
+      ${_td(_ed(GmbB,3))}
+      ${_td(_ed(GmmB,3))}
+      ${_td(_ed(hNiniB,1))}
+      ${_td(_ed(hNdesB,1))}
+      ${_td(_ed(pNB,1))}
+      ${_td(_ed(pDB,1))}
+      ${_td(_ed(GseB,3))}
     </tr>`;
     return rA+rB;
   }).join('');
 
-  const volPropP3Rows=Array.from({length:4},(_,i)=>{
-    const t=trials[i]||null;
-    const pt=pts[i]||{};
+  const volPropP3Rows=acPts.map((pt,i)=>{
+    const ptData=pts.find(p=>Math.abs(p.Pb-pt.Pb)<0.05)||pts[i]||{};
     return `<tr>
       ${_td(i+1,';font-weight:bold')}
-      ${_td(_ed(t?t.Pb:null,1))}
-      ${_td(_ed(pt.Va,1))}
-      ${_td(_ed(pt.VMA,1))}
-      ${_td(_ed(pt.VFA,1))}
-      ${_td(_ed(pt.pGmmNini,1))}
-      ${_td(_ed(pt.avgGmb,3))}
-      ${_td(_ed(pt.Pbe,2))}
-      ${_td(_ed(pt.DP,2))}
+      ${_td(_ed(pt.Pb,1))}
+      ${_td(_ed(ptData.Va,1))}
+      ${_td(_ed(ptData.VMA,1))}
+      ${_td(_ed(ptData.VFA,1))}
+      ${_td(_ed(ptData.pGmmNini,1))}
+      ${_td(_ed(ptData.avgGmb,3))}
+      ${_td(_ed(ptData.Pbe,2))}
+      ${_td(_ed(ptData.DP,2))}
     </tr>`;
   }).join('');
 
