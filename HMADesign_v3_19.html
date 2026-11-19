@@ -7353,8 +7353,8 @@ function _produceReportPDFInner(mixId){
   const p4=`<div class="page">
     ${_pageHdr(4)}
     ${_secTitle('SUPERPAVE VOLUMETRIC ANALYSIS')}
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px">
-      ${chartSvgs.map(s=>`<div>${s}</div>`).join('')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;justify-items:center">
+      ${chartSvgs.map(s=>`<div style="display:flex;justify-content:center;width:100%">${s}</div>`).join('')}
     </div>
     <div style="margin-top:8px">${_tbl()}
       <tr style="background:#1F3864;color:white;font-weight:bold">
