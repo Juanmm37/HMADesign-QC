@@ -7092,13 +7092,22 @@ function _produceReportPDFInner(mixId){
     <!-- Estimated Properties @ 4% Va -->
     <div style="margin-top:5px"><table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
       <colgroup>
-        <col style="width:14%"><col style="width:11%"><col style="width:11%"><col style="width:11%">
-        <col style="width:19%"><col style="width:11%"><col style="width:11%"><col style="width:12%">
+        <col style="width:14%"><col style="width:12%"><col style="width:12%"><col style="width:12%">
+        <col style="width:14%"><col style="width:12%"><col style="width:12%"><col style="width:12%">
       </colgroup>
       <tr style="background:#1F3864;color:white;font-weight:bold">
         <th colspan="8" style="padding:2px 4px;border:1px solid #aaa;text-align:center">ESTIMATED PROPERTIES @ 4.0% AIR VOIDS</th>
       </tr>
-      ${_th(['TRIAL NO.','% P<sub>b,est</sub>','% VMA<sub>est</sub>','% VFA<sub>est</sub>','% G<sub>mm</sub>@N<sub>ini</sub> @ P<sub>b,est</sub>','% P<sub>be,est</sub>','DP<sub>est</sub>',''],'#2E75B6')}
+      <tr style="background:#2E75B6;color:white;font-weight:bold">
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">TRIAL NO.</th>
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% P<sub>b,est</sub></th>
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% VMA<sub>est</sub></th>
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% VFA<sub>est</sub></th>
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle;font-size:6.5pt">% G<sub>mm</sub>@N<sub>ini</sub> @ P<sub>b,est</sub></th>
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">% P<sub>be,est</sub></th>
+        <th style="padding:3px 2px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle">DP<sub>est</sub></th>
+        <th style="border:none"></th>
+      </tr>
       ${estPropRows}
       <tr style="background:#DCE6F1;font-weight:bold">
         ${_td('SPECIFICATION')}${_td('')}${_td('')}${_td('')}${_td('* ≤ 89.5')}${_td('')}${_td('')}<td style="border:none"></td>
