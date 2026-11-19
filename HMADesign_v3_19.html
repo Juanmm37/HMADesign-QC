@@ -6554,7 +6554,7 @@ function _produceReportPDFInner(mixId){
     const inC=coarseActive.includes(k);
     const inF=fineActive.includes(k);
     const inR=rapActive.includes(k);
-    const tdM=(v,rs,dp)=>`<td rowspan="${rs}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${v!=null?v.toFixed(dp):''}</td>`;
+    const tdM=(v,rs,dp)=>`<td rowspan="${rs}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${v!=null?_ed(v,dp):''}</td>`;
     let blendCell='',gsaCell='',waCell='';
     if(isFirstC){
       blendCell=tdM(coarseBlend.gsb,coarseActive.length,3);
