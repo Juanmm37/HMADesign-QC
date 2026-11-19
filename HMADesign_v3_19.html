@@ -6921,10 +6921,10 @@ function produceReportPDF(mixId){
     const td2=(v,st)=>`<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle;${bgSel}${st||''}">${v!=null&&v!==''?v:''}</td>`;
     const rA=`<tr style="${bgSel}">
       <td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle;font-weight:bold;${bgSel}">TRIAL ${i+1}</td>
-      ${_td('A')}${_td(_ed(t.Pb,1))}${_td(_ed(GmbA,3))}${td2(_ed(GmbAvg,3))}${_td(_ed(GmmA,4))}${td2(_ed(GmmAvg,4))}${td2(_ed(VaAvg,1))}${td2(_ed(VMA,1))}${_td(_ed(hNiniA,1))}${_td(_ed(hNdesA,1))}${_td(_ed(pNiniA,1))}${td2(_ed(pNiniAvg,1))}${_td(_ed(pNdesA,1))}${td2(_ed(pNdesAvg,1))}${_td(_ed(GseA,3))}${td2(_ed(GseAvg,3))}
+      ${_td('A')}${td2(_ed(t.Pb,1))}${_td(_ed(GmbA,3))}${td2(_ed(GmbAvg,3))}${_td(_ed(GmmA,3))}${td2(_ed(GmmAvg,3))}${td2(_ed(VaAvg,1))}${td2(_ed(VMA,1))}${_td(_ed(hNiniA,1))}${_td(_ed(hNdesA,1))}${_td(_ed(pNiniA,1))}${td2(_ed(pNiniAvg,1))}${_td(_ed(pNdesA,1))}${td2(_ed(pNdesAvg,1))}${_td(_ed(GseA,3))}${td2(_ed(GseAvg,3))}
     </tr>`;
     const rB=`<tr style="${bgSel}">
-      ${_td('B')}${_td(_ed(t.Pb,1))}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,4))}${_td(_ed(hNiniB,1))}${_td(_ed(hNdesB,1))}${_td(_ed(pNiniB,1))}${_td(_ed(pNdesB,1))}${_td(_ed(GseB,3))}
+      ${_td('B')}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,3))}${_td(_ed(hNiniB,1))}${_td(_ed(hNdesB,1))}${_td(_ed(pNiniB,1))}${_td(_ed(pNdesB,1))}${_td(_ed(GseB,3))}
     </tr>`;
     return rA+rB;
   }).join('');
