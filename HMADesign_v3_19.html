@@ -6891,8 +6891,7 @@ function produceReportPDF(mixId){
     }).join('');
     const ss2=k==='BHF'?_edStr(s.source||s.supplier||'Refer to Note 3.'):_edStr(s.source||s.supplier||'');
     const mat2=getAgg(s).material||'';
-    const kLabel2=`<b>${k}</b>${mat2?`<div style="font-size:5.5pt;font-weight:normal;color:#444;line-height:1.2;margin-top:1px">${mat2}</div>`:''}`;
-    return `<tr>${_tdL(kLabel2)}${_tdL(ss2)}${_td(_ed(gsb,3))}${_td(_ed(gsa,3))}${_td(_ed(wa,1))}${trialPcts}</tr>`;
+    return `<tr>${_tdL(`<b>${k}</b>`)}${_tdL(mat2)}${_tdL(ss2)}${_td(_ed(gsb,3))}${_td(_ed(gsa,3))}${_td(_ed(wa,1))}${trialPcts}</tr>`;
   }).join('');
 
   const trialGradRows=trials.map((t,i)=>{
