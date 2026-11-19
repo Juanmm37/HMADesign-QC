@@ -6558,8 +6558,9 @@ function produceReportPDF(mixId){
     const supSrc=k==='BHF'
       ?_edStr(s.source||s.supplier||'Refer to Note 3.')
       :_edStr(s.source||s.supplier||'');
-    return `<tr style="height:14px">
-      ${_tdL(`<b>${k}</b>`)}
+    const mat=getAgg(s).material||'';
+    return `<tr>
+      ${_tdL(`<b>${k}</b>${mat?`<div style="font-size:5.5pt;font-weight:normal;color:#444;line-height:1.2;margin-top:1px">${mat}</div>`:''}`)}
       ${_tdL(supSrc)}
       ${_td(_edStr(s.invNo||''))}
       ${_td(_ed(bp,1))}
