@@ -6891,19 +6891,41 @@ function produceReportPDF(mixId){
 
   const volTrialRows=trials.map((t,i)=>{
     const vol=t.vol||{};
-    const GmbA=vol.GmbA,GmbB=vol.GmbB,GmmA=vol.GmmA,GmmB=vol.GmmB;
-    const GmbAvg=(GmbA!=null&&GmbB!=null)?(+GmbA+(+GmbB))/2:null;
-    const GmmAvg=(GmmA!=null&&GmmB!=null)?(+GmmA+(+GmmB))/2:null;
+    const Pb=+(t.Pb)||0, Ps=100-Pb, Gb=mix.Gb||1.022;
+    const GmbA=vol.GmbA!=null?+vol.GmbA:null;
+    const GmbB=vol.GmbB!=null?+vol.GmbB:null;
+    const GmmA=vol.GmmA!=null?+vol.GmmA:null;
+    const GmmB=vol.GmmB!=null?+vol.GmmB:null;
+    const GmbAvg=(GmbA!=null&&GmbB!=null)?(GmbA+GmbB)/2:(GmbA!=null?GmbA:GmbB);
+    const GmmAvg=(GmmA!=null&&GmmB!=null)?(GmmA+GmmB)/2:(GmmA!=null?GmmA:null);
+    const gsb=_blendedGsb(t);
+    const GmmForB=GmmB!=null?GmmB:(GmmA!=null?GmmA:null);
     const VaA=(GmbA!=null&&GmmA!=null)?(1-GmbA/GmmA)*100:null;
-    const VaB=(GmbB!=null&&GmmB!=null)?(1-GmbB/GmmB)*100:null;
-    const VaAvg=VaA!=null&&VaB!=null?(VaA+VaB)/2:null;
-    const pNiniA=vol.hNiniA!=null&&vol.hNdesA!=null?null:null; // height-based % Gmm@Nini
-    const hNiniA=vol.hNiniA,hNiniB=vol.hNiniB,hNdesA=vol.hNdesA,hNdesB=vol.hNdesB;
-    const pNdesA=(GmbA&&GmmA)?(GmbA/GmmA)*100:null;
-    const pNdesB=(GmbB&&GmmB)?(GmbB/GmmB)*100:null;
-    const sel=i===selIdx?` style="background:#FFF2CC"`:'';
-    const rA=`<tr${sel}>${_td(`TRIAL ${i+1}`,'rowspan="2";vertical-align:middle;font-weight:bold')}${_td('A')}${_td(_ed(t.Pb,1))}${_td(_ed(GmbA,3))}${_td(_ed(GmbAvg,3),'rowspan="2";vertical-align:middle')}${_td(_ed(GmmA,4))}${_td(_ed(GmmAvg,4),'rowspan="2";vertical-align:middle')}${_td(_ed(VaA,1))}${_td('')}${_td(_ed(hNiniA,1))}${_td(_ed(hNdesA,1))}${_td(_ed(pNdesA,1))}${_td('')}${_td(_ed(pNdesA,1))}${_td('')}${_td('')}${_td('')}</tr>`;
-    const rB=`<tr${sel}>${_td('B')}${_td(_ed(t.Pb,1))}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,4))}${_td(_ed(VaB,1))}${_td('')}${_td(_ed(hNiniB,1))}${_td(_ed(hNdesB,1))}${_td(_ed(pNdesB,1))}${_td('')}${_td(_ed(pNdesB,1))}${_td('')}${_td('')}${_td('')}</tr>`;
+    const VaB=(GmbB!=null&&GmmForB!=null)?(1-GmbB/GmmForB)*100:null;
+    const VaAvg=(VaA!=null&&VaB!=null)?(VaA+VaB)/2:(VaA!=null?VaA:VaB);
+    const VMA=(GmbAvg!=null&&gsb!=null&&Ps>0)?100-GmbAvg*Ps/gsb:null;
+    const hNiniA=vol.hNiniA!=null?+vol.hNiniA:null;
+    const hNiniB=vol.hNiniB!=null?+vol.hNiniB:null;
+    const hNdesA=vol.hNdesA!=null?+vol.hNdesA:null;
+    const hNdesB=vol.hNdesB!=null?+vol.hNdesB:null;
+    const pNdesA=(GmbA!=null&&GmmA!=null)?GmbA/GmmA*100:null;
+    const pNdesB=(GmbB!=null&&GmmForB!=null)?GmbB/GmmForB*100:null;
+    const pNdesAvg=(pNdesA!=null&&pNdesB!=null)?(pNdesA+pNdesB)/2:(pNdesA!=null?pNdesA:pNdesB);
+    const pNiniA=(GmbA!=null&&GmmA!=null&&hNdesA!=null&&hNiniA!=null)?GmbA*(hNdesA/hNiniA)/GmmA*100:null;
+    const pNiniB=(GmbB!=null&&GmmForB!=null&&hNdesB!=null&&hNiniB!=null)?GmbB*(hNdesB/hNiniB)/GmmForB*100:null;
+    const pNiniAvg=(pNiniA!=null&&pNiniB!=null)?(pNiniA+pNiniB)/2:(pNiniA!=null?pNiniA:pNiniB);
+    const GseA=(GmmA!=null&&Pb>0)?Ps/(100/GmmA-Pb/Gb):null;
+    const GseB=(GmmB!=null&&Pb>0)?Ps/(100/GmmB-Pb/Gb):null;
+    const GseAvg=(GseA!=null&&GseB!=null)?(GseA+GseB)/2:(GseA!=null?GseA:null);
+    const bgSel=i===selIdx?'background:#FFF2CC;':'';
+    const td2=(v,st)=>`<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle;${bgSel}${st||''}">${v!=null&&v!==''?v:''}</td>`;
+    const rA=`<tr style="${bgSel}">
+      <td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle;font-weight:bold;${bgSel}">TRIAL ${i+1}</td>
+      ${_td('A')}${_td(_ed(t.Pb,1))}${_td(_ed(GmbA,3))}${td2(_ed(GmbAvg,3))}${_td(_ed(GmmA,4))}${td2(_ed(GmmAvg,4))}${td2(_ed(VaAvg,1))}${td2(_ed(VMA,1))}${_td(_ed(hNiniA,1))}${_td(_ed(hNdesA,1))}${_td(_ed(pNiniA,1))}${td2(_ed(pNiniAvg,1))}${_td(_ed(pNdesA,1))}${td2(_ed(pNdesAvg,1))}${_td(_ed(GseA,3))}${td2(_ed(GseAvg,3))}
+    </tr>`;
+    const rB=`<tr style="${bgSel}">
+      ${_td('B')}${_td(_ed(t.Pb,1))}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,4))}${_td(_ed(hNiniB,1))}${_td(_ed(hNdesB,1))}${_td(_ed(pNiniB,1))}${_td(_ed(pNdesB,1))}${_td(_ed(GseB,3))}
+    </tr>`;
     return rA+rB;
   }).join('');
 
