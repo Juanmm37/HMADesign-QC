@@ -7534,7 +7534,8 @@ function _produceReportPDFInner(mixId){
       <tr><td style="padding:4px;border:1px solid #aaa"></td><td style="padding:4px;border:1px solid #aaa"></td><td style="padding:4px;border:1px solid #aaa"></td><td style="padding:4px;border:1px solid #aaa"></td><td style="padding:4px;border:1px solid #aaa"></td></tr>
     </table>
 
-    <div style="margin-top:5px">${_tbl()}
+    <div style="margin-top:5px"><table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+      <colgroup><col style="width:28%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"><col style="width:12%"></colgroup>
       <tr style="background:#1F3864;color:white;font-weight:bold">
         <th style="padding:2px 3px;border:1px solid #aaa"></th>
         <th colspan="3" style="padding:2px 4px;border:1px solid #aaa;text-align:center">CONDITIONED (WET) SUBSET</th>
@@ -7561,36 +7562,20 @@ function _produceReportPDFInner(mixId){
       <tr>${_tdL('Percent Air Voids')}${wCalc.map(c=>_td(_ed(c.Va,1))).join('')}${dCalc.map(c=>_td(_ed(c.Va,1))).join('')}</tr>
       <tr>${_tdL('Vol. of Air Voids, cm³')}${wCalc.map(c=>_td(_ed(c.volAV,1))).join('')}${dCalc.map(c=>_td(_ed(c.volAV,1))).join('')}</tr>
       <tr>${_tdL('Load, N')}${wCalc.map(()=>_td('')).join('')}${dCalc.map(c=>_td(_ed(c.load,0))).join('')}</tr>
+      <tr>
+        <td style="padding:2px 3px;border:1px solid #aaa;background:#f5f5f5"></td>
+        <td colspan="3" style="padding:2px 4px;border:1px solid #aaa;background:#1F3864;color:white;font-weight:bold;text-align:center">SSD CONDITIONED</td>
+        <td colspan="3" style="padding:2px 3px;border:1px solid #aaa;background:#d9d9d9"></td>
+      </tr>
+      <tr>${_tdL('Thickness, mm')}${wCalc.map(c=>_td(_ed(c.tCond,1))).join('')}${dCalc.map(()=>'<td style="padding:2px 3px;border:1px solid #aaa;background:#f0f0f0"></td>').join('')}</tr>
+      <tr>${_tdL('SSD Mass, g')}${wCalc.map(c=>_td(_ed(c.mSSDcond,1))).join('')}${dCalc.map(()=>'<td style="padding:2px 3px;border:1px solid #aaa;background:#f0f0f0"></td>').join('')}</tr>
+      <tr>${_tdL('Vol. Absorbed Water, cm³')}${wCalc.map(c=>_td(_ed(c.volAbs,1))).join('')}${dCalc.map(()=>'<td style="padding:2px 3px;border:1px solid #aaa;background:#f0f0f0"></td>').join('')}</tr>
+      <tr>${_tdL('% Saturation')}${wCalc.map(c=>_td(_ed(c.satPct,1))).join('')}${dCalc.map(()=>'<td style="padding:2px 3px;border:1px solid #aaa;background:#f0f0f0"></td>').join('')}</tr>
+      <tr>${_tdL('Load, N')}${wCalc.map(c=>_td(_ed(c.load,0))).join('')}${dCalc.map(()=>'<td style="padding:2px 3px;border:1px solid #aaa;background:#f0f0f0"></td>').join('')}</tr>
+      <tr><td colspan="7" style="padding:2px 4px;border:1px solid #aaa;background:#1F3864;color:white;font-weight:bold;text-align:center">CALCULATED STRENGTHS</td></tr>
+      <tr>${_tdL('Dry Strength, kPa')}${wCalc.map(()=>_td('')).join('')}${dCalc.map(c=>_td(_ed(c.ITS,1))).join('')}</tr>
+      <tr>${_tdL('Wet Strength, kPa')}${wCalc.map(c=>_td(_ed(c.ITS,1))).join('')}${dCalc.map(()=>_td('')).join('')}</tr>
     </table></div>
-
-    <div style="margin-top:5px;display:flex;gap:12px">
-      <div style="flex:0 0 auto">${_tbl()}
-        <tr style="background:#1F3864;color:white;font-weight:bold">
-          <th style="padding:2px 4px;border:1px solid #aaa;font-weight:bold">SSD CONDITIONED</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">1</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">2</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">3</th>
-        </tr>
-        <tr>${_tdL('Thickness, mm')}${wCalc.map(c=>_td(_ed(c.tCond,1))).join('')}</tr>
-        <tr>${_tdL('SSD Mass, g')}${wCalc.map(c=>_td(_ed(c.mSSDcond,1))).join('')}</tr>
-        <tr>${_tdL('Vol. Absorbed Water, cm³')}${wCalc.map(c=>_td(_ed(c.volAbs,1))).join('')}</tr>
-        <tr>${_tdL('% Saturation')}${wCalc.map(c=>_td(_ed(c.satPct,1))).join('')}</tr>
-        <tr>${_tdL('Load, N')}${wCalc.map(c=>_td(_ed(c.load,0))).join('')}</tr>
-      </table></div>
-      <div style="flex:0 0 auto">${_tbl()}
-        <tr style="background:#1F3864;color:white;font-weight:bold">
-          <th style="padding:2px 4px;border:1px solid #aaa;font-weight:bold">CALCULATED STRENGTHS</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">1</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">2</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">3</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">1</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">2</th>
-          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">3</th>
-        </tr>
-        <tr>${_tdL('Dry Strength, kPa')}${wCalc.map(()=>_td('')).join('')}${dCalc.map(c=>_td(_ed(c.ITS,1))).join('')}</tr>
-        <tr>${_tdL('Wet Strength, kPa')}${wCalc.map(c=>_td(_ed(c.ITS,1))).join('')}${dCalc.map(()=>_td('')).join('')}</tr>
-      </table></div>
-    </div>
 
     <div style="margin-top:5px">${_tbl()}
       <tr><td colspan="2" style="border:none;padding:3px 2px;background:#1F3864;color:white;font-weight:bold;font-size:7pt;padding:2px 4px">TENSILE STRENGTH RATIO</td></tr>
