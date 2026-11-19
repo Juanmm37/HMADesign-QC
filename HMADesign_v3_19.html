@@ -6630,6 +6630,7 @@ function _produceReportPDFInner(mixId){
   </table>`;
 
   // Vol props @ design Pb
+  const targetVa=(mix.info&&getBands(mix.info).Va)||4.0;
   const Va_d=designPb?_interp(pts,'Pb','Va',designPb):null;
   const VMA_d=designPb?_interp(pts,'Pb','VMA',designPb):null;
   const VFA_d=designPb?_interp(pts,'Pb','VFA',designPb):null;
