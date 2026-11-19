@@ -7132,6 +7132,7 @@ function produceReportPDF(mixId){
 
   const acPts=mix.acPoints||[];
   const volDesignRows=acPts.map((pt,i)=>{
+    if(!pt||!Array.isArray(pt.vols))return '';
     const v0=pt.vols[0]||{},v1=pt.vols[1]||{};
     const GmbA=v0.Gmb!=null?+v0.Gmb:null;
     const GmbB=v1.Gmb!=null?+v1.Gmb:null;
