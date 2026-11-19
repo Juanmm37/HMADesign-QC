@@ -7437,16 +7437,16 @@ function _produceReportPDFInner(mixId){
         <th colspan="17" style="padding:2px 4px;border:1px solid #aaa;text-align:center">VERIFY % G<sub>mm</sub> @ N<sub>max</sub></th>
       </tr>
       <tr style="background:#2E75B6;color:white;font-weight:bold">
-        ${_thN('SPECIMEN NO.',';font-size:6.5pt')} ${_thN('Sp.')} ${_thN('% P<sub>b</sub>')}
+        ${_thN('SPECIMEN NO.',';font-size:6.5pt',true)} ${_thN('Sp.','',true)} ${_thN('% P<sub>b</sub>','',true)}
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>mb</sub>@N<sub>max</sub></th>
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>mm</sub></th>
-        ${_thN('Ht.@N<sub>ini</sub>',';font-size:6.5pt')}
-        ${_thN('Ht.@N<sub>des</sub>',';font-size:6.5pt')}
-        ${_thN('Ht.@N<sub>max</sub>',';font-size:6.5pt')}
+        ${_thN('Ht.@N<sub>ini</sub>',';font-size:6.5pt',true)}
+        ${_thN('Ht.@N<sub>des</sub>',';font-size:6.5pt',true)}
+        ${_thN('Ht.@N<sub>max</sub>',';font-size:6.5pt',true)}
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-size:6.5pt">%G<sub>mm</sub>@N<sub>ini</sub></th>
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-size:6.5pt">%G<sub>mm</sub>@N<sub>des</sub></th>
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-size:6.5pt">%G<sub>mm</sub>@N<sub>max</sub></th>
-        ${_thN('Avg.')}
+        ${_thN('Avg.','',true)}
       </tr>
       <tr style="background:#2E75B6;color:white;font-weight:bold">
         <th style="padding:2px 3px;border:1px solid #aaa">G<sub>mb</sub></th><th style="padding:2px 3px;border:1px solid #aaa">Avg.</th>
