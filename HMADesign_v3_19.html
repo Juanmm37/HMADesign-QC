@@ -7549,18 +7549,18 @@ function _produceReportPDFInner(mixId){
         <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">2</th>
         <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">3</th>
       </tr>
-      <tr>${_tdL('Sample Identification')}${wet.map(s=>_td(_edStr(s.id||''))).join('')}${dry.map(s=>_td(_edStr(s.id||''))).join('')}</tr>
-      <tr>${_tdL('Diameter, mm')}${wet.map(s=>_td(_ed(tsr.diam||150,0))).join('')}${dry.map(s=>_td(_ed(tsr.diam||150,0))).join('')}</tr>
-      <tr>${_tdL('Thickness, mm')}${wet.map(s=>_td(_ed(s.t,1))).join('')}${dry.map(s=>_td(_ed(s.t,1))).join('')}</tr>
-      <tr>${_tdL('Dry Mass in Air, g')}${wet.map(s=>_td(_ed(s.mDry,1))).join('')}${dry.map(s=>_td(_ed(s.mDry,1))).join('')}</tr>
-      <tr>${_tdL('SSD Mass, g')}${wet.map(s=>_td(_ed(s.mSSD,1))).join('')}${dry.map(s=>_td(_ed(s.mSSD,1))).join('')}</tr>
-      <tr>${_tdL('Mass in Water, g')}${wet.map(s=>_td(_ed(s.mWat,1))).join('')}${dry.map(s=>_td(_ed(s.mWat,1))).join('')}</tr>
-      <tr>${_tdL('Volume, cm³')}${wet.map(s=>{const v=(s.mSSD&&s.mWat)?s.mSSD-s.mWat:null;return _td(_ed(v,2));}).join('')}${dry.map(s=>{const v=(s.mSSD&&s.mWat)?s.mSSD-s.mWat:null;return _td(_ed(v,2));}).join('')}</tr>
-      <tr>${_tdL('Bulk Specific Gravity (G<sub>mb</sub>)')}${wet.map(s=>{const vol=(s.mSSD&&s.mWat)?s.mSSD-s.mWat:null;const g=(s.mDry&&vol)?s.mDry/vol:null;return _td(_ed(g,3));}).join('')}${dry.map(s=>{const vol=(s.mSSD&&s.mWat)?s.mSSD-s.mWat:null;const g=(s.mDry&&vol)?s.mDry/vol:null;return _td(_ed(g,3));}).join('')}</tr>
-      <tr>${_tdL('Max. Specific Gravity (G<sub>mm</sub>)')}${wet.map(s=>_td(_ed(tsr.Gmm,4))).join('')}${dry.map(s=>_td(_ed(tsr.Gmm,4))).join('')}</tr>
-      <tr>${_tdL('Percent Air Voids')}${[...wet,...dry].map((_,i)=>_td('')).join('')}</tr>
-      <tr>${_tdL('Vol. of Air Voids, cm³')}${[...wet,...dry].map(_=>_td('')).join('')}</tr>
-      <tr>${_tdL('Load, N')}${wet.map(s=>_td(_ed(s.load,0))).join('')}${dry.map(s=>_td(_ed(s.load,0))).join('')}</tr>
+      <tr>${_tdL('Sample Identification')}${wet.map((s,i)=>_td(_edStr(s.id||String(i+1)))).join('')}${dry.map((s,i)=>_td(_edStr(s.id||String(i+1)))).join('')}</tr>
+      <tr>${_tdL('Diameter, mm')}${[...wCalc,...dCalc].map(()=>_td(_ed(tsrDiam,0))).join('')}</tr>
+      <tr>${_tdL('Thickness, mm')}${wCalc.map(c=>_td(_ed(c.t,1))).join('')}${dCalc.map(c=>_td(_ed(c.t,1))).join('')}</tr>
+      <tr>${_tdL('Dry Mass in Air, g')}${wCalc.map(c=>_td(_ed(c.mDry,1))).join('')}${dCalc.map(c=>_td(_ed(c.mDry,1))).join('')}</tr>
+      <tr>${_tdL('SSD Mass, g')}${wCalc.map(c=>_td(_ed(c.mSSD,1))).join('')}${dCalc.map(c=>_td(_ed(c.mSSD,1))).join('')}</tr>
+      <tr>${_tdL('Mass in Water, g')}${wCalc.map(c=>_td(_ed(c.mWat,1))).join('')}${dCalc.map(c=>_td(_ed(c.mWat,1))).join('')}</tr>
+      <tr>${_tdL('Volume, cm³')}${wCalc.map(c=>_td(_ed(c.vol,1))).join('')}${dCalc.map(c=>_td(_ed(c.vol,1))).join('')}</tr>
+      <tr>${_tdL('Bulk Specific Gravity (G<sub>mb</sub>)')}${wCalc.map(c=>_td(_ed(c.Gmb,3))).join('')}${dCalc.map(c=>_td(_ed(c.Gmb,3))).join('')}</tr>
+      <tr>${_tdL('Max. Specific Gravity (G<sub>mm</sub>)')}${[...wCalc,...dCalc].map(()=>_td(_ed(tsrGmm,3))).join('')}</tr>
+      <tr>${_tdL('Percent Air Voids')}${wCalc.map(c=>_td(_ed(c.Va,1))).join('')}${dCalc.map(c=>_td(_ed(c.Va,1))).join('')}</tr>
+      <tr>${_tdL('Vol. of Air Voids, cm³')}${wCalc.map(c=>_td(_ed(c.volAV,1))).join('')}${dCalc.map(c=>_td(_ed(c.volAV,1))).join('')}</tr>
+      <tr>${_tdL('Load, N')}${wCalc.map(()=>_td('')).join('')}${dCalc.map(c=>_td(_ed(c.load,0))).join('')}</tr>
     </table></div>
 
     <div style="margin-top:5px;display:flex;gap:12px">
@@ -7571,11 +7571,11 @@ function _produceReportPDFInner(mixId){
           <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">2</th>
           <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">3</th>
         </tr>
-        <tr>${_tdL('Thickness, mm')}${wet.map(s=>_td(_ed(s.tCond,1))).join('')}</tr>
-        <tr>${_tdL('SSD Mass, g')}${wet.map(s=>_td(_ed(s.mSSDcond,1))).join('')}</tr>
-        <tr>${_tdL('Vol. Absorbed Water, cm³')}${wet.map(s=>{const v=(s.mSSDcond&&s.mSSD)?s.mSSDcond-s.mSSD:null;return _td(_ed(v,2));}).join('')}</tr>
-        <tr>${_tdL('% Saturation')}${wet.map(_=>_td('')).join('')}</tr>
-        <tr>${_tdL('Load, N')}${wet.map(s=>_td(_ed(s.load,0))).join('')}</tr>
+        <tr>${_tdL('Thickness, mm')}${wCalc.map(c=>_td(_ed(c.tCond,1))).join('')}</tr>
+        <tr>${_tdL('SSD Mass, g')}${wCalc.map(c=>_td(_ed(c.mSSDcond,1))).join('')}</tr>
+        <tr>${_tdL('Vol. Absorbed Water, cm³')}${wCalc.map(c=>_td(_ed(c.volAbs,1))).join('')}</tr>
+        <tr>${_tdL('% Saturation')}${wCalc.map(c=>_td(_ed(c.satPct,1))).join('')}</tr>
+        <tr>${_tdL('Load, N')}${wCalc.map(c=>_td(_ed(c.load,0))).join('')}</tr>
       </table></div>
       <div style="flex:0 0 auto">${_tbl()}
         <tr style="background:#1F3864;color:white;font-weight:bold">
@@ -7587,18 +7587,18 @@ function _produceReportPDFInner(mixId){
           <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">2</th>
           <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">3</th>
         </tr>
-        <tr>${_tdL('Dry Strength, kPa')}${dry.map(s=>{const vol=(s.mSSD&&s.mWat)?s.mSSD-s.mWat:null;const t=s.t;const d=tsr.diam||150;const str=(s.load&&t&&d)?(2000*s.load)/(Math.PI*d*t):null;return _td(_ed(str,1));}).join('')}${dry.map(_=>_td('')).join('')}</tr>
-        <tr>${_tdL('Wet Strength, kPa')}${wet.map(s=>{const t=s.tCond||s.t;const d=tsr.diam||150;const str=(s.load&&t&&d)?(2000*s.load)/(Math.PI*d*t):null;return _td(_ed(str,1));}).join('')}${wet.map(_=>_td('')).join('')}</tr>
+        <tr>${_tdL('Dry Strength, kPa')}${wCalc.map(()=>_td('')).join('')}${dCalc.map(c=>_td(_ed(c.ITS,1))).join('')}</tr>
+        <tr>${_tdL('Wet Strength, kPa')}${wCalc.map(c=>_td(_ed(c.ITS,1))).join('')}${dCalc.map(()=>_td('')).join('')}</tr>
       </table></div>
     </div>
 
     <div style="margin-top:5px">${_tbl()}
       <tr><td colspan="2" style="border:none;padding:3px 2px;background:#1F3864;color:white;font-weight:bold;font-size:7pt;padding:2px 4px">TENSILE STRENGTH RATIO</td></tr>
-      <tr>${_tdL('Avg. Dry Strength, kPa')}${_td(_ed(tsr.tsrResult?null:null,1))}</tr>
-      <tr>${_tdL('Avg. Wet Strength, kPa')}${_td('')}</tr>
-      <tr>${_tdL('Tensile Strength Ratio, %')}${_td(_ed(tsr.tsrResult,1))}</tr>
+      <tr>${_tdL('Avg. Dry Strength, kPa')}${_td(_ed(avgDryITS,0))}</tr>
+      <tr>${_tdL('Avg. Wet Strength, kPa')}${_td(_ed(avgWetITS,0))}</tr>
+      <tr>${_tdL('Tensile Strength Ratio, %')}${_td(_ed(tsrRatioPDF,0))}</tr>
       <tr>${_tdL('Visual Moisture Damage Rating, No = 0 to Most Stripped = 5')}${_td(_edStr(tsr.moistDmg!=null?tsr.moistDmg:'0'))}</tr>
-      <tr>${_tdL('Cracked/ Broken Aggregate, Nil/ Slight/ Medium/ High')}${_td(_edStr(tsr.cracked||'Slight'))}</tr>
+      <tr>${_tdL('Cracked/ Broken Aggregate, Nil/ Slight/ Medium/ High')}${_td(_edStr(tsr.cracked||''))}</tr>
     </table></div>
   </div>`;
 
