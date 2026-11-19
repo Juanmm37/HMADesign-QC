@@ -7650,9 +7650,17 @@ function _produceReportPDFInner(mixId,theme){
   ${p1}${p2}${p3}${p4}${p5}
   </body></html>`;
 
+  // Apply dark/grayscale theme by swapping color tokens
+  let finalHtml=html;
+  if(theme==='dark'){
+    finalHtml=finalHtml
+      .replace(/#1F3864/gi,'#1a1a1a')
+      .replace(/#2E75B6/gi,'#595959')
+      .replace(/#DCE6F1/gi,'#d9d9d9');
+  }
   const w=window.open('','_blank','width=1050,height=800,scrollbars=yes');
   if(!w){alert('Pop-up blocked. Please allow pop-ups for this page and try again.');return;}
-  w.document.write(html);
+  w.document.write(finalHtml);
   w.document.close();
 }
 
