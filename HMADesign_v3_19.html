@@ -7161,7 +7161,7 @@ function _produceReportPDFInner(mixId){
   const fa3K=['FA1','FA2','BHF'].filter(k=>activeSlots.includes(k));
   const caB3=_grpBlend3(ca3K),faB3=_grpBlend3(fa3K);
   const selAggrRows=(()=>{
-    const tdM=(v,rs,dp)=>`<td rowspan="${rs}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${v!=null?v.toFixed(dp):''}</td>`;
+    const tdM=(v,rs,dp)=>`<td rowspan="${rs}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${v!=null?_ed(v,dp):''}</td>`;
     let html='';
     for(const k of activeSlots){
       const s=slots[k];
