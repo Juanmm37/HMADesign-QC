@@ -7145,7 +7145,7 @@ function _produceReportPDFInner(mixId){
     const hNiniB=v0.hNiniB!=null?+v0.hNiniB:null;
     const hNdesA=v0.hNdesA!=null?+v0.hNdesA:null;
     const hNdesB=v0.hNdesB!=null?+v0.hNdesB:null;
-    const res=calcVolSelected(pt,mix.info,combGsb||2.7,null);
+    const res=calcVolSelected(pt,mix.info||{},combGsb||2.7,null);
     const GmbAvg=res?res.avgGmb:null;
     const GmmAvg=res?res.Gmm:null;
     const Va=res?res.Va:null;
