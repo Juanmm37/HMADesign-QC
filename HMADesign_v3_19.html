@@ -6519,45 +6519,61 @@ function _produceReportPDFInner(mixId){
   // Blended Gsb (combined)
   const combGsb=selTrial?_blendedGsb(selTrial):null;
 
-  // Group active slots for blended Gsb per group
+  // Group active slots for blended Gsb/Gsa/%Abs per group
   const coarseActive=['CA1','CA2','CA3'].filter(k=>activeSlots.includes(k));
   const fineActive=['FA1','FA2','BHF'].filter(k=>activeSlots.includes(k));
   const rapActive=['RAP1','RAP2'].filter(k=>activeSlots.includes(k));
-  function _groupGsb(keys){
+  function _groupBlend(keys){
     const bp=selTrial&&selTrial.blendPct?selTrial.blendPct:{};
-    let num=0,den=0;
+    let nG=0,dG=0,nA=0,dA=0,nW=0,dW=0;
     for(const k of keys){
-      const pct=bp[k];if(!pct||pct===0)continue;
+      const pct=+(bp[k]||0);if(!pct)continue;
       const sl=slots[k];if(!sl)continue;
-      const gsb=_slotGsb(sl);
-      if(gsb&&gsb>0){num+=pct;den+=pct/gsb;}
+      const gsb=_slotGsb(sl),gsa=_slotGsa(sl),wa=_slotWA(sl);
+      if(gsb&&gsb>0){nG+=pct;dG+=pct/gsb;}
+      if(gsa!=null){nA+=pct*gsa;dA+=pct;}
+      if(wa!=null){nW+=pct*wa;dW+=pct;}
     }
-    return den>0?num/den:null;
+    return{gsb:dG>0?nG/dG:null,gsa:dA>0?nA/dA:null,wa:dW>0?nW/dW:null};
   }
-  const coarseGsb=_groupGsb(coarseActive);
-  const fineGsb=_groupGsb(fineActive);
-  const rapGsb=_groupGsb(rapActive);
+  // keep _groupGsb alias for any other callers
+  function _groupGsb(keys){return _groupBlend(keys).gsb;}
+  const coarseBlend=_groupBlend(coarseActive);
+  const fineBlend=_groupBlend(fineActive);
+  const rapBlend=_groupBlend(rapActive);
+  const coarseGsb=coarseBlend.gsb,fineGsb=fineBlend.gsb,rapGsb=rapBlend.gsb;
 
-  // Aggregate source data rows with merged blended Gsb per group
+  // Aggregate source data rows with merged blended Gsb/Gsa/%Abs per group
   const aggSrcRows=activeSlots.map(k=>{
     const s=slots[k];
     const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
     const gsb=_slotGsb(s);
-    const gsa=_slotGsa(s);
-    const wa=_slotWA(s);
-    // Determine merged blended Gsb cell
-    let blendCell='';
     const isFirstC=coarseActive.length>0&&k===coarseActive[0];
     const isFirstF=fineActive.length>0&&k===fineActive[0];
     const isFirstR=rapActive.length>0&&k===rapActive[0];
     const inC=coarseActive.includes(k);
     const inF=fineActive.includes(k);
     const inR=rapActive.includes(k);
-    if(isFirstC) blendCell=`<td rowspan="${coarseActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(coarseGsb,3)}</td>`;
-    else if(isFirstF) blendCell=`<td rowspan="${fineActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(fineGsb,3)}</td>`;
-    else if(isFirstR) blendCell=`<td rowspan="${rapActive.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${_ed(rapGsb,3)}</td>`;
-    else if((inC&&!isFirstC)||(inF&&!isFirstF)||(inR&&!isFirstR)) blendCell=''; // merged
-    else blendCell=_td(''); // standalone slot
+    const tdM=(v,rs,dp)=>`<td rowspan="${rs}" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle">${v!=null?v.toFixed(dp):''}</td>`;
+    let blendCell='',gsaCell='',waCell='';
+    if(isFirstC){
+      blendCell=tdM(coarseBlend.gsb,coarseActive.length,3);
+      gsaCell=tdM(coarseBlend.gsa,coarseActive.length,3);
+      waCell=tdM(coarseBlend.wa,coarseActive.length,2);
+    } else if(isFirstF){
+      blendCell=tdM(fineBlend.gsb,fineActive.length,3);
+      gsaCell=tdM(fineBlend.gsa,fineActive.length,3);
+      waCell=tdM(fineBlend.wa,fineActive.length,2);
+    } else if(isFirstR){
+      blendCell=tdM(rapBlend.gsb,rapActive.length,3);
+      gsaCell=tdM(rapBlend.gsa,rapActive.length,3);
+      waCell=tdM(rapBlend.wa,rapActive.length,2);
+    } else if((inC&&!isFirstC)||(inF&&!isFirstF)||(inR&&!isFirstR)){
+      blendCell='';gsaCell='';waCell=''; // all merged from first row
+    } else {
+      const gsa=_slotGsa(s),wa=_slotWA(s);
+      blendCell=_td('');gsaCell=_td(_ed(gsa,3));waCell=_td(_ed(wa,2));
+    }
     const supSrc=k==='BHF'
       ?_edStr(s.source||s.supplier||'Refer to Note 3.')
       :_edStr(s.source||s.supplier||'');
@@ -6570,8 +6586,8 @@ function _produceReportPDFInner(mixId){
       ${_td(_ed(bp,1))}
       ${_td(_ed(gsb,3))}
       ${blendCell}
-      ${_td(_ed(gsa,3))}
-      ${_td(_ed(wa,1))}
+      ${gsaCell}
+      ${waCell}
     </tr>`;
   }).join('');
   const _thAggType=`<tr style="background:#2E75B6;color:white;font-weight:bold">
