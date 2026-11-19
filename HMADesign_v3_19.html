@@ -7390,6 +7390,34 @@ function _produceReportPDFInner(mixId){
     return `<tr>${_tdL(label)}${wet.map((s,i)=>_td(_ed(wFn(s,i),1))).join('')}${dry.map((s,i)=>_td(_ed(dFn(s,i),1))).join('')}</tr>`;
   }
 
+  // Pre-compute TSR specimen values
+  const tsrDiam=tsr.diam||150;
+  const tsrGmm=tsr.Gmm||null;
+  function _tsrCalc(sp,isCond){
+    const t=sp.t!=null?+sp.t:null;
+    const mDry=sp.mDry!=null?+sp.mDry:null;
+    const mSSD=sp.mSSD!=null?+sp.mSSD:null;
+    const mWat=sp.mWat!=null?+sp.mWat:null;
+    const load=sp.load!=null?+sp.load:null;
+    const vol=(mSSD!=null&&mWat!=null)?mSSD-mWat:null;
+    const Gmb=(vol&&vol>0&&mDry!=null)?mDry/vol:null;
+    const Va=(Gmb!=null&&tsrGmm)?(1-Gmb/tsrGmm)*100:null;
+    const volAV=(Va!=null&&vol!=null)?Va/100*vol:null;
+    const tCond=sp.tCond!=null?+sp.tCond:null;
+    const mSSDcond=sp.mSSDcond!=null?+sp.mSSDcond:null;
+    const useT=isCond?(tCond||t):t;
+    const ITS=(load&&useT&&tsrDiam)?2000*load/(Math.PI*tsrDiam*useT):null;
+    const volAbs=(isCond&&mSSDcond!=null&&mDry!=null)?mSSDcond-mDry:null;
+    const satPct=(volAbs!=null&&volAV&&volAV>0)?volAbs/volAV*100:null;
+    return{t,mDry,mSSD,mWat,vol,Gmb,Va,volAV,load,tCond,mSSDcond,ITS,volAbs,satPct};
+  }
+  const wCalc=wet.map(s=>_tsrCalc(s,true));
+  const dCalc=dry.map(s=>_tsrCalc(s,false));
+  function _tsrAv(arr){const v=arr.filter(x=>x!=null&&isFinite(x));return v.length?v.reduce((a,b)=>a+b,0)/v.length:null;}
+  const avgDryITS=_tsrAv(dCalc.map(c=>c.ITS));
+  const avgWetITS=_tsrAv(wCalc.map(c=>c.ITS));
+  const tsrRatioPDF=tsr.tsrResult||(avgDryITS&&avgWetITS?avgWetITS/avgDryITS*100:null);
+
   // Nmax batch data
   const nmx=mix.nmaxBatch||{};
   const nmxGmbA=nmx.Gmb_A!=null?+nmx.Gmb_A:null;
