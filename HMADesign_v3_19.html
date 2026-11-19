@@ -7118,9 +7118,9 @@ function produceReportPDF(mixId){
     const wa=_slotWA(s);
     const ss3=k==='BHF'?_edStr(s.source||s.supplier||'Refer to Note 3.'):_edStr(s.source||s.supplier||'');
     const mat3=getAgg(s).material||'';
-    const kLabel3=`<b>${k}</b>${mat3?`<div style="font-size:5.5pt;font-weight:normal;color:#444;line-height:1.2;margin-top:1px">${mat3}</div>`:''}`;
     return `<tr>
-      ${_tdL(kLabel3)}
+      ${_tdL(`<b>${k}</b>`)}
+      ${_tdL(mat3)}
       ${_tdL(ss3)}
       ${_td(_ed(bp,1))}
       ${_td(_ed(sp,1))}
