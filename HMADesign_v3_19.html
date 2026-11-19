@@ -7417,7 +7417,7 @@ function _produceReportPDFInner(mixId){
   const nmxAvgPNmax=(nmxPNmaxA!=null&&nmxPNmaxB!=null)?(nmxPNmaxA+nmxPNmaxB)/2:nmxPNmaxA;
 
   const _td2n=(v,st)=>`<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle${st||''}">${v!=null&&v!==''?v:''}</td>`;
-  const _thN=(t,extra)=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle${extra||''}">${t}</th>`;
+  const _thN=(t,extra,r2)=>`<th ${r2?'rowspan="2"':''} style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle${extra||''}">${t}</th>`;
 
   const p5=`<div class="page">
     ${_pageHdr(5)}
