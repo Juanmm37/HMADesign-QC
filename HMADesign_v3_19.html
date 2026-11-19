@@ -7390,52 +7390,106 @@ function _produceReportPDFInner(mixId){
     return `<tr>${_tdL(label)}${wet.map((s,i)=>_td(_ed(wFn(s,i),1))).join('')}${dry.map((s,i)=>_td(_ed(dFn(s,i),1))).join('')}</tr>`;
   }
 
+  // Nmax batch data
+  const nmx=mix.nmaxBatch||{};
+  const nmxGmbA=nmx.Gmb_A!=null?+nmx.Gmb_A:null;
+  const nmxGmbB=nmx.Gmb_B!=null?+nmx.Gmb_B:null;
+  const nmxGmmA=nmx.Gmm_A!=null?+nmx.Gmm_A:null;
+  const nmxGmmB=nmx.Gmm_B!=null?+nmx.Gmm_B:null;
+  const nmxHNiniA=nmx.hNini_A!=null?+nmx.hNini_A:null;
+  const nmxHNiniB=nmx.hNini_B!=null?+nmx.hNini_B:null;
+  const nmxHNdesA=nmx.hNdes_A!=null?+nmx.hNdes_A:null;
+  const nmxHNdesB=nmx.hNdes_B!=null?+nmx.hNdes_B:null;
+  const nmxHNmaxA=nmx.hNmax_A!=null?+nmx.hNmax_A:null;
+  const nmxHNmaxB=nmx.hNmax_B!=null?+nmx.hNmax_B:null;
+  const nmxAvgGmb=(nmxGmbA!=null&&nmxGmbB!=null)?(nmxGmbA+nmxGmbB)/2:nmxGmbA;
+  const nmxAvgGmm=(nmxGmmA!=null&&nmxGmmB!=null)?(nmxGmmA+nmxGmmB)/2:nmxGmmA;
+  // Per-specimen %Gmm at each gyration level (height-corrected)
+  const _pGmm=(Gmb,Gmm,hN,hNmax)=>(Gmb&&Gmm&&hN&&hNmax)?((Gmb*hNmax)/(Gmm*hN)*100):null;
+  const nmxPNiniA=_pGmm(nmxGmbA,nmxGmmA,nmxHNiniA,nmxHNmaxA);
+  const nmxPNiniB=_pGmm(nmxGmbB,nmxGmmB,nmxHNiniB,nmxHNmaxB);
+  const nmxPNdesA=_pGmm(nmxGmbA,nmxGmmA,nmxHNdesA,nmxHNmaxA);
+  const nmxPNdesB=_pGmm(nmxGmbB,nmxGmmB,nmxHNdesB,nmxHNmaxB);
+  const nmxPNmaxA=(nmxGmbA&&nmxGmmA)?nmxGmbA/nmxGmmA*100:null;
+  const nmxPNmaxB=(nmxGmbB&&nmxGmmB)?nmxGmbB/nmxGmmB*100:null;
+  const nmxAvgPNini=(nmxPNiniA!=null&&nmxPNiniB!=null)?(nmxPNiniA+nmxPNiniB)/2:nmxPNiniA;
+  const nmxAvgPNdes=(nmxPNdesA!=null&&nmxPNdesB!=null)?(nmxPNdesA+nmxPNdesB)/2:nmxPNdesA;
+  const nmxAvgPNmax=(nmxPNmaxA!=null&&nmxPNmaxB!=null)?(nmxPNmaxA+nmxPNmaxB)/2:nmxPNmaxA;
+
+  const _td2n=(v,st)=>`<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle${st||''}">${v!=null&&v!==''?v:''}</td>`;
+  const _thN=(t,extra)=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:normal;vertical-align:middle${extra||''}">${t}</th>`;
+
   const p5=`<div class="page">
     ${_pageHdr(5)}
     ${_secTitle('N<sub>max</sub> VERIFICATION')}
-    ${_tbl()}
+    <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+      <colgroup>
+        <col style="width:7%"><col style="width:4%"><col style="width:5%">
+        <col style="width:6%"><col style="width:6%">
+        <col style="width:6%"><col style="width:6%">
+        <col style="width:6%"><col style="width:6%"><col style="width:6%">
+        <col style="width:6%"><col style="width:6%">
+        <col style="width:6%"><col style="width:6%">
+        <col style="width:6%"><col style="width:6%">
+        <col style="width:6%">
+      </colgroup>
       <tr style="background:#1F3864;color:white;font-weight:bold">
         <th colspan="17" style="padding:2px 4px;border:1px solid #aaa;text-align:center">VERIFY % G<sub>mm</sub> @ N<sub>max</sub></th>
       </tr>
       <tr style="background:#2E75B6;color:white;font-weight:bold">
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">SPECIMEN NO.</th>
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">Sp.</th>
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">% P<sub>b</sub></th>
+        ${_thN('SPECIMEN NO.',';font-size:6.5pt')} ${_thN('Sp.')} ${_thN('% P<sub>b</sub>')}
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>mb</sub>@N<sub>max</sub></th>
         <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>mm</sub></th>
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">Ht.@N<sub>ini</sub></th>
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">Ht.@N<sub>des</sub></th>
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">Ht.@N<sub>max</sub></th>
-        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">%G<sub>mm</sub>@N<sub>ini</sub></th>
-        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">%G<sub>mm</sub>@N<sub>des</sub></th>
-        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">%G<sub>mm</sub>@N<sub>max</sub></th>
-        <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">Avg.</th>
+        ${_thN('Ht.@N<sub>ini</sub>',';font-size:6.5pt')}
+        ${_thN('Ht.@N<sub>des</sub>',';font-size:6.5pt')}
+        ${_thN('Ht.@N<sub>max</sub>',';font-size:6.5pt')}
+        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-size:6.5pt">%G<sub>mm</sub>@N<sub>ini</sub></th>
+        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-size:6.5pt">%G<sub>mm</sub>@N<sub>des</sub></th>
+        <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center;font-size:6.5pt">%G<sub>mm</sub>@N<sub>max</sub></th>
+        ${_thN('Avg.')}
       </tr>
       <tr style="background:#2E75B6;color:white;font-weight:bold">
         <th style="padding:2px 3px;border:1px solid #aaa">G<sub>mb</sub></th><th style="padding:2px 3px;border:1px solid #aaa">Avg.</th>
         <th style="padding:2px 3px;border:1px solid #aaa">G<sub>mm</sub></th><th style="padding:2px 3px;border:1px solid #aaa">Avg.</th>
+        <th colspan="3" style="border:none"></th>
         <th style="padding:2px 3px;border:1px solid #aaa">%G<sub>mm</sub></th><th style="padding:2px 3px;border:1px solid #aaa">Avg.</th>
         <th style="padding:2px 3px;border:1px solid #aaa">%G<sub>mm</sub></th><th style="padding:2px 3px;border:1px solid #aaa">Avg.</th>
         <th style="padding:2px 3px;border:1px solid #aaa">%G<sub>mm</sub></th><th style="padding:2px 3px;border:1px solid #aaa">Avg.</th>
+        <th style="border:none"></th>
       </tr>
       <tr>
-        ${_td('1',';font-weight:bold;vertical-align:middle')}
+        ${_td2n('1',';font-weight:bold')}
         ${_td('A')}
         ${_td(_ed(designPb,1))}
-        ${_td(_ed(tsr.Gmm?tsr.Gmm*(1-(tsr.pGmmNmax||0)/100):null,3))}
-        <td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center"></td>
-        ${_td(_ed(tsr.Gmm,4))}
-        <td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center"></td>
-        ${_td('')}${_td('')}${_td('')}
-        ${_td('')}<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center"></td>
-        ${_td('')}<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center"></td>
-        ${_td(_ed(tsr.pGmmNmax,1))}<td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center"></td>
-        <td rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle;text-align:center"></td>
+        ${_td(_ed(nmxGmbA,3))}
+        ${_td2n(_ed(nmxAvgGmb,3))}
+        ${_td(_ed(nmxGmmA,3))}
+        ${_td2n(_ed(nmxAvgGmm,3))}
+        ${_td(_ed(nmxHNiniA,1))}
+        ${_td(_ed(nmxHNdesA,1))}
+        ${_td(_ed(nmxHNmaxA,1))}
+        ${_td(_ed(nmxPNiniA,1))}
+        ${_td2n(_ed(nmxAvgPNini,1))}
+        ${_td(_ed(nmxPNdesA,1))}
+        ${_td2n(_ed(nmxAvgPNdes,1))}
+        ${_td(_ed(nmxPNmaxA,1))}
+        ${_td2n(_ed(nmxAvgPNmax,1))}
+        ${_td2n(_ed(nmxAvgPNmax,1))}
       </tr>
       <tr>
         ${_td('B')}
         ${_td(_ed(designPb,1))}
-        ${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}
+        ${_td(_ed(nmxGmbB,3))}
+        ${_td(_ed(nmxGmmB,3))}
+        ${_td(_ed(nmxHNiniB,1))}
+        ${_td(_ed(nmxHNdesB,1))}
+        ${_td(_ed(nmxHNmaxB,1))}
+        ${_td(_ed(nmxPNiniB,1))}
+        ${_td(_ed(nmxPNdesB,1))}
+        ${_td(_ed(nmxPNmaxB,1))}
+      </tr>
+      <tr style="background:#DCE6F1;font-weight:bold">
+        ${_td('SPECIFICATION')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('')}${_td('≤ 98.0')}${_td('')}
       </tr>
     </table>
 
