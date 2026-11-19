@@ -6560,7 +6560,8 @@ function produceReportPDF(mixId){
       :_edStr(s.source||s.supplier||'');
     const mat=getAgg(s).material||'';
     return `<tr>
-      ${_tdL(`<b>${k}</b>${mat?`<div style="font-size:5.5pt;font-weight:normal;color:#444;line-height:1.2;margin-top:1px">${mat}</div>`:''}`)}
+      ${_tdL(`<b>${k}</b>`)}
+      ${_tdL(mat)}
       ${_tdL(supSrc)}
       ${_td(_edStr(s.invNo||''))}
       ${_td(_ed(bp,1))}
