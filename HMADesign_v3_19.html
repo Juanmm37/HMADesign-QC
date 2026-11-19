@@ -7087,9 +7087,11 @@ function produceReportPDF(mixId){
   // PAGE 3 — DESIGN BINDER CONTENT SELECTION
   // ─────────────────────────────────────────────
 
+  const selStockPcts=selTrial?calcStockpilePercentages(selTrial):{};
   const selAggrRows=activeSlots.map(k=>{
     const s=slots[k];
-    const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
+    const bp=selTrial&&selTrial.blendPct?+(selTrial.blendPct[k]||0):null;
+    const sp=selStockPcts[k]!=null?+selStockPcts[k]:bp;
     const gsb=_slotGsb(s);
     const gsa=_slotGsa(s);
     const wa=_slotWA(s);
@@ -7098,7 +7100,7 @@ function produceReportPDF(mixId){
       ${_tdL(`<b>${k}</b>`)}
       ${_tdL(ss3)}
       ${_td(_ed(bp,1))}
-      ${_td(_ed(bp,1))}
+      ${_td(_ed(sp,1))}
       ${_td(_ed(gsb,3))}
       ${_td(_ed(gsa,3))}
       ${_td(_ed(wa,1))}
