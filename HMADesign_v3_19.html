@@ -7668,6 +7668,408 @@ function _produceReportPDFInner(mixId,theme){
   w.document.close();
 }
 
+function _produceMarshallReportPDFInner(mixId,theme){
+  const mix=db.mixes.find(m=>m.id===mixId);
+  if(!mix){alert('Mix not found.');return;}
+  const info=mix.info||{};
+  const mt=info.mixType||'';
+  const slots=mix.slots||{};
+  const trials=mix.trials||[];
+  const selIdx=(mix.selectedTrialIdx!==null&&mix.selectedTrialIdx!==undefined)?mix.selectedTrialIdx:0;
+  const selTrial=trials[selIdx]||trials[0]||null;
+  const designPb=mix.designPb;
+  const acPts=mix.acPoints||[];
+  const SLOT_KEYS=['CA1','CA2','CA3','FA1','FA2','BHF','RAP1','RAP2'];
+  const SIEVES_M=['26.5','19','16','13.2','9.5','4.75','2.36','1.18','0.6','0.3','0.15','0.075'];
+  const totalPages=2;
+  const BLOWS_SIDE={'HL1':50,'HL2':50,'HL3F':50,'HL4F':50,'HL3':75,'HL3HS':75,'HL4':75,'HL8':75,'DFC':75,'MDBC':75,'HDBC':75};
+  const blowsSide=BLOWS_SIDE[mt]||75;
+
+  // ── Helpers ──
+  function _fmtD(iso){if(!iso)return '';const d=new Date(iso+'T00:00:00');if(isNaN(d))return iso;return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();}
+  function _n(v,dec){if(v===null||v===undefined||v===''||isNaN(Number(v)))return '';return Number(v).toFixed(dec!=null?dec:1);}
+  function _ed(v,dec){const txt=(v!==null&&v!==undefined&&v!==''&&!isNaN(Number(v)))?_n(v,dec):(v!=null?String(v):'');return `<span contenteditable="true" class="ed">${txt}</span>`;}
+  function _edStr(v){return `<span contenteditable="true" class="ed">${v!=null?String(v):''}</span>`;}
+  function _slotGsb(s){const r=getAgg(s);return r.Gsb_mod!=null?r.Gsb_mod:r.Gsb_m;}
+  function _slotGsa(s){const r=getAgg(s);return r.Gsa_mod!=null?r.Gsa_mod:r.Gsa_m;}
+  function _slotWA(s){const r=getAgg(s);return r.WA_mod!=null?r.WA_mod:r.WA_m;}
+  function _slotGrad(s,sv){const r=getAgg(s);const gM=(r.gradation_mod||{})[sv];const gm=(r.gradation||{})[sv];return(gM!==null&&gM!==undefined)?gM:(gm!==null&&gm!==undefined)?gm:null;}
+  function _blendGrad(trial,sv){const bp=trial.blendPct||{};let sum=0,tot=0;for(const k of SLOT_KEYS){const pct=bp[k];if(pct==null||pct===0)continue;const sl=slots[k];if(!sl)continue;const r=getAgg(sl);const gM=(r.gradation_mod||{})[sv];const gm=(r.gradation||{})[sv];const val=(gM!==null&&gM!==undefined)?gM:(gm!==null&&gm!==undefined)?gm:100;sum+=pct*val;tot+=pct;}return tot>0?sum/tot:null;}
+  function _blendedGsb(trial){const bp=trial.blendPct||{};let num=0,den=0;for(const k of SLOT_KEYS){const pct=bp[k];if(pct==null||pct===0)continue;const sl=slots[k];if(!sl)continue;const gsb=_slotGsb(sl);if(gsb&&gsb>0){num+=pct;den+=pct/gsb;}}return den>0?num/den:null;}
+  function _th(cells,bg){bg=bg||'#1F3864';return `<tr style="background:${bg};color:white;font-weight:bold">${cells.map(c=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center">${c}</th>`).join('')}</tr>`;}
+  function _td(v,extra){extra=extra||'';return `<td style="padding:2px 3px;border:1px solid #aaa;text-align:center${extra}">${v!=null&&v!==''?v:''}</td>`;}
+  function _tdL(v,extra){extra=extra||'';return `<td style="padding:2px 4px;border:1px solid #aaa${extra}">${v!=null&&v!==''?v:''}</td>`;}
+  function _tbl(){return `<table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial">`;}
+  function _secTitle(t){return `<div style="display:inline-block;border:1.5px solid #000;padding:2px 8px;font-weight:bold;font-size:8.5pt;margin:8px 0 4px;font-family:Arial">${t}</div>`;}
+  function _fmtSieve(s){const n=parseFloat(s);if(n<1)return n.toFixed(3);if(Number.isInteger(n))return n.toFixed(1);return String(n);}
+  function _pageHdr(n){
+    const mixTypeStr=(mix.mixType||'')+' MUNI';
+    return `<div style="display:flex;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:2px;margin-bottom:1px;font-family:Arial">
+      <span style="font-weight:bold;font-size:8pt">CAPITAL PAVING INC.</span>
+      <span style="font-weight:bold;font-size:8pt">MARSHALL MIX DESIGN REPORT</span>
+      <span style="font-weight:bold;font-size:8pt">MIX DESIGN NO. ${mix.mixNo||''}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:Arial">
+      <span style="font-size:7.5pt">${mixTypeStr}</span>
+      <span style="font-size:7.5pt">PAGE ${n} of ${totalPages}</span>
+      <span style="font-size:7.5pt">${_fmtD(mix.dateCompleted)}</span>
+    </div>`;
+  }
+
+  // Active slots
+  const activeSlots=SLOT_KEYS.filter(k=>{
+    const s=slots[k];if(!s)return false;
+    if(s.material||_slotGsb(s))return true;
+    if(trials.some(t=>t.blendPct&&t.blendPct[k]>0))return true;
+    const g=s.gradation_mod||s.gradation||{};
+    return Object.keys(g).length>0;
+  });
+
+  // Blended Gsb
+  const combGsb=selTrial?_blendedGsb(selTrial):null;
+
+  // Design criteria
+  const tgt=getVolTargets(info,mt)||{};
+  const pct475=selTrial?_blendGrad(selTrial,'4.75'):null;
+  const vmaMin=getMarshallVmaMin(mt,pct475);
+  if(vmaMin!==null&&tgt)tgt.VMA=[vmaMin,null];
+  const vaR=(tgt.Va)||MS_VOL.Va['default'];
+  const stabMin=tgt.Stab?tgt.Stab[0]:MS_VOL.minStab['default'];
+  const flowMin=tgt.Flow?tgt.Flow[0]:MS_VOL.minFlow['default'];
+
+  // Design selected AC point
+  const selAcPt=designPb?(acPts.find(pt=>Math.abs(pt.Pb-designPb)<0.01)||null):null;
+  const selRes=selAcPt?calcVolSelected(selAcPt,info,combGsb||2.7):null;
+
+  // JMF gradation row
+  const jmfRow=SIEVES_M.map(sv=>_td(_ed(selTrial?_blendGrad(selTrial,sv):null,1))).join('');
+
+  // Aggregate source rows (Marshall: individual rows, no merged blended cells)
+  const aggSrcRows=activeSlots.map(k=>{
+    const s=slots[k];
+    const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
+    const gsb=_slotGsb(s),gsa=_slotGsa(s),wa=_slotWA(s);
+    const supSrc=k==='BHF'?_edStr(s.source||s.supplier||'Refer to Note 3.'):_edStr(s.source||s.supplier||'');
+    const mat=getAgg(s).material||'';
+    return `<tr>
+      ${_tdL(`<b>${k}</b>`)}${_tdL(_edStr(mat))}${_tdL(supSrc)}${_td(_edStr(s.invNo||''))}
+      ${_td(_ed(bp,1))}${_td(_ed(gsb,3))}${_td(_ed(gsa,3))}${_td(_ed(wa,2))}
+    </tr>`;
+  }).join('');
+
+  // Aggregate gradation rows
+  const aggGradRows=activeSlots.map(k=>{
+    const s=slots[k];
+    const bp=selTrial&&selTrial.blendPct?selTrial.blendPct[k]:null;
+    return `<tr style="height:14px">${_tdL(`<b>${k}</b>`)}${_td(_ed(bp,1))}${SIEVES_M.map(sv=>_td(_ed(_slotGrad(s,sv),1))).join('')}</tr>`;
+  }).join('');
+  const blendRow=`<tr style="height:14px;font-weight:bold">
+    ${_tdL('<b>BLENDED</b>')}${_td(_ed(designPb,1))}
+    ${SIEVES_M.map(sv=>_td(`<b>${_ed(selTrial?_blendGrad(selTrial,sv):null,1)}</b>`)).join('')}
+  </tr>`;
+
+  // Marshall properties block
+  const _vTD='padding:2px 3px;border:1px solid #aaa';
+  const marshallProps=`${_tbl()}
+    <tr style="background:#1F3864;color:white;font-weight:bold"><th colspan="3" style="${_vTD};text-align:center">MARSHALL PROPERTIES</th></tr>
+    <tr style="background:#2E75B6;color:white;font-weight:bold">
+      <th style="${_vTD};text-align:left">PROPERTY</th>
+      <th style="${_vTD};text-align:center">SELECTED</th>
+      <th style="${_vTD};text-align:center">CRITERIA</th>
+    </tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">Air Voids (%)</td>${_td(_ed(selRes?selRes.Va:null,1))}${_td(`${vaR[0]} – ${vaR[1]}`)}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">VMA (%)</td>${_td(_ed(selRes?selRes.VMA:null,1))}${_td(vmaMin!==null?`≥ ${_n(vmaMin,1)}`:'—')}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">Flow, 0.25 mm</td>${_td(_ed(selRes?selRes.Flow:null,1))}${_td(`≥ ${flowMin}`)}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">Stability, N</td>${_td(_ed(selRes?selRes.Stab:null,0))}${_td(`≥ ${stabMin}`)}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">G<sub>mb</sub> (BRD)</td>${_td(_ed(selRes?selRes.avgGmb:null,3))}${_td('—')}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">G<sub>mm</sub> (MRD)</td>${_td(_ed(selRes?selRes.Gmm:null,3))}${_td('—')}</tr>
+  </table>`;
+
+  // Asphalt cement + additives block
+  const acTable=`<table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+    <tr style="background:#1F3864;color:white;font-weight:bold">
+      <th style="padding:2px 3px;border:1px solid #aaa;width:38%;text-align:center">SUPPLIER</th>
+      <th style="padding:2px 3px;border:1px solid #aaa;width:22%;text-align:center">PGAC GRADE</th>
+      <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">* DESIGN TEMPERATURES</th>
+    </tr>
+    <tr style="background:#2E75B6;color:white;font-weight:bold">
+      <th style="padding:2px 3px;border:1px solid #aaa"></th>
+      <th style="padding:2px 3px;border:1px solid #aaa"></th>
+      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;width:20%">MIXING</th>
+      <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;width:20%">COMPACTION</th>
+    </tr>
+    <tr>
+      ${_td(_edStr(mix.pgacSup||''))}${_td(_edStr(mix.pgac||''))}
+      ${_td(_ed(mix.tMix,0)+'°C')}${_td(_ed(mix.tComp,0)+'°C')}
+    </tr>
+  </table>
+  <div style="font-size:7pt;margin-top:2px">* Established by the supplier.</div>
+  <div style="margin-top:4px">${_tbl()}
+    ${_th(['ADDITIVE(S)','SUPPLIER','TYPE','DOSAGE'],'#1F3864')}
+    <tr style="height:14px">
+      <td style="padding:2px 3px;border:1px solid #aaa;text-align:center">${_edStr('')}</td>
+      <td style="padding:2px 3px;border:1px solid #aaa;text-align:center">${_edStr('')}</td>
+      <td style="padding:2px 3px;border:1px solid #aaa;text-align:center">${_edStr('')}</td>
+      <td style="padding:2px 3px;border:1px solid #aaa;text-align:center">${_edStr('')}</td>
+    </tr>
+  </table></div>`;
+
+  // ── PAGE 1 ──
+  const p1=`<div class="page">
+    <div style="display:flex;align-items:flex-start;margin-bottom:3px">
+      <div style="flex:0 0 85px"><img src="${LOGO_CAPITAL}" height="70" style="vertical-align:top"></div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:15pt;font-weight:bold;font-family:Arial;letter-spacing:1px">MARSHALL MIX DESIGN REPORT</div>
+        <div style="font-size:8pt;font-family:Arial;margin-top:2px">Capital Paving Inc. P.O. Box 815, Guelph, Ontario N1H 6L8</div>
+        <div style="font-size:8pt;font-family:Arial">Phone: (519) 822-4511&nbsp;&nbsp;Fax: (519) 822-1454&nbsp;&nbsp;www.capitalpaving.net</div>
+      </div>
+      <div style="flex:0 0 130px;text-align:right"><img src="${LOGO_BMC}" height="58" style="max-width:130px;vertical-align:top"></div>
+    </div>
+    <div style="text-align:right;margin-bottom:2px">
+      <span style="font-weight:bold;font-size:7.5pt;font-family:Arial">MIX DESIGN NO.</span>
+      <span contenteditable="true" class="ed" style="border:1px solid #000;padding:1px 24px;margin-left:4px;font-family:Arial">${mix.mixNo||''}</span>
+    </div>
+    <div style="display:flex;gap:16px;margin-bottom:2px;font-family:Arial;font-size:8pt">
+      <div style="flex:1">
+        <table style="border:none;border-collapse:collapse;width:100%">
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">CUSTOMER:</td><td style="border:none;vertical-align:middle">${_edStr(mix.customer||'')}</td></tr>
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">PROJECT:</td><td style="border:none;vertical-align:middle">${_edStr(mix.project||'')}</td></tr>
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">LOCATION:</td><td style="border:none;vertical-align:middle">${_edStr(mix.location||'')}</td></tr>
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">ITEM NO.:</td><td style="border:none;vertical-align:middle">${_edStr(mix.itemNo||'')}</td></tr>
+        </table>
+      </div>
+      <div style="flex:1">
+        <table style="border:none;border-collapse:collapse;width:100%">
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">DATE SAMPLES COLLECTED:</td><td style="border:none;vertical-align:middle">${_edStr(_fmtD(mix.dateCollected))}</td></tr>
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">DATE DESIGN COMPLETED:</td><td style="border:none;vertical-align:middle">${_edStr(_fmtD(mix.dateCompleted))}</td></tr>
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">MIX TYPE:</td><td style="border:none;vertical-align:middle">${_edStr(mix.mixType||'')}</td></tr>
+          <tr style="height:13px"><td style="border:none;font-weight:bold;padding:0 6px 0 0;white-space:nowrap;vertical-align:middle">COMPACTION (blows/side):</td><td style="border:none;vertical-align:middle">${_edStr(blowsSide)}</td></tr>
+        </table>
+      </div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+      <colgroup>
+        <col style="width:7%"><col style="width:7%">
+        ${SIEVES_M.map(()=>`<col style="width:${(86/SIEVES_M.length).toFixed(2)}%">`).join('')}
+      </colgroup>
+      <tr style="background:#1F3864;color:white;font-weight:bold">
+        <th colspan="${2+SIEVES_M.length}" style="padding:2px 4px;border:1px solid #aaa;text-align:center">JOB MIX FORMULA (JMF) - GRADATION PERCENT PASSING</th>
+      </tr>
+      <tr style="background:#2E75B6;color:white;font-weight:bold">
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">% AC</th>
+        <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">% AC<sub>new</sub></th>
+        <th colspan="${SIEVES_M.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center">SIEVE SIZE (mm)</th>
+      </tr>
+      <tr style="background:#2E75B6;color:white;font-weight:bold">
+        <th style="padding:2px 3px;border:1px solid #aaa"></th>
+        <th style="padding:2px 3px;border:1px solid #aaa"></th>
+        ${SIEVES_M.map(s=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">${_fmtSieve(s)}</th>`).join('')}
+      </tr>
+      <tr style="height:14px">
+        ${_td(_ed(designPb,1))}${_td(_ed(null,1))}
+        ${jmfRow}
+      </tr>
+    </table>
+    <div style="display:flex;gap:8px;margin-top:3px">
+      <div style="flex:1.1">${marshallProps}</div>
+      <div style="flex:1.5">${acTable}</div>
+    </div>
+    <div style="margin-top:2px">
+      ${_tbl()}
+        <tr style="background:#1F3864;color:white;font-weight:bold">
+          <th colspan="8" style="padding:2px 4px;border:1px solid #aaa;text-align:center">AGGREGATE SOURCE DATA</th>
+        </tr>
+        <tr style="background:#2E75B6;color:white;font-weight:bold">
+          <th colspan="2" style="padding:2px 3px;border:1px solid #aaa;text-align:center">AGGREGATE TYPE</th>
+          <th style="padding:2px 3px;border:1px solid #aaa">SUPPLIER / SOURCE</th>
+          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">INV. NO.</th>
+          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">%</th>
+          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>sb</sub></th>
+          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">G<sub>sa</sub></th>
+          <th style="padding:2px 3px;border:1px solid #aaa;text-align:center">% ABS.</th>
+        </tr>
+        ${aggSrcRows}
+        <tr>
+          <td colspan="4" style="padding:2px 3px;border:1px solid #aaa"></td>
+          <td colspan="2" style="padding:2px 3px;border:1px solid #aaa;font-weight:bold;text-align:right;font-family:Arial">COMBINED G<sub>sb</sub></td>
+          ${_td(_ed(combGsb,3),';font-weight:bold')}
+          <td style="padding:2px 3px;border:1px solid #aaa"></td>
+        </tr>
+      </table>
+    </div>
+    <div style="margin-top:2px">
+      ${_tbl()}
+        <tr style="background:#1F3864;color:white;font-weight:bold">
+          <th colspan="${2+SIEVES_M.length}" style="padding:2px 4px;border:1px solid #aaa;text-align:center">AGGREGATE GRADATION</th>
+        </tr>
+        <tr style="background:#2E75B6;color:white;font-weight:bold">
+          <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">AGG. TYPE</th>
+          <th rowspan="2" style="padding:2px 3px;border:1px solid #aaa;vertical-align:middle">% AC</th>
+          <th colspan="${SIEVES_M.length}" style="padding:2px 3px;border:1px solid #aaa;text-align:center">SIEVE SIZE (mm)</th>
+        </tr>
+        <tr style="background:#2E75B6;color:white;font-weight:bold">
+          ${SIEVES_M.map(s=>`<th style="padding:2px 3px;border:1px solid #aaa;text-align:center;white-space:nowrap">${_fmtSieve(s)}</th>`).join('')}
+        </tr>
+        ${aggGradRows}
+        ${blendRow}
+      </table>
+    </div>
+    <div style="margin-top:3px;font-family:Arial;font-size:6.5pt;line-height:1.2">
+      <div>1.&nbsp;&nbsp;Typical mix weight to produce a briquette with a height of 63.5 mm ± 1.5 mm: <span contenteditable="true" class="ed" style="border-bottom:1px dashed #666;min-width:40px;display:inline-block"></span> grams.</div>
+      <div>2.&nbsp;&nbsp;Average water absorption of compacted specimens: <span contenteditable="true" class="ed" style="border-bottom:1px dashed #666;min-width:30px;display:inline-block"></span>%. Vacuum sealing not required in determining G<sub>mb</sub> since value ≤ 2.0%.</div>
+      <div>3.&nbsp;&nbsp;Baghouse fines (BHF) are added to account for aggregate breakdown during production and are not to be included when proportioning and blending aggregates to meet physical property requirements.</div>
+      <div>4.&nbsp;&nbsp;Designed in accordance with the Marshall Method in Asphalt Institute MS-2, following LS-261, LS-262, LS-264, LS-265, LS-266, and LS-307 testing methods.</div>
+      <div>5.&nbsp;&nbsp;Capital Paving, at their discretion, reserves the right to use an alternate PGAC supplier identified in the MTO's Designated Sources of Material (DSM).</div>
+    </div>
+    <div style="margin-top:14px;display:flex;justify-content:space-between;align-items:flex-end;font-family:Arial;font-size:8pt">
+      <table style="border:none;border-collapse:collapse">
+        <tr>
+          <td style="border:none;font-weight:bold;white-space:nowrap;vertical-align:bottom;padding:0 8px 0 0">TEST DATA CERTIFIED BY:</td>
+          <td style="border:none;border-bottom:1px solid #000;width:220px;vertical-align:bottom;padding:0">&nbsp;</td>
+        </tr>
+        <tr>
+          <td style="border:none;padding:0"></td>
+          <td style="border:none;padding:3px 0 0 0;text-align:center;font-size:7.5pt">Mark Latyn, Capital Paving Inc.</td>
+        </tr>
+      </table>
+      <div><img src="${LOGO_CCIL}" height="48"></div>
+    </div>
+  </div>`;
+
+  // ── PAGE 2 — Volumetric Calculations ──
+  const tdS='padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle';
+
+  const volSpecRows=acPts.map(pt=>{
+    const v0=(pt.vols&&pt.vols[0])||{};
+    const v1=(pt.vols&&pt.vols[1])||{};
+    const v2=(pt.vols&&pt.vols[2])||{};
+    const res=calcVolSelected(pt,info,combGsb||2.7);
+    if(!res)return `<tr><td colspan="12" style="${tdS}">No data for Pb=${pt.Pb}%</td></tr>`;
+    const GmbA=v0.Gmb,GmbB=v1.Gmb,GmbC=v2.Gmb;
+    const GmmA=v0.GmmA,GmmB=v0.GmmB;
+    const isDesign=designPb&&Math.abs(pt.Pb-designPb)<0.01;
+    const bgStyle=isDesign?'background:#FFF2CC;':'';
+    const td3=(v,st)=>`<td rowspan="3" style="${tdS};${bgStyle}${st||''}">${v!=null&&v!==''?v:''}</td>`;
+    const r1=`<tr style="${bgStyle}">
+      ${td3(_ed(pt.Pb,1),'font-weight:bold')}
+      ${_td('A')}${_td(_ed(GmbA,3))}
+      ${td3(_ed(res.avgGmb,3),'font-weight:bold')}
+      ${_td(_ed(GmmA,3))}
+      ${td3(_ed(res.Gmm,3),'font-weight:bold')}
+      ${td3(_ed(res.Va,1),'font-weight:bold')}
+      ${td3(_ed(res.VMA,1))}
+      ${td3(_ed(res.Stab,0))}
+      ${td3(_ed(res.Flow,1))}
+      ${td3(_ed(res.avgGse,3))}
+      ${td3(_ed(v0.avgHeight,1))}
+    </tr>`;
+    const r2=`<tr style="${bgStyle}">${_td('B')}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,3))}</tr>`;
+    const r3=`<tr style="border-bottom:2px solid #888;${bgStyle}">${_td('C')}${_td(_ed(GmbC,3))}<td style="${tdS};${bgStyle}"></td></tr>`;
+    return r1+r2+r3;
+  }).join('');
+
+  const p075sel=selTrial?_blendGrad(selTrial,'0.075'):null;
+  const volSummaryRows=acPts.map(pt=>{
+    const res=calcVolSelected(pt,info,combGsb||2.7,p075sel);
+    if(!res)return '';
+    const isDesign=designPb&&Math.abs(pt.Pb-designPb)<0.01;
+    const bg=isDesign?'background:#FFF2CC;':'';
+    return `<tr style="${bg}">
+      ${_td(_ed(pt.Pb,1),';font-weight:bold')}
+      ${_td(_ed(res.Va,1))}${_td(_ed(res.VMA,1))}${_td(_ed(res.VFA,1))}
+      ${_td(_ed(res.Pba_pct,2))}${_td(_ed(res.Pbe,2))}${_td(_ed(res.DP,2))}
+      ${_td(_ed(res.Stab,0))}${_td(_ed(res.Flow,1))}
+    </tr>`;
+  }).join('');
+
+  const criRow=`<tr style="background:#DCE6F1;font-style:italic">
+    ${_td('CRITERIA')}
+    ${_td(`${vaR[0]}–${vaR[1]}`)}
+    ${_td(vmaMin!==null?`≥${_n(vmaMin,1)}`:'—')}
+    ${_td('65–75')}
+    ${_td('—')}${_td('—')}${_td('0.6–1.2')}
+    ${_td(`≥${stabMin}`)}${_td(`≥${flowMin}`)}
+  </tr>`;
+
+  const p2=`<div class="page">
+    ${_pageHdr(2)}
+    ${_secTitle('VOLUMETRIC DATA — COMPACTED SPECIMEN MEASUREMENTS')}
+    <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+      <colgroup>
+        <col style="width:5%"><col style="width:5%"><col style="width:8%"><col style="width:8%">
+        <col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:7%">
+        <col style="width:9%"><col style="width:7%"><col style="width:8%"><col style="width:9%">
+      </colgroup>
+      <tr style="background:#1F3864;color:white;font-weight:bold">
+        <th style="${tdS}">Pb<br>%</th>
+        <th style="${tdS}">Spec</th>
+        <th style="${tdS}">G<sub>mb</sub><br>(ind.)</th>
+        <th style="${tdS}">G<sub>mb</sub><br>(avg)</th>
+        <th style="${tdS}">G<sub>mm</sub><br>(ind.)</th>
+        <th style="${tdS}">G<sub>mm</sub><br>(avg)</th>
+        <th style="${tdS}">Va<br>%</th>
+        <th style="${tdS}">VMA<br>%</th>
+        <th style="${tdS}">Stability<br>N</th>
+        <th style="${tdS}">Flow<br>0.25mm</th>
+        <th style="${tdS}">Avg<br>G<sub>se</sub></th>
+        <th style="${tdS}">Avg Ht<br>mm</th>
+      </tr>
+      ${volSpecRows}
+    </table>
+    ${_secTitle('VOLUMETRIC PROPERTIES SUMMARY')}
+    ${_tbl()}
+      ${_th(['Pb, %','Va, %','VMA, %','VFA, %','P<sub>ba</sub>, %','P<sub>be</sub>, %','D/P','Stability, N','Flow'],'#1F3864')}
+      ${criRow}
+      ${volSummaryRows}
+    </table>
+    <div style="margin-top:8px;font-family:Arial;font-size:7.5pt">
+      <span style="font-weight:bold">DESIGN BINDER CONTENT: </span>
+      <span contenteditable="true" class="ed" style="font-weight:bold">${_n(designPb,1)}</span>% AC
+      <span style="color:#666"> (highlighted row)</span>
+    </div>
+  </div>`;
+
+  // ── Assemble HTML ──
+  const html=`<!DOCTYPE html><html><head>
+  <meta charset="UTF-8">
+  <title>Marshall Mix Design Report — ${mix.mixNo||mix.id}</title>
+  <style>
+    @page{size:letter portrait;margin:8mm}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:Arial,sans-serif;font-size:7pt;color:#000;background:#fff;padding:8px}
+    .page{width:190mm;min-height:254mm;padding:4mm;margin-bottom:8mm;page-break-after:always;border:0.5px solid #ddd;position:relative}
+    .page:last-of-type{page-break-after:auto}
+    table{width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial}
+    th,td{padding:2px 3px;border:1px solid #aaa;vertical-align:middle}
+    .ed{outline:none;cursor:text;border-bottom:1px dashed #bbb}
+    .ed:focus{background:#fffff0;border-bottom:1px solid #1F3864}
+    @media print{.no-print{display:none!important}.ed{border-bottom:none}}
+    .toolbar{display:flex;gap:8px;padding:8px;background:#f0f0f0;border-bottom:2px solid #1F3864;position:sticky;top:0;z-index:99}
+    .toolbar button{padding:5px 14px;cursor:pointer;font-size:9pt;font-weight:bold;border-radius:4px;border:1px solid #aaa}
+    .btn-print{background:#1F3864;color:white;border-color:#1F3864}
+  </style>
+  </head><body>
+  <div class="toolbar no-print">
+    <button class="btn-print" onclick="window.print()">🖴 Print / Save PDF</button>
+    <span style="font-size:8pt;color:#555;align-self:center">Click any value to edit before saving.</span>
+  </div>
+  <div class="no-print" style="height:36px"></div>
+  ${p1}${p2}
+  </body></html>`;
+
+  let finalHtml=html;
+  if(theme==='dark'){
+    finalHtml=finalHtml
+      .replace(/#1F3864/gi,'#1a1a1a')
+      .replace(/#2E75B6/gi,'#595959')
+      .replace(/#DCE6F1/gi,'#d9d9d9');
+  }
+  const w=window.open('','_blank','width=1050,height=800,scrollbars=yes');
+  if(!w){alert('Pop-up blocked. Please allow pop-ups for this page and try again.');return;}
+  w.document.write(finalHtml);
+  w.document.close();
+}
+
 
 
 function renderAnalytics(){
