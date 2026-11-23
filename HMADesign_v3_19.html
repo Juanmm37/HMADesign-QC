@@ -9515,7 +9515,7 @@ function computePropertyCurves(){
   }
 
   const data={pts};
-  ['Va','VMA','VFA','pGmmNini','avgGmb','pGmmNdes','DP','Gmm'].forEach(prop=>{
+  ['Va','VMA','VFA','pGmmNini','avgGmb','pGmmNdes','DP','Gmm','Stab','Flow'].forEach(prop=>{
     const validPts=pts.filter(p=>p[prop]!==null&&p[prop]!==undefined);
     if(validPts.length<2)return;
     const pbs=validPts.map(p=>p.Pb);
