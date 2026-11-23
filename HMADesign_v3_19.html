@@ -8119,10 +8119,10 @@ function _produceMarshallReportPDFInner(mixId,theme){
 
   // SVG chart helper for page 3
   function _mkChart3(label,prop,color,critLines){
-    const validPts=_pcPts.filter(p=>p[prop]!=null&&!isNaN(Number(p[prop])));
+    const validPts=_pcPts.filter(p=>p[prop]!=null&&!isNaN(Number(p[prop]))).sort((a,b)=>a.Pb-b.Pb);
     if(!validPts.length)return'';
     const curve=pc[prop]&&(pc[prop][_rt]||pc[prop].poly||pc[prop].linear);
-    const W=220,H=160,PL=38,PR=10,PT=16,PB=28,cW=W-PL-PR,cH=H-PT-PB;
+    const W=300,H=190,PL=44,PR=14,PT=20,PB=36,cW=W-PL-PR,cH=H-PT-PB;
     const dataVals=validPts.map(p=>+p[prop]);
     const dataMin=Math.min(...dataVals,critLines?Math.min(...critLines):Infinity);
     const dataMax=Math.max(...dataVals,critLines?Math.max(...critLines):-Infinity);
@@ -8135,18 +8135,19 @@ function _produceMarshallReportPDFInner(mixId,theme){
     if(yMax<=yMin)yMax=yMin+niceStep*4;
     const xOf=pb=>PL+(pb-_pbMin)/(_pbMax-_pbMin)*cW;
     const yOf=v=>PT+cH-(v-yMin)/(yMax-yMin)*cH;
-    const dec=isDens?3:1;
-    // Grid
-    const yRange=yMax-yMin;
-    let yStep=niceStep;while((yRange/yStep)>8)yStep*=2;
+    const dec=isDens?3:(prop==='Stab'?0:1);
+    // Y-axis grid (5 intervals like Superpave)
     const yGridSvg=[];
-    for(let v=Math.ceil(yMin/yStep)*yStep;v<=yMax+0.001;v=Math.round((v+yStep)*1000)/1000){
-      const y=yOf(v);yGridSvg.push(`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${PL+cW}" y2="${y.toFixed(1)}" stroke="#eee" stroke-width="0.6"/><text x="${PL-3}" y="${(y+3).toFixed(1)}" font-size="7" fill="#888" text-anchor="end">${v.toFixed(dec)}</text>`);
+    for(let i=0;i<=5;i++){
+      const v=yMin+(yMax-yMin)*i/5;
+      const y=yOf(v);
+      yGridSvg.push(`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${PL+cW}" y2="${y.toFixed(1)}" stroke="#ccc" stroke-width="0.5"/><text x="${PL-2}" y="${(y+3).toFixed(1)}" font-size="6" fill="#555" text-anchor="end">${v.toFixed(dec)}</text>`);
     }
-    const xGridSvg=_pbsAll.map(pb=>{const x=xOf(pb);return`<line x1="${x.toFixed(1)}" y1="${PT}" x2="${x.toFixed(1)}" y2="${PT+cH}" stroke="#eee" stroke-width="0.6"/><text x="${x.toFixed(1)}" y="${PT+cH+10}" font-size="7" fill="#888" text-anchor="middle">${pb.toFixed(1)}</text>`;});
-    // Criteria horizontal lines (red)
-    const critSvg=(critLines||[]).map(cv=>{if(cv<yMin||cv>yMax)return'';const y=yOf(cv);return`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${PL+cW}" y2="${y.toFixed(1)}" stroke="#c0392b" stroke-width="1.2" stroke-dasharray="4,2"/><text x="${PL+cW+2}" y="${(y+3).toFixed(1)}" font-size="6.5" fill="#c0392b">${cv.toFixed(dec)}</text>`;}).join('');
-    // Curve
+    // X-axis ticks at each data Pb
+    const xGridSvg=_pbsAll.map(pb=>{const x=xOf(pb);return`<line x1="${x.toFixed(1)}" y1="${PT}" x2="${x.toFixed(1)}" y2="${PT+cH}" stroke="#ccc" stroke-width="0.5"/><text x="${x.toFixed(1)}" y="${PT+cH+9}" font-size="6" fill="#555" text-anchor="middle">${pb.toFixed(1)}</text>`;});
+    // Criteria horizontal lines (red dashed, no labels)
+    const critSvg=(critLines||[]).map(cv=>{if(cv==null||cv<yMin||cv>yMax)return'';const y=yOf(cv);return`<line x1="${PL}" y1="${y.toFixed(1)}" x2="${PL+cW}" y2="${y.toFixed(1)}" stroke="red" stroke-width="1" stroke-dasharray="3,2"/>`;}).join('');
+    // Regression curve
     let curveSvg='';
     if(curve&&typeof curve.predict==='function'){
       const cpts=[];
@@ -8155,26 +8156,18 @@ function _produceMarshallReportPDFInner(mixId,theme){
         const v=curve.predict(pb);
         if(v>=yMin-range*0.1&&v<=yMax+range*0.1)cpts.push({x:xOf(pb),y:yOf(v)});
       }
-      if(cpts.length>1)curveSvg=`<path d="${cpts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="1.8"/>`;
+      if(cpts.length>1)curveSvg=`<path d="${cpts.map((p,i)=>`${i===0?'M':'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="1.5"/>`;
     }
-    // Design Pb line
+    // Design Pb vertical line (yellow, no annotation)
     const dpLine=designPb?`<line x1="${xOf(designPb).toFixed(1)}" y1="${PT}" x2="${xOf(designPb).toFixed(1)}" y2="${PT+cH}" stroke="#f0b429" stroke-width="1.2" stroke-dasharray="4,2"/>`:'';
-    // Data points
-    const dots=validPts.map(p=>`<circle cx="${xOf(p.Pb).toFixed(1)}" cy="${yOf(+p[prop]).toFixed(1)}" r="3" fill="${color}" stroke="white" stroke-width="1"/>`).join('');
-    // Design Pb value label
-    let dpLabel='';
-    if(designPb&&curve&&typeof curve.predict==='function'){
-      const val=curve.predict(designPb);
-      if(val>=yMin&&val<=yMax)dpLabel=`<text x="${(xOf(designPb)+4).toFixed(1)}" y="${(yOf(val)-4).toFixed(1)}" font-size="8" font-weight="700" fill="${color}">${val.toFixed(dec)}</text>`;
-    }
-    return`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block">
-      <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="#fafbff"/>
+    // Data points as diamonds (like Superpave)
+    const diamonds=validPts.map(p=>{const cx=xOf(p.Pb),cy=yOf(+p[prop]),s=4;return`<polygon points="${cx.toFixed(1)},${(cy-s).toFixed(1)} ${(cx+s).toFixed(1)},${cy.toFixed(1)} ${cx.toFixed(1)},${(cy+s).toFixed(1)} ${(cx-s).toFixed(1)},${cy.toFixed(1)}" fill="${color}"/>`;}).join('');
+    return`<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #ccc">
+      <text x="${W/2}" y="12" text-anchor="middle" font-size="7" font-weight="bold" font-family="Arial" fill="#000">${label}</text>
+      <rect x="${PL}" y="${PT}" width="${cW}" height="${cH}" fill="white" stroke="#999" stroke-width="0.5"/>
       ${yGridSvg.join('')}${xGridSvg.join('')}
-      ${critSvg}${dpLine}${curveSvg}${dots}${dpLabel}
-      <line x1="${PL}" y1="${PT}" x2="${PL}" y2="${PT+cH}" stroke="#888" stroke-width="1"/>
-      <line x1="${PL}" y1="${PT+cH}" x2="${PL+cW}" y2="${PT+cH}" stroke="#888" stroke-width="1"/>
-      <text x="${PL+cW/2}" y="${PT-3}" font-size="8.5" font-weight="700" fill="#1f3864" text-anchor="middle">${label}</text>
-      <text x="${PL+cW/2}" y="${H-2}" font-size="7" fill="#666" text-anchor="middle">Pb (%)</text>
+      ${critSvg}${dpLine}${curveSvg}${diamonds}
+      <text x="${PL+cW/2}" y="${H-7}" text-anchor="middle" font-size="6" fill="#555">% Asphalt Binder</text>
     </svg>`;
   }
 
