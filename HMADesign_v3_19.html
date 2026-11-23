@@ -7936,96 +7936,140 @@ function _produceMarshallReportPDFInner(mixId,theme){
     </div>
   </div>`;
 
-  // ── PAGE 2 — Volumetric Calculations ──
+  // ── PAGE 2 — AC Binder Content Selection ──
   const tdS='padding:2px 3px;border:1px solid #aaa;text-align:center;vertical-align:middle';
+  const p075sel=selTrial?_blendGrad(selTrial,'0.075'):null;
+  function _pGmm(gmb,gmm){if(!gmb||!gmm)return null;return gmb/gmm*100;}
+  const selPtRes=(()=>{if(!designPb)return null;const sp=acPts.find(pt=>Math.abs(pt.Pb-designPb)<0.01);return sp?calcVolSelected(sp,info,combGsb||2.7):null;})();
 
-  const volSpecRows=acPts.map(pt=>{
-    const v0=(pt.vols&&pt.vols[0])||{};
-    const v1=(pt.vols&&pt.vols[1])||{};
-    const v2=(pt.vols&&pt.vols[2])||{};
-    const res=calcVolSelected(pt,info,combGsb||2.7);
-    if(!res)return `<tr><td colspan="12" style="${tdS}">No data for Pb=${pt.Pb}%</td></tr>`;
+  const volSpecRows=acPts.map((pt,ptIdx)=>{
+    const v0=(pt.vols&&pt.vols[0])||{},v1=(pt.vols&&pt.vols[1])||{},v2=(pt.vols&&pt.vols[2])||{};
+    const res=calcVolSelected(pt,info,combGsb||2.7);if(!res)return '';
     const GmbA=v0.Gmb,GmbB=v1.Gmb,GmbC=v2.Gmb;
     const GmmA=v0.GmmA,GmmB=v0.GmmB;
-    const isDesign=designPb&&Math.abs(pt.Pb-designPb)<0.01;
-    const bgStyle=isDesign?'background:#FFF2CC;':'';
-    const td3=(v,st)=>`<td rowspan="3" style="${tdS};${bgStyle}${st||''}">${v!=null&&v!==''?v:''}</td>`;
-    const r1=`<tr style="${bgStyle}">
-      ${td3(_ed(pt.Pb,1),'font-weight:bold')}
-      ${_td('A')}${_td(_ed(GmbA,3))}
-      ${td3(_ed(res.avgGmb,3),'font-weight:bold')}
-      ${_td(_ed(GmmA,3))}
-      ${td3(_ed(res.Gmm,3),'font-weight:bold')}
-      ${td3(_ed(res.Va,1),'font-weight:bold')}
-      ${td3(_ed(res.VMA,1))}
-      ${td3(_ed(res.Stab,0))}
-      ${td3(_ed(res.Flow,1))}
-      ${td3(_ed(res.avgGse,3))}
-      ${td3(_ed(v0.avgHeight,1))}
-    </tr>`;
-    const r2=`<tr style="${bgStyle}">${_td('B')}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,3))}</tr>`;
-    const r3=`<tr style="border-bottom:2px solid #888;${bgStyle}">${_td('C')}${_td(_ed(GmbC,3))}<td style="${tdS};${bgStyle}"></td></tr>`;
+    const pGmmA=_pGmm(GmbA,res.Gmm),pGmmB=_pGmm(GmbB,res.Gmm),pGmmC=_pGmm(GmbC,res.Gmm);
+    const avgPGmm=_pGmm(res.avgGmb,res.Gmm);
+    const stabArr=[v0.Stab,v1.Stab,v2.Stab].filter(v=>v!=null&&!isNaN(+v));
+    const avgStab=stabArr.length?stabArr.reduce((a,b)=>a+b,0)/stabArr.length:v0.Stab;
+    const flowArr=[v0.Flow,v1.Flow,v2.Flow].filter(v=>v!=null&&!isNaN(+v));
+    const avgFlow=flowArr.length?flowArr.reduce((a,b)=>a+b,0)/flowArr.length:v0.Flow;
+    const isD=designPb&&Math.abs(pt.Pb-designPb)<0.01;
+    const bg=isD?'background:#FFF2CC;':'';
+    const td3v=(v,st)=>`<td rowspan="3" style="${tdS};${bg}${st||''}">${v!=null&&v!==''?v:''}</td>`;
+    const r1=`<tr style="${bg}">${td3v('<b>'+(ptIdx+1)+'</b>')}${td3v('<b>'+_ed(pt.Pb,1)+'</b>')}
+      ${_td('A')}${_td(_ed(GmbA,3))}${td3v(_ed(res.avgGmb,3),';font-weight:bold')}
+      ${_td(_ed(GmmA,3))}${td3v(_ed(res.Gmm,3),';font-weight:bold')}
+      ${td3v(_ed(res.Va,1),';font-weight:bold')}${td3v(_ed(res.VMA,1))}
+      ${td3v(_ed(avgStab,0))}${td3v(_ed(avgFlow,1))}
+      ${_td(_ed(pGmmA,1))}${td3v(_ed(avgPGmm,1),';font-weight:bold')}
+      ${td3v(_ed(res.avgGse,3))}${td3v(_ed(v0.avgWaterAbs,2))}${td3v(_ed(v0.avgHeight,1))}</tr>`;
+    const r2=`<tr style="${bg}">${_td('B')}${_td(_ed(GmbB,3))}${_td(_ed(GmmB,3))}${_td(_ed(pGmmB,1))}</tr>`;
+    const r3=`<tr style="border-bottom:2px solid #888;${bg}">${_td('C')}${_td(_ed(GmbC,3))}<td style="${tdS};${bg}"></td>${_td(_ed(pGmmC,1))}</tr>`;
     return r1+r2+r3;
   }).join('');
 
-  const p075sel=selTrial?_blendGrad(selTrial,'0.075'):null;
-  const volSummaryRows=acPts.map(pt=>{
-    const res=calcVolSelected(pt,info,combGsb||2.7,p075sel);
-    if(!res)return '';
-    const isDesign=designPb&&Math.abs(pt.Pb-designPb)<0.01;
-    const bg=isDesign?'background:#FFF2CC;':'';
-    return `<tr style="${bg}">
-      ${_td(_ed(pt.Pb,1),';font-weight:bold')}
-      ${_td(_ed(res.Va,1))}${_td(_ed(res.VMA,1))}${_td(_ed(res.VFA,1))}
+  const volSummaryRows=acPts.map((pt,ptIdx)=>{
+    const res=calcVolSelected(pt,info,combGsb||2.7,p075sel);if(!res)return '';
+    const isD=designPb&&Math.abs(pt.Pb-designPb)<0.01;const bg=isD?'background:#FFF2CC;':'';
+    return `<tr style="${bg}">${_td('<b>'+(ptIdx+1)+'</b>')}${_td(_ed(pt.Pb,1),';font-weight:bold')}
+      ${_td(vmaMin!==null?'≥'+_n(vmaMin,1):'—')}${_td(_ed(res.VFA,1))}${_td(_ed(res.Va,1),';font-weight:bold')}
       ${_td(_ed(res.Pba_pct,2))}${_td(_ed(res.Pbe,2))}${_td(_ed(res.DP,2))}
-      ${_td(_ed(res.Stab,0))}${_td(_ed(res.Flow,1))}
-    </tr>`;
+      ${_td(_ed(res.Stab,0))}${_td(_ed(res.Flow,1))}</tr>`;
   }).join('');
 
-  const criRow=`<tr style="background:#DCE6F1;font-style:italic">
-    ${_td('CRITERIA')}
-    ${_td(`${vaR[0]}–${vaR[1]}`)}
-    ${_td(vmaMin!==null?`≥${_n(vmaMin,1)}`:'—')}
-    ${_td('65–75')}
-    ${_td('—')}${_td('—')}${_td('0.6–1.2')}
-    ${_td(`≥${stabMin}`)}${_td(`≥${flowMin}`)}
-  </tr>`;
+  const criRow=`<tr style="background:#BDD7EE;font-style:italic">
+    <td style="${tdS};background:#BDD7EE;font-style:italic">¹ Design Criteria</td>
+    <td style="${tdS};background:#BDD7EE"></td>
+    ${_td(vmaMin!==null?'≥'+_n(vmaMin,1):'—')}${_td('65–75')}${_td(vaR[0]+'–'+vaR[1])}
+    ${_td('—')}${_td('—')}${_td('0.6–1.2')}${_td('≥'+stabMin)}${_td('≥'+flowMin)}</tr>`;
 
   const p2=`<div class="page">
-    ${_pageHdr(2)}
-    ${_secTitle('VOLUMETRIC DATA — COMPACTED SPECIMEN MEASUREMENTS')}
-    <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;table-layout:fixed">
+    <div style="display:flex;justify-content:flex-end;margin-bottom:5px">
+      <div style="border:1.5px solid #000;padding:4px 20px;font-size:13pt;font-weight:bold;font-family:Arial">AC Binder Content Selection</div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;margin-bottom:5px">
+      <tr>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mix No.</td>
+        <td style="border:none;padding:1px 8px">${_edStr(mix.mixNo||'')}</td>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">PGAC</td>
+        <td style="border:none;padding:1px 6px">${_edStr(mix.pgacSup||'')}</td>
+        <td style="border:none;padding:1px 4px">${_edStr(mix.pgac||'')}</td>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">* G<sub>sb</sub></td>
+        <td style="border:none;padding:1px 8px">${_ed(combGsb,3)}</td>
+        <td style="border:none;padding:1px 4px 1px 10px;font-weight:bold;white-space:nowrap">Selected Blend</td>
+        <td style="border:1px solid #000;min-width:30px;padding:1px 8px">&nbsp;</td>
+        <td style="border:1px solid #000;min-width:60px;padding:1px 20px">&nbsp;</td>
+      </tr>
+      <tr>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mix Type</td>
+        <td style="border:none;padding:1px 8px">${_edStr(info.mixType||'')}</td>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mixing Temp.</td>
+        <td style="border:none;padding:1px 6px">${_ed(mix.tMix,0)} °C</td>
+        <td style="border:none"></td>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">G<sub>b</sub></td>
+        <td style="border:none;padding:1px 8px">${_ed(info.Gb||1.022,3)}</td>
+        <td colspan="3" style="border:none;padding:1px 4px;font-size:6pt;font-style:italic">* Combined G<sub>sb</sub> calculated using individual aggregate stockpile samples.</td>
+      </tr>
+      <tr>
+        <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Compaction Temp.</td>
+        <td style="border:none;padding:1px 8px">${_ed(mix.tComp,0)} °C</td>
+        <td colspan="5" style="border:none"></td>
+        <td colspan="2" style="border:none;text-align:right;font-weight:bold;padding:1px 4px">OPSS 1150</td>
+        <td style="border:none"></td>
+      </tr>
+    </table>
+    <table style="width:100%;border-collapse:collapse;font-size:6pt;font-family:Arial;table-layout:fixed;margin-bottom:3px">
       <colgroup>
-        <col style="width:5%"><col style="width:5%"><col style="width:8%"><col style="width:8%">
-        <col style="width:8%"><col style="width:8%"><col style="width:7%"><col style="width:7%">
-        <col style="width:9%"><col style="width:7%"><col style="width:8%"><col style="width:9%">
+        <col style="width:4%"><col style="width:5%"><col style="width:4%">
+        <col style="width:6%"><col style="width:7%">
+        <col style="width:6%"><col style="width:7%">
+        <col style="width:5%"><col style="width:5%">
+        <col style="width:7%"><col style="width:5.5%">
+        <col style="width:5.5%"><col style="width:7%">
+        <col style="width:6%"><col style="width:7%"><col style="width:8%">
       </colgroup>
       <tr style="background:#1F3864;color:white;font-weight:bold">
-        <th style="${tdS}">Pb<br>%</th>
-        <th style="${tdS}">Spec</th>
-        <th style="${tdS}">G<sub>mb</sub><br>(ind.)</th>
-        <th style="${tdS}">G<sub>mb</sub><br>(avg)</th>
-        <th style="${tdS}">G<sub>mm</sub><br>(ind.)</th>
-        <th style="${tdS}">G<sub>mm</sub><br>(avg)</th>
-        <th style="${tdS}">Va<br>%</th>
-        <th style="${tdS}">VMA<br>%</th>
-        <th style="${tdS}">Stability<br>N</th>
-        <th style="${tdS}">Flow<br>0.25mm</th>
-        <th style="${tdS}">Avg<br>G<sub>se</sub></th>
-        <th style="${tdS}">Avg Ht<br>mm</th>
+        <th colspan="16" style="padding:2px 4px;border:1px solid #aaa;text-align:left;font-size:5.5pt;font-weight:normal">
+          Diameter of Mold ${_edStr('101.6')} mm &nbsp;&nbsp;&nbsp; Compaction ${_edStr(String(blowsSide))} bps &nbsp;&nbsp;&nbsp;
+          % G<sub>mm</sub> @ P<sub>b</sub>: <b>${selPtRes&&selPtRes.avgGmb&&selPtRes.Gmm?_n(selPtRes.avgGmb/selPtRes.Gmm*100,1):''}</b> &nbsp;&nbsp;&nbsp;
+          G<sub>se</sub> @ P<sub>b</sub>: <b>${selPtRes?_n(selPtRes.avgGse,3):''}</b> &nbsp;&nbsp;&nbsp; OPSS 1150 &nbsp;&nbsp; (63.5 ± 1.5)
+        </th>
+      </tr>
+      <tr style="background:#1F3864;color:white;font-weight:bold">
+        <th rowspan="2" style="${tdS}">No.</th>
+        <th rowspan="2" style="${tdS}">P<sub>b</sub><br>%</th>
+        <th rowspan="2" style="${tdS}">Spec</th>
+        <th colspan="2" style="${tdS}">G<sub>mb</sub></th>
+        <th colspan="2" style="${tdS}">G<sub>mm</sub></th>
+        <th rowspan="2" style="${tdS}">¹P<sub>a</sub></th>
+        <th rowspan="2" style="${tdS}">VMA</th>
+        <th rowspan="2" style="${tdS}">Corr. Stability, N<br><span style="font-weight:normal;font-size:5pt">Avg.</span></th>
+        <th rowspan="2" style="${tdS}">Flow, 0.25 mm<br><span style="font-weight:normal;font-size:5pt">Avg.</span></th>
+        <th colspan="2" style="${tdS}">% G<sub>mm</sub></th>
+        <th rowspan="2" style="${tdS}">Avg.<br>G<sub>se</sub></th>
+        <th rowspan="2" style="${tdS}">Avg.<br>% W.Abs.</th>
+        <th rowspan="2" style="${tdS}">Avg.<br>Ht. mm</th>
+      </tr>
+      <tr style="background:#1F3864;color:white;font-weight:bold">
+        <th style="${tdS}"></th><th style="${tdS}">Avg.</th>
+        <th style="${tdS}"></th><th style="${tdS}">Avg.</th>
+        <th style="${tdS}"></th><th style="${tdS}">Avg.</th>
       </tr>
       ${volSpecRows}
     </table>
-    ${_secTitle('VOLUMETRIC PROPERTIES SUMMARY')}
-    ${_tbl()}
-      ${_th(['Pb, %','Va, %','VMA, %','VFA, %','P<sub>ba</sub>, %','P<sub>be</sub>, %','D/P','Stability, N','Flow'],'#1F3864')}
+    <div style="font-size:6pt;font-family:Arial;margin-bottom:4px">¹ Calculated as per LS-265.</div>
+    <table style="width:100%;border-collapse:collapse;font-size:6.5pt;font-family:Arial">
+      <tr style="background:#2E75B6;color:white">
+        <td colspan="10" style="padding:2px 6px;border:1px solid #aaa;font-weight:bold">Volumetric Properties</td>
+      </tr>
+      ${_th(['No.','P<sub>b</sub>','VMA min.','VFA','P<sub>a</sub>','P<sub>ba</sub>','P<sub>be</sub>','D/P','Stability, N','Flow'],'#1F3864')}
       ${criRow}
       ${volSummaryRows}
     </table>
-    <div style="margin-top:8px;font-family:Arial;font-size:7.5pt">
-      <span style="font-weight:bold">DESIGN BINDER CONTENT: </span>
-      <span contenteditable="true" class="ed" style="font-weight:bold">${_n(designPb,1)}</span>% AC
-      <span style="color:#666"> (highlighted row)</span>
+    <div style="margin-top:5px;font-family:Arial;font-size:6pt;line-height:1.6">
+      <div>¹ <em>OPSS.MUNI 1150 (Nov. 2020)</em></div>
+      <div>² <em>Recommended by the Asphalt Institute for Heavy Traffic conditions</em></div>
+      <div>³ <em>Superpave criteria (mixes with gradations that pass beneath the PCS Control Point, the DP shall be 0.8 – 1.6)</em></div>
     </div>
   </div>`;
 
