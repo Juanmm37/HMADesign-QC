@@ -7742,16 +7742,16 @@ function _produceMarshallReportPDFInner(mixId,theme){
   function _secTitle(t){return `<div style="display:inline-block;border:1.5px solid #000;padding:2px 8px;font-weight:bold;font-size:8.5pt;margin:8px 0 4px;font-family:Arial">${t}</div>`;}
   function _fmtSieve(s){const n=parseFloat(s);if(n<1)return n.toFixed(3);if(Number.isInteger(n))return n.toFixed(1);return String(n);}
   function _pageHdr(n){
-    const mixTypeStr=(mix.mixType||'')+' MUNI';
+    const mixTypeStr=(mt||'')+' MUNI';
     return `<div style="display:flex;justify-content:space-between;border-bottom:2px solid #000;padding-bottom:2px;margin-bottom:1px;font-family:Arial">
       <span style="font-weight:bold;font-size:8pt">CAPITAL PAVING INC.</span>
       <span style="font-weight:bold;font-size:8pt">MARSHALL MIX DESIGN REPORT</span>
-      <span style="font-weight:bold;font-size:8pt">MIX DESIGN NO. ${mix.mixNo||''}</span>
+      <span style="font-weight:bold;font-size:8pt">MIX DESIGN NO. ${_inf('mixNo')||''}</span>
     </div>
     <div style="display:flex;justify-content:space-between;margin-bottom:8px;font-family:Arial">
       <span style="font-size:7.5pt">${mixTypeStr}</span>
       <span style="font-size:7.5pt">PAGE ${n} of ${totalPages}</span>
-      <span style="font-size:7.5pt">${_fmtD(mix.dateCompleted)}</span>
+      <span style="font-size:7.5pt">${_fmtD(_inf('dateCompleted'))}</span>
     </div>`;
   }
 
