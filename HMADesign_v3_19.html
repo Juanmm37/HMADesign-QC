@@ -7838,8 +7838,8 @@ function _produceMarshallReportPDFInner(mixId,theme){
       <th style="padding:2px 3px;border:1px solid #aaa;text-align:center;width:20%">COMPACTION</th>
     </tr>
     <tr>
-      ${_td(_edStr(mix.pgacSup||''))}${_td(_edStr(mix.pgac||''))}
-      ${_td(_ed(mix.tMix,0)+'°C')}${_td(_ed(mix.tComp,0)+'°C')}
+      ${_td(_edStr(_inf('pgacSup')||''))}${_td(_edStr(_inf('pgac')||''))}
+      ${_td(_ed(_inf('tMix')||165,0)+'°C')}${_td(_ed(_inf('tComp')||150,0)+'°C')}
     </tr>
   </table>
   <div style="font-size:7pt;margin-top:2px">* Established by the supplier.</div>
