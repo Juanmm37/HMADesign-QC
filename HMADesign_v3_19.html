@@ -8051,7 +8051,7 @@ function _produceMarshallReportPDFInner(mixId,theme){
       </tr>
       <tr>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Compaction Temp.</td>
-        <td style="border:none;padding:1px 8px">${_ed(mix.tComp,0)} °C</td>
+        <td style="border:none;padding:1px 8px">${_ed(_inf('tComp')||150,0)} °C</td>
         <td colspan="5" style="border:none"></td>
         <td colspan="2" style="border:none;text-align:right;font-weight:bold;padding:1px 4px">OPSS 1150</td>
         <td style="border:none"></td>
