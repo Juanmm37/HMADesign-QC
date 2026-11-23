@@ -8262,7 +8262,7 @@ function _produceMarshallReportPDFInner(mixId,theme){
     <span style="font-size:8pt;color:#555;align-self:center">Click any value to edit before saving.</span>
   </div>
   <div class="no-print" style="height:36px"></div>
-  ${p1}${p2}
+  ${p1}${p2}${_pcPts.length>=2?p3:''}
   </body></html>`;
 
   let finalHtml=html;
