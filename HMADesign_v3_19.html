@@ -7683,9 +7683,46 @@ function _produceMarshallReportPDFInner(mixId,theme){
   const acPts=mix.acPoints||[];
   const SLOT_KEYS=['CA1','CA2','CA3','FA1','FA2','BHF','RAP1','RAP2'];
   const SIEVES_M=['26.5','19','16','13.2','9.5','4.75','2.36','1.18','0.6','0.3','0.15','0.075'];
-  const totalPages=2;
+  const totalPages=3;
   const BLOWS_SIDE={'HL1':50,'HL2':50,'HL3F':50,'HL4F':50,'HL3':75,'HL3HS':75,'HL4':75,'HL8':75,'DFC':75,'MDBC':75,'HDBC':75};
   const blowsSide=BLOWS_SIDE[mt]||75;
+
+  // ── Property curves (rehydrate predict methods, fit Stab/Flow inline) ──
+  const _pcRaw=mix.propertyCurves||{};
+  const _pcPts=(_pcRaw.pts||[]).filter(p=>p.Pb!=null&&!isNaN(p.Pb));
+  const pc=Object.assign({},_pcRaw);
+  // Reconstruct predict methods lost during JSON serialization
+  ['Va','VMA','VFA','avgGmb','Gmm','Stab','Flow'].forEach(prop=>{
+    const d=pc[prop];if(!d)return;
+    if(d.linear&&typeof d.linear.predict!=='function'&&d.linear.m!=null){const{m,b}=d.linear;d.linear.predict=x=>m*x+b;}
+    if(d.poly&&typeof d.poly.predict!=='function'&&Array.isArray(d.poly.coefs)){
+      const coefs=d.poly.coefs;
+      const pbs=_pcPts.map(p=>p.Pb);const xMin=Math.min(...pbs),xMax=Math.max(...pbs),xRange=xMax-xMin||1;
+      d.poly.predict=x=>{const xn=(x-xMin)/xRange;return coefs.reduce((s,c,i)=>s+c*Math.pow(xn,i),0);};
+    }
+  });
+  // Fit Stab and Flow poly curves from pts (not computed in computePropertyCurves)
+  function _polyFitFrom(pts,key){
+    const valid=pts.filter(p=>p[key]!=null&&!isNaN(Number(p[key])));
+    if(valid.length<2)return null;
+    const xs=valid.map(p=>+p.Pb),ys=valid.map(p=>+p[key]);
+    const xMin=Math.min(...xs),xMax=Math.max(...xs),xRange=xMax-xMin||1;
+    const xn=xs.map(x=>(x-xMin)/xRange);
+    let s=[0,0,0,0,0],r=[0,0,0];
+    for(let i=0;i<xs.length;i++){const v=xn[i];s[0]+=1;s[1]+=v;s[2]+=v*v;s[3]+=v*v*v;s[4]+=v*v*v*v;r[0]+=ys[i];r[1]+=v*ys[i];r[2]+=v*v*ys[i];}
+    const mat=[[s[0],s[1],s[2],r[0]],[s[1],s[2],s[3],r[1]],[s[2],s[3],s[4],r[2]]];
+    for(let i=0;i<3;i++){let mx=i;for(let k=i+1;k<3;k++)if(Math.abs(mat[k][i])>Math.abs(mat[mx][i]))mx=k;[mat[i],mat[mx]]=[mat[mx],mat[i]];if(Math.abs(mat[i][i])<1e-10)return null;for(let k=i+1;k<3;k++){const c=mat[k][i]/mat[i][i];for(let j=i;j<4;j++)mat[k][j]-=c*mat[i][j];}}
+    const a=Array(3);for(let i=2;i>=0;i--){a[i]=mat[i][3];for(let j=i+1;j<3;j++)a[i]-=mat[i][j]*a[j];a[i]/=mat[i][i];}
+    return{coefs:a,xMin,xRange,predict:x=>{const xn=(x-xMin)/xRange;return a[0]+a[1]*xn+a[2]*xn*xn;}};
+  }
+  if(_pcPts.length>=2){
+    if(!pc.Stab){pc.Stab={poly:_polyFitFrom(_pcPts,'Stab'),linear:null};}
+    else if(!pc.Stab.poly||typeof pc.Stab.poly.predict!=='function'){pc.Stab.poly=_polyFitFrom(_pcPts,'Stab');}
+    if(!pc.Flow){pc.Flow={poly:_polyFitFrom(_pcPts,'Flow'),linear:null};}
+    else if(!pc.Flow.poly||typeof pc.Flow.poly.predict!=='function'){pc.Flow.poly=_polyFitFrom(_pcPts,'Flow');}
+  }
+  const _rt=mix.propCurvesRegType||'poly'; // prefer poly (Juan's preference)
+  function _predAt(key,pb){if(!pb)return null;const d=pc[key];if(!d)return null;const m=d[_rt]||d.poly||d.linear;return(m&&typeof m.predict==='function')?m.predict(pb):null;}
 
   // ── Helpers ──
   function _fmtD(iso){if(!iso)return '';const d=new Date(iso+'T00:00:00');if(isNaN(d))return iso;return d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}).toUpperCase();}
