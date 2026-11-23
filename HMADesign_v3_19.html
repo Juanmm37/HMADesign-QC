@@ -7816,12 +7816,12 @@ function _produceMarshallReportPDFInner(mixId,theme){
       <th style="${_vTD};text-align:center">SELECTED</th>
       <th style="${_vTD};text-align:center">CRITERIA</th>
     </tr>
-    <tr style="height:14px"><td style="${_vTD};text-align:left">Air Voids (%)</td>${_td(_ed(selRes?selRes.Va:null,1))}${_td(`${vaR[0]} – ${vaR[1]}`)}</tr>
-    <tr style="height:14px"><td style="${_vTD};text-align:left">VMA (%)</td>${_td(_ed(selRes?selRes.VMA:null,1))}${_td(vmaMin!==null?`≥ ${_n(vmaMin,1)}`:'—')}</tr>
-    <tr style="height:14px"><td style="${_vTD};text-align:left">Flow, 0.25 mm</td>${_td(_ed(selRes?selRes.Flow:null,1))}${_td(`≥ ${flowMin}`)}</tr>
-    <tr style="height:14px"><td style="${_vTD};text-align:left">Stability, N</td>${_td(_ed(selRes?selRes.Stab:null,0))}${_td(`≥ ${stabMin}`)}</tr>
-    <tr style="height:14px"><td style="${_vTD};text-align:left">G<sub>mb</sub> (BRD)</td>${_td(_ed(selRes?selRes.avgGmb:null,3))}${_td('—')}</tr>
-    <tr style="height:14px"><td style="${_vTD};text-align:left">G<sub>mm</sub> (MRD)</td>${_td(_ed(selRes?selRes.Gmm:null,3))}${_td('—')}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">Air Voids (%)</td>${_td(_ed(_predAt('Va',designPb)??selRes?.Va??null,1))}${_td(`${vaR[0]} – ${vaR[1]}`)}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">VMA (%)</td>${_td(_ed(_predAt('VMA',designPb)??selRes?.VMA??null,1))}${_td(vmaMin!==null?`≥ ${_n(vmaMin,1)}`:'—')}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">Flow, 0.25 mm</td>${_td(_ed(_predAt('Flow',designPb)??selRes?.Flow??null,1))}${_td(`≥ ${flowMin}`)}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">Stability, N</td>${_td(_ed(_predAt('Stab',designPb)??selRes?.Stab??null,0))}${_td(`≥ ${stabMin}`)}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">G<sub>mb</sub> (BRD)</td>${_td(_ed(_predAt('avgGmb',designPb)??selRes?.avgGmb??null,3))}${_td('—')}</tr>
+    <tr style="height:14px"><td style="${_vTD};text-align:left">G<sub>mm</sub> (MRD)</td>${_td(_ed(_predAt('Gmm',designPb)??selRes?.Gmm??null,3))}${_td('—')}</tr>
   </table>`;
 
   // Asphalt cement + additives block
