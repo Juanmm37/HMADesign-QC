@@ -8036,8 +8036,8 @@ function _produceMarshallReportPDFInner(mixId,theme){
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">* G<sub>sb</sub></td>
         <td style="border:none;padding:1px 8px">${_ed(combGsb,3)}</td>
         <td style="border:none;padding:1px 4px 1px 10px;font-weight:bold;white-space:nowrap">Selected Blend</td>
-        <td style="border:1px solid #000;min-width:30px;padding:1px 8px">&nbsp;</td>
-        <td style="border:1px solid #000;min-width:60px;padding:1px 20px">&nbsp;</td>
+        <td style="border:1px solid #000;min-width:30px;padding:1px 8px;text-align:center;font-weight:bold">${selTrial?_edStr(String(selTrial.id||selIdx+1)):_edStr('')}</td>
+        <td style="border:1px solid #000;min-width:60px;padding:1px 8px">${_edStr(selTrial&&selTrial.notes?selTrial.notes:'')}</td>
       </tr>
       <tr>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mix Type</td>
