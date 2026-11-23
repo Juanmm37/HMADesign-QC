@@ -8029,10 +8029,10 @@ function _produceMarshallReportPDFInner(mixId,theme){
     <table style="width:100%;border-collapse:collapse;font-size:7pt;font-family:Arial;margin-bottom:5px">
       <tr>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mix No.</td>
-        <td style="border:none;padding:1px 8px">${_edStr(mix.mixNo||'')}</td>
+        <td style="border:none;padding:1px 8px">${_edStr(_inf('mixNo')||'')}</td>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">PGAC</td>
-        <td style="border:none;padding:1px 6px">${_edStr(mix.pgacSup||'')}</td>
-        <td style="border:none;padding:1px 4px">${_edStr(mix.pgac||'')}</td>
+        <td style="border:none;padding:1px 6px">${_edStr(_inf('pgacSup')||'')}</td>
+        <td style="border:none;padding:1px 4px">${_edStr(_inf('pgac')||'')}</td>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">* G<sub>sb</sub></td>
         <td style="border:none;padding:1px 8px">${_ed(combGsb,3)}</td>
         <td style="border:none;padding:1px 4px 1px 10px;font-weight:bold;white-space:nowrap">Selected Blend</td>
