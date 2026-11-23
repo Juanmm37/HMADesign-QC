@@ -8043,7 +8043,7 @@ function _produceMarshallReportPDFInner(mixId,theme){
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mix Type</td>
         <td style="border:none;padding:1px 8px">${_edStr(info.mixType||'')}</td>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">Mixing Temp.</td>
-        <td style="border:none;padding:1px 6px">${_ed(mix.tMix,0)} °C</td>
+        <td style="border:none;padding:1px 6px">${_ed(_inf('tMix')||165,0)} °C</td>
         <td style="border:none"></td>
         <td style="border:none;padding:1px 4px 1px 0;font-weight:bold;white-space:nowrap">G<sub>b</sub></td>
         <td style="border:none;padding:1px 8px">${_ed(info.Gb||1.022,3)}</td>
