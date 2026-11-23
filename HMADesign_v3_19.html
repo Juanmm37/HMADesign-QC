@@ -7669,10 +7669,12 @@ function _produceReportPDFInner(mixId,theme){
 }
 
 function _produceMarshallReportPDFInner(mixId,theme){
-  const mix=db.mixes.find(m=>m.id===mixId);
+  const mix=(ms&&ms.id===mixId)?ms:db.mixes.find(m=>m.id===mixId);
   if(!mix){alert('Mix not found.');return;}
   const info=mix.info||{};
-  const mt=info.mixType||'';
+  // _inf: read a field from ms.info (when mix===ms) or flat mix (when mix===db item)
+  function _inf(key){const iv=info[key];return(iv!=null&&iv!=='')? iv:mix[key];}
+  const mt=info.mixType||mix.mixType||'';
   const slots=mix.slots||{};
   const trials=mix.trials||[];
   const selIdx=(mix.selectedTrialIdx!==null&&mix.selectedTrialIdx!==undefined)?mix.selectedTrialIdx:0;
