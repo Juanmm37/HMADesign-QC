@@ -9583,7 +9583,7 @@ function calcDesignPb(){
 function rehydratePropertyCurves(){
   const pc=ms.propertyCurves;
   if(!pc)return;
-  ['Va','VMA','VFA','pGmmNini','avgGmb','pGmmNdes','DP','Gmm'].forEach(prop=>{
+  ['Va','VMA','VFA','pGmmNini','avgGmb','pGmmNdes','DP','Gmm','Stab','Flow'].forEach(prop=>{
     const d=pc[prop];if(!d)return;
     if(d.linear&&typeof d.linear.predict!=='function'&&d.linear.m!==undefined){
       const{m,b}=d.linear;d.linear.predict=x=>m*x+b;
