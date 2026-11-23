@@ -8113,10 +8113,6 @@ function _produceMarshallReportPDFInner(mixId,theme){
   </div>`;
 
   // ── PAGE 3 — Test Property Curves ──
-  (()=>{
-    // No data: skip
-    if(_pcPts.length<2){return;}
-  })();
   const _pbsAll=_pcPts.map(p=>p.Pb).sort((a,b)=>a-b);
   const _pbMin=(_pbsAll[0]||4)-0.3,_pbMax=(_pbsAll[_pbsAll.length-1]||7)+0.3;
   const mixNoStr=_inf('mixNo')||'';
