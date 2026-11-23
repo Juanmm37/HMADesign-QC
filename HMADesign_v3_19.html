@@ -9666,7 +9666,11 @@ function renderS7PropCurves(){
     // Y-axis grid with nice intervals
     const yRange=yMax-yMin;
     let yInterval=0.001;
-    if(yRange>50)yInterval=10;
+    if(yRange>5000)yInterval=1000;
+    else if(yRange>2000)yInterval=500;
+    else if(yRange>500)yInterval=100;
+    else if(yRange>200)yInterval=50;
+    else if(yRange>50)yInterval=10;
     else if(yRange>20)yInterval=5;
     else if(yRange>10)yInterval=2;
     else if(yRange>5)yInterval=1;
@@ -9678,13 +9682,14 @@ function renderS7PropCurves(){
     else yInterval=0.01;
 
     const yGridLines=[];
-    const yStart=Math.ceil(yMin*1000/yInterval)/1000*yInterval;
+    const yStart=Math.ceil(yMin/yInterval)*yInterval;
     const numSteps=Math.round((yMax-yStart)/yInterval)+1;
     for(let i=0;i<numSteps;i++){
-      const v=Math.round((yStart+i*yInterval)*1000)/1000;
-      if(v>=yMin-0.001&&v<=yMax+0.001){
-        const decimals=(prop==='avgGmb'||prop==='Gmm')?3:1;
-        yGridLines.push(`<line x1="${PL}" y1="${yOf(v)}" x2="${PL+cW}" y2="${yOf(v)}" stroke="#eee" stroke-width="0.6"/><text x="${PL-3}" y="${yOf(v)+3}" font-size="8" fill="#999" text-anchor="end">${v.toFixed(decimals)}</text>`);
+      const v=Math.round((yStart+i*yInterval)*1e6)/1e6;
+      if(v>=yMin-yInterval*0.01&&v<=yMax+yInterval*0.01){
+        const decimals=(prop==='avgGmb'||prop==='Gmm')?3:(prop==='Stab')?0:1;
+        const lbl=v.toFixed(decimals);
+        yGridLines.push(`<line x1="${PL}" y1="${yOf(v)}" x2="${PL+cW}" y2="${yOf(v)}" stroke="#eee" stroke-width="0.6"/><text x="${PL-3}" y="${yOf(v)+3}" font-size="${lbl.length>5?7:8}" fill="#999" text-anchor="end">${lbl}</text>`);
       }
     }
     const yGrid=yGridLines.join('');
