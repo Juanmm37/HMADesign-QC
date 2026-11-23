@@ -6303,7 +6303,7 @@ const LOGO_CCIL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAioAAAEUCAYAAAAFq
 
 function produceReportPDF(mixId,theme){
   try{
-    const _m=db.mixes.find(m=>m.id===mixId);
+    const _m=(ms&&ms.id===mixId)?ms:db.mixes.find(m=>m.id===mixId);
     const _fam=_m&&_m.info?_m.info.family:'';
     if(_fam==='Marshall'){_produceMarshallReportPDFInner(mixId,theme||'blue');}
     else{_produceReportPDFInner(mixId,theme||'blue');}
